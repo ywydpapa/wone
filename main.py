@@ -24,11 +24,12 @@ import dotenv
 from starlette.responses import JSONResponse
 from datetime import datetime, timedelta
 import funchub
-from funchub import ALGORITHM, JWT_SECRET_KEY, get_password_hash, verify_password, get_current_user
 from typing import Optional
-import phapp
-from routers import board
 import shutil
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+import uvicorn
 
 dotenv.load_dotenv()
 DATABASE_URL = os.getenv("dburl")
@@ -62,9 +63,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-app.include_router(phapp.router)
-
 
 templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -105,11 +103,12 @@ def to_int(s, default=0):
         return default
 
 
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
-
-
-@app.get("/hello/{name}")
-async def say_hello(name: str):
-    return {"message": f"Hello {name}"}
+@app.get("/", response_class=HTMLResponse)
+async def read_dashboard(request: Request):
+    return templates.TemplateResponse(
+        request=request, name="/top/index.html", context={
+            "request": request,
+            "page_title": "업무 대시보드",
+            "user_name": "관리자"
+        }
+    )
