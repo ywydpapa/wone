@@ -9,7 +9,7 @@ from fastapi import (
     Form,
     Response,
     HTTPException,
-    Body,File, UploadFile
+    Body, File, UploadFile
 )
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -26,9 +26,6 @@ from datetime import datetime, timedelta
 import funchub
 from typing import Optional
 import shutil
-from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
 import uvicorn
 
 dotenv.load_dotenv()
@@ -43,18 +40,14 @@ engine = create_async_engine(
     pool_recycle=1800,
 )
 
-
 async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
-
 app = FastAPI()
-
 
 app.add_middleware(
     SessionMiddleware,
     secret_key=os.getenv("SESSION_SECRET_KEY", "supersecretkey"),
 )
-
 
 app.add_middleware(
     CORSMiddleware,
@@ -81,34 +74,128 @@ async def get_db():
         yield session
 
 
-def _clean_str(value: object) -> str | None:
-    if value is None:
-        return None
-    s = str(value).strip()
-    return s if s != "" else None
-
-def _clean_int(value: object) -> int | None:
-    s = _clean_str(value)
-    if s is None:
-        return None
-    try:
-        return int(s)
-    except ValueError:
-        raise ValueError(f"Invalid integer input: {s!r}")
-
-def to_int(s, default=0):
-    try:
-        return int(s)
-    except Exception:
-        return default
+# --- 세션 체크용 헬퍼 함수 ---
+def check_login(request: Request):
+    """세션에 logined 값이 없으면 False 반환"""
+    return request.session.get("logined", False)
 
 
 @app.get("/", response_class=HTMLResponse)
 async def read_dashboard(request: Request):
+    # 로그인 상태가 아니면 로그인 페이지로 리다이렉트
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+
     return templates.TemplateResponse(
         request=request, name="/top/index.html", context={
             "request": request,
             "page_title": "업무 대시보드",
-            "user_name": "관리자"
+            "user_name": request.session.get("username", "관리자")
         }
     )
+
+
+@app.get("/resume", response_class=HTMLResponse)
+async def resume(request: Request):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+
+    return templates.TemplateResponse(
+        request=request, name="/top/resume.html", context={
+            "request": request,
+            "page_title": "채용/인재",
+            "user_name": request.session.get("username", "관리자")
+        }
+    )
+
+
+@app.get("/emp_dash", response_class=HTMLResponse)
+async def emp_dash(request: Request):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+
+    return templates.TemplateResponse(
+        request=request, name="/top/emp_dash.html", context={
+            "request": request,
+            "page_title": "업무 대시보드",
+            "user_name": request.session.get("username", "관리자")
+        }
+    )
+
+
+@app.get("/manage_dash", response_class=HTMLResponse)
+async def manage_dash(request: Request):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+
+    return templates.TemplateResponse(
+        request=request, name="/top/manage_dash.html", context={
+            "request": request,
+            "page_title": "관리자 대시보드",
+            "user_name": request.session.get("username", "관리자")
+        }
+    )
+
+
+@app.get("/youtube_edit", response_class=HTMLResponse)
+async def yt_edit(request: Request):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+
+    return templates.TemplateResponse(
+        request=request, name="/top/youtube_edit.html", context={
+            "request": request,
+            "page_title": "관리자 대시보드",
+            "user_name": request.session.get("username", "관리자")
+        }
+    )
+
+@app.get("/real_trans", response_class=HTMLResponse)
+async def real_trans(request: Request):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+
+    return templates.TemplateResponse(
+        request=request, name="/apps/realtime_trans.html", context={
+            "request": request,
+            "page_title": "관리자 대시보드",
+            "user_name": request.session.get("username", "관리자")
+        }
+    )
+
+@app.get("/login", response_class=HTMLResponse)
+async def login(request: Request):
+    # 이미 로그인된 상태라면 메인 페이지(/)로 리다이렉트
+    if check_login(request):
+        return RedirectResponse(url="/", status_code=303)
+
+    return templates.TemplateResponse(
+        request=request, name="/login/login.html", context={
+            "request": request,
+            "page_title": "로그인",
+        }
+    )
+
+
+@app.post("/login_check")
+async def login_check(request: Request, username: str = Form(...), password: str = Form(...)):
+    # TODO: 실제 DB를 조회하여 username과 password가 맞는지 검증하는 로직 추가 필요
+    # 여기서는 임시로 값이 들어오기만 하면 로그인 성공으로 간주합니다.
+    if username and password:
+        # 세션에 로그인 상태 저장
+        request.session["logined"] = True
+        request.session["username"] = username
+
+        # 로그인 성공 시 메인 페이지로 리다이렉트
+        return RedirectResponse(url="/", status_code=303)
+    else:
+        # 실패 시 다시 로그인 페이지로
+        return RedirectResponse(url="/login", status_code=303)
+
+
+@app.get("/logout")
+async def logout(request: Request):
+    # 세션 데이터 전체 삭제 (로그아웃)
+    request.session.clear()
+    # 로그아웃 후 로그인 페이지로 리다이렉트
+    return RedirectResponse(url="/login", status_code=303)

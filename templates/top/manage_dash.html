@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ko">
+{% include 'common/header.html' %}
+<body>
+
+<!-- Navbar -->
+{% include 'common/topbar.html' %}
+
+<!-- Header -->
+<div class="dash-header">
+    <div class="container-fluid px-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2>근로자 업무 현황 대시보드</h2>
+                <p class="mb-0 text-white-50">담당 부서: IT 지원팀 / 경영지원팀</p>
+            </div>
+            <button class="btn btn-primary bg-white text-dark border-0 fw-bold px-4 rounded-pill">
+                <i class="fas fa-plus me-2"></i>새 업무 할당
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="container-fluid px-4 pb-5">
+    <!-- Stats -->
+    <div class="row">
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card">
+                <div class="stat-icon bg-blue-light"><i class="fas fa-users"></i></div>
+                <div class="stat-info">
+                    <p>관리 중인 근로자</p>
+                    <h3>12<span>명</span></h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card">
+                <div class="stat-icon bg-purple-light"><i class="fas fa-tasks"></i></div>
+                <div class="stat-info">
+                    <p>진행 중인 업무</p>
+                    <h3>24<span>건</span></h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card">
+                <div class="stat-icon bg-green-light"><i class="fas fa-clipboard-check"></i></div>
+                <div class="stat-info">
+                    <p>검토 대기 (완료)</p>
+                    <h3>5<span>건</span></h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card border-danger">
+                <div class="stat-icon bg-red-light"><i class="fas fa-hands-helping"></i></div>
+                <div class="stat-info">
+                    <p>미처리 지원 요청</p>
+                    <h3 class="text-danger">2<span>건</span></h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Left: Task Monitoring Table -->
+        <div class="col-xl-8 col-lg-7">
+            <div class="content-card">
+                <div class="card-title-wrap">
+                    <h5><i class="fas fa-list-alt me-2 text-primary"></i>실시간 업무 진행 현황</h5>
+                    <div class="d-flex gap-2">
+                        <select class="form-select form-select-sm w-auto">
+                            <option>전체 상태</option>
+                            <option>진행중</option>
+                            <option>지연</option>
+                            <option>검토대기</option>
+                        </select>
+                        <input type="text" class="form-control form-control-sm w-auto" placeholder="근로자 검색...">
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-custom table-hover">
+                        <thead>
+                            <tr>
+                                <th>근로자</th>
+                                <th>업무명</th>
+                                <th>상태</th>
+                                <th>마감 기한</th>
+                                <th>관리</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="worker-info">
+                                        <img src="https://ui-avatars.com/api/?name=김+민수&background=eef4fb&color=0056b3" alt="김민수">
+                                        <div>
+                                            <span class="worker-name">김민수</span>
+                                            <span class="worker-type">지체장애 / IT지원팀</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="fw-bold text-dark">웹 접근성 모니터링 결과 보고서 작성</td>
+                                <td><span class="status-badge status-progress">진행중</span></td>
+                                <td>오늘 18:00</td>
+                                <td>
+                                    <button class="btn btn-sm btn-light text-primary" title="메시지 보내기"><i class="far fa-envelope"></i></button>
+                                    <button class="btn btn-sm btn-light" title="상세보기"><i class="fas fa-chevron-right"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="worker-info">
+                                        <img src="https://ui-avatars.com/api/?name=이+지은&background=eef4fb&color=0056b3" alt="이지은">
+                                        <div>
+                                            <span class="worker-name">이지은</span>
+                                            <span class="worker-type">청각장애 / 경영지원팀</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="fw-bold text-dark">고객사 영수증 데이터 엑셀 입력</td>
+                                <td><span class="status-badge status-delayed">지연됨</span></td>
+                                <td class="text-danger">어제 18:00</td>
+                                <td>
+                                    <button class="btn btn-sm btn-light text-primary" title="메시지 보내기"><i class="far fa-envelope"></i></button>
+                                    <button class="btn btn-sm btn-light" title="상세보기"><i class="fas fa-chevron-right"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="worker-info">
+                                        <img src="https://ui-avatars.com/api/?name=박+준호&background=eef4fb&color=0056b3" alt="박준호">
+                                        <div>
+                                            <span class="worker-name">박준호</span>
+                                            <span class="worker-type">발달장애 / 디자인팀</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="fw-bold text-dark">이벤트 배너 시안 3종 제작</td>
+                                <td><span class="status-badge status-review">검토대기</span></td>
+                                <td>내일 12:00</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary" title="결과물 검토">검토</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="worker-info">
+                                        <img src="https://ui-avatars.com/api/?name=최+수진&background=eef4fb&color=0056b3" alt="최수진">
+                                        <div>
+                                            <span class="worker-name">최수진</span>
+                                            <span class="worker-type">시각장애 / 고객지원팀</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="fw-bold text-dark">주간 고객 문의 내역 분류</td>
+                                <td><span class="status-badge status-progress">진행중</span></td>
+                                <td>오늘 15:00</td>
+                                <td>
+                                    <button class="btn btn-sm btn-light text-primary" title="메시지 보내기"><i class="far fa-envelope"></i></button>
+                                    <button class="btn btn-sm btn-light" title="상세보기"><i class="fas fa-chevron-right"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-center mt-3">
+                    <a href="#" class="text-decoration-none fw-bold">전체 업무 보기 <i class="fas fa-arrow-right ms-1"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Support Requests & Quick Actions -->
+        <div class="col-xl-4 col-lg-5">
+            <!-- Urgent Support Requests -->
+            <div class="content-card border-danger border-opacity-25">
+                <div class="card-title-wrap mb-3">
+                    <h5 class="text-danger"><i class="fas fa-exclamation-circle me-2"></i>긴급 지원 요청 <span class="badge bg-danger rounded-pill ms-1">2</span></h5>
+                </div>
+
+                <div class="support-item">
+                    <div class="support-header">
+                        <span class="support-title"><i class="fas fa-hands-helping me-1"></i> 수어 통역 지원 요청</span>
+                        <span class="support-time">10분 전</span>
+                    </div>
+                    <div class="support-desc">
+                        <strong>이지은 (청각장애)</strong><br>
+                        "오늘 오후 2시 타 부서와의 긴급 화상회의에 수어 통역사 배정을 요청합니다."
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-sm btn-danger flex-grow-1">통역사 배정</button>
+                        <button class="btn btn-sm btn-outline-secondary">메시지</button>
+                    </div>
+                </div>
+
+                <div class="support-item">
+                    <div class="support-header">
+                        <span class="support-title"><i class="fas fa-question-circle me-1"></i> 업무 지시서 설명 요청</span>
+                        <span class="support-time">1시간 전</span>
+                    </div>
+                    <div class="support-desc">
+                        <strong>박준호 (발달장애)</strong><br>
+                        "새로 할당된 배너 디자인 가이드라인 내용이 이해하기 어렵습니다. 직무지도원 면담을 요청합니다."
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-sm btn-danger flex-grow-1">면담 일정 잡기</button>
+                        <button class="btn btn-sm btn-outline-secondary">메시지</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="content-card">
+                <div class="card-title-wrap">
+                    <h5><i class="fas fa-bolt me-2 text-primary"></i>빠른 실행</h5>
+                </div>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-outline-primary text-start p-3 fw-bold">
+                        <i class="fas fa-bullhorn me-2"></i> 전체 근로자 공지사항 발송
+                    </button>
+                    <button class="btn btn-outline-primary text-start p-3 fw-bold">
+                        <i class="fas fa-file-alt me-2"></i> 주간 업무 리포트 자동 생성
+                    </button>
+                    <button class="btn btn-outline-primary text-start p-3 fw-bold">
+                        <i class="fas fa-user-plus me-2"></i> 신규 근로자 계정 및 환경 설정
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap 5 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container">
+        <a class="navbar-brand" href="/"><span>W</span>no1</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mx-auto">
+                <li class="nav-item"><a class="nav-link active" href="/">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="/resume">채용/인재</a></li>
+                <li class="nav-item"><a class="nav-link" href="/emp_dash">업무 대시보드</a></li>
+                <li class="nav-item"><a class="nav-link" href="/manage_dash">관리자 대시보드</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Community</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
+            </ul>
+            <div class="d-flex align-items-center gap-4">
+                <!-- Accessibility Settings -->
+                <a href="#" class="text-secondary text-decoration-none" title="접근성 설정" data-bs-toggle="tooltip">
+                    <i class="fas fa-universal-access fs-4"></i>
+                </a>
+                <!-- Notifications -->
+                <a href="#" class="text-secondary text-decoration-none position-relative">
+                    <i class="far fa-bell fs-4"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle">
+                        <span class="visually-hidden">새로운 알림</span>
+                    </span>
+                </a>
+                <!-- User Dropdown -->
+                <div class="dropdown">
+                    <div class="user-profile" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="https://ui-avatars.com/api/?name=김+민수&background=eef4fb&color=0056b3" alt="User">
+                        <span class="name">김민수 님 <i class="fas fa-chevron-down ms-1 small"></i></span>
+                    </div>
+                    <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm mt-2">
+                        <li><a class="dropdown-item" href="#"><i class="far fa-user me-2"></i>내 프로필</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>설정</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="/logout"><i class="fas fa-sign-out-alt me-2"></i>로그아웃</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>

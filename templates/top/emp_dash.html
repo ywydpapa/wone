@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ko">
+{% include 'common/header.html' %}
+<body>
+
+<!-- Navbar -->
+{% include 'common/topbar.html' %}
+
+<!-- Dashboard Header -->
+<div class="dash-header">
+    <div class="container">
+        <h2>환영합니다, 김민수 님! 👋</h2>
+        <p>오늘 처리해야 할 새로운 업무가 3건 있습니다. 힘찬 하루 보내세요!</p>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="container pb-5">
+    <!-- Stats Row -->
+    <div class="row">
+        <div class="col-lg-4 col-md-6">
+            <div class="stat-card">
+                <div class="stat-icon bg-blue-light">
+                    <i class="fas fa-tasks"></i>
+                </div>
+                <div class="stat-info">
+                    <p>진행 중인 업무</p>
+                    <h3>3<span>건</span></h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6">
+            <div class="stat-card">
+                <div class="stat-icon bg-green-light">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-info">
+                    <p>이번 주 완료 업무</p>
+                    <h3>12<span>건</span></h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6">
+            <div class="stat-card">
+                <div class="stat-icon bg-yellow-light">
+                    <i class="far fa-envelope"></i>
+                </div>
+                <div class="stat-info">
+                    <p>새로운 메시지</p>
+                    <h3>2<span>건</span></h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-2">
+        <!-- Left Column: Task List -->
+        <div class="col-lg-8">
+            <div class="content-card">
+                <div class="card-title">
+                    <span><i class="fas fa-clipboard-list me-2 text-primary"></i>오늘의 할 일</span>
+                    <button class="btn btn-sm btn-outline-primary rounded-pill px-3">+ 새 업무 추가</button>
+                </div>
+
+                <div class="task-list">
+                    <!-- Task 1 -->
+                    <div class="task-item">
+                        <input class="form-check-input task-checkbox" type="checkbox" id="task1">
+                        <div class="task-content">
+                            <label class="task-title" for="task1">웹 접근성 모니터링 결과 보고서 작성</label>
+                            <div class="task-meta d-flex align-items-center gap-3">
+                                <span class="badge-status status-urgent">긴급</span>
+                                <span><i class="far fa-clock"></i> 오늘 18:00 까지</span>
+                                <span><i class="far fa-folder-open"></i> IT 지원팀</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-light btn-sm"><i class="fas fa-ellipsis-v"></i></button>
+                    </div>
+
+                    <!-- Task 2 -->
+                    <div class="task-item">
+                        <input class="form-check-input task-checkbox" type="checkbox" id="task2">
+                        <div class="task-content">
+                            <label class="task-title" for="task2">고객사 영수증 데이터 엑셀 입력 (200건)</label>
+                            <div class="task-meta d-flex align-items-center gap-3">
+                                <span class="badge-status status-progress">진행중</span>
+                                <span><i class="far fa-clock"></i> 내일 12:00 까지</span>
+                                <span><i class="far fa-folder-open"></i> 경영지원팀</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-light btn-sm"><i class="fas fa-ellipsis-v"></i></button>
+                    </div>
+
+                    <!-- Task 3 -->
+                    <div class="task-item">
+                        <input class="form-check-input task-checkbox" type="checkbox" id="task3">
+                        <div class="task-content">
+                            <label class="task-title" for="task3">주간 팀 화상 회의 참석</label>
+                            <div class="task-meta d-flex align-items-center gap-3">
+                                <span class="badge-status status-progress">대기</span>
+                                <span><i class="far fa-clock"></i> 오늘 14:00 (Zoom)</span>
+                                <span><i class="far fa-folder-open"></i> 공통 업무</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-light btn-sm"><i class="fas fa-ellipsis-v"></i></button>
+                    </div>
+
+                    <!-- Task 4 (Completed) -->
+                    <div class="task-item opacity-50">
+                        <input class="form-check-input task-checkbox" type="checkbox" id="task4" checked disabled>
+                        <div class="task-content">
+                            <label class="task-title text-decoration-line-through" for="task4">전일자 업무 일지 제출</label>
+                            <div class="task-meta d-flex align-items-center gap-3">
+                                <span class="badge-status status-done">완료</span>
+                                <span><i class="fas fa-check"></i> 오늘 09:00 제출됨</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Messages & Tools -->
+        <div class="col-lg-4">
+            <!-- Messages -->
+            <div class="content-card">
+                <div class="card-title">
+                    <span><i class="far fa-comments me-2 text-primary"></i>담당자 메시지</span>
+                    <a href="#" class="text-decoration-none small">전체보기</a>
+                </div>
+
+                <div class="msg-item">
+                    <div class="msg-header">
+                        <span class="msg-sender"><i class="fas fa-user-circle me-1"></i>이매니저</span>
+                        <span class="msg-time">오전 10:30</span>
+                    </div>
+                    <div class="msg-body">
+                        민수님, 오늘 오후 2시 화상회의 링크 메일로 보내드렸습니다. 수어 통역사분도 함께 참석하실 예정입니다.
+                    </div>
+                </div>
+
+                <div class="msg-item">
+                    <div class="msg-header">
+                        <span class="msg-sender"><i class="fas fa-user-circle me-1"></i>박팀장</span>
+                        <span class="msg-time">어제</span>
+                    </div>
+                    <div class="msg-body">
+                        접근성 보고서 초안 확인했습니다. 수정 요청사항 코멘트로 남겨두었으니 확인 부탁드립니다. 수고하셨습니다!
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Tools -->
+            <div class="content-card">
+                <div class="card-title">
+                    <span><i class="fas fa-toolbox me-2 text-primary"></i>업무 도구</span>
+                </div>
+                <a href="#" class="tool-btn">
+                    <i class="fas fa-file-signature"></i> 업무 일지 작성하기
+                </a>
+                <a href="/youtube_edit" class="tool-btn">
+                    <i class="fas fa-video"></i> 영상자료 편집 작업
+                </a>
+                <a href="/real_trans" class="tool-btn">
+                    <i class="fas fa-headphones-alt"></i> 실시간 자막/통역 지원 요청
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap 5 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Tooltip Initialization -->
+<script>
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+</script>
+</body>
+</html>

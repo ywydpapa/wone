@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>영상 편집 - Wno1</title>
+
+    <!-- Google Fonts: Cairo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* 공통 변수 및 기본 스타일 */
+        :root {
+            --primary-blue: #0056b3;
+            --light-blue: #eef4fb;
+            --dark-blue: #0a2540;
+            --text-color: #333333;
+            --gray-bg: #f8f9fa;
+            --youtube-red: #ff0000;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            color: var(--text-color);
+            background-color: var(--gray-bg);
+        }
+
+        /* Navbar */
+        .navbar {
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            background: #fff;
+        }
+        .navbar-brand {
+            font-weight: 900;
+            font-size: 1.8rem;
+            color: var(--dark-blue);
+        }
+        .navbar-brand span { color: var(--primary-blue); }
+        .nav-link {
+            font-weight: 600;
+            color: var(--text-color);
+            margin: 0 10px;
+            transition: color 0.3s;
+        }
+        .nav-link:hover, .nav-link.active { color: var(--primary-blue); }
+
+        /* Header */
+        .header-dash {
+            background: linear-gradient(135deg, var(--dark-blue) 0%, var(--primary-blue) 100%);
+            padding: 80px 0 130px;
+            text-align: center;
+            color: white;
+            position: relative;
+        }
+        .header-dash h2 {
+            font-weight: 700;
+            margin-bottom: 15px;
+            font-size: 2.5rem;
+        }
+        .header-dash p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Filter Section (Overlapping) */
+        .filter-section {
+            margin-top: -60px;
+            position: relative;
+            z-index: 10;
+        }
+        .filter-card {
+            background: #fff;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+        .form-control-lg, .form-select-lg {
+            border-radius: 10px;
+            font-size: 1rem;
+            padding: 15px 20px;
+            background-color: var(--gray-bg);
+            border: 1px solid #eee;
+        }
+        .form-control-lg:focus, .form-select-lg:focus {
+            box-shadow: none;
+            border-color: var(--primary-blue);
+        }
+        .btn-search {
+            background-color: var(--dark-blue);
+            color: white;
+            border-radius: 10px;
+            padding: 15px;
+            font-weight: 700;
+            width: 100%;
+            transition: all 0.3s;
+        }
+        .btn-search:hover {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+
+        /* Video Cards */
+        .list-section {
+            padding: 60px 0 100px;
+        }
+        .video-card {
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.03);
+            transition: transform 0.3s, box-shadow 0.3s;
+            height: 100%;
+            border: 1px solid #f0f0f0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .video-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+        .video-thumbnail {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            background-color: #000;
+        }
+        .video-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.85;
+            transition: opacity 0.3s, transform 0.5s;
+        }
+        .video-card:hover .video-thumbnail img {
+            opacity: 1;
+            transform: scale(1.05);
+        }
+        .play-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 3.5rem;
+            transition: color 0.3s, transform 0.3s;
+            z-index: 2;
+        }
+        .video-card:hover .play-btn {
+            color: var(--youtube-red);
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+        .duration-badge {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            color: #fff;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .video-content {
+            padding: 25px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .item-badge {
+            background-color: var(--light-blue);
+            color: var(--primary-blue);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-right: 5px;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+        .badge-shorts { background-color: #ffebee; color: var(--youtube-red); }
+
+        .video-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--dark-blue);
+            margin-bottom: 10px;
+            text-decoration: none;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .video-title:hover { color: var(--primary-blue); }
+
+        .video-meta {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            flex-grow: 1;
+        }
+        .video-meta div { margin-bottom: 5px; }
+        .video-meta i { width: 20px; color: var(--primary-blue); text-align: center; }
+
+        /* Tools Section */
+        .tools-section {
+            background: #fff;
+            padding: 80px 0;
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+        }
+        .tool-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        .pr-color { background: #e8e3ff; color: #9999ff; }
+        .ae-color { background: #e0f0ff; color: #9999ff; }
+        .ps-color { background: #e0f4ff; color: #31a8ff; }
+
+        /* Footer */
+        .footer {
+            background-color: var(--dark-blue);
+            color: #fff;
+            padding: 50px 0 20px;
+            text-align: center;
+        }
+        .footer a { color: #fff; text-decoration: none; opacity: 0.8; margin: 0 10px; }
+        .footer a:hover { opacity: 1; }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+{% include 'common/topbar.html' %}
+
+<!-- Header -->
+<div class="header-dash">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2">
+                <h2>유튜브 영상 편집 작업목록</h2>
+                <p>제작 완료된 영상은 검토용 사이트에 즉시 업로드 하여 크로스체크 하여야 합니다.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Search & Filter Section -->
+<div class="container filter-section">
+    <div class="filter-card">
+        <form action="#" method="GET">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <select class="form-select form-select-lg" name="category">
+                        <option value="">영상 카테고리 (전체)</option>
+                        <option value="vlog">브이로그 / 일상</option>
+                        <option value="gaming">게임 / 스트리밍 하이라이트</option>
+                        <option value="info">정보 전달 / 리뷰</option>
+                        <option value="shorts">쇼츠 / 릴스 / 틱톡</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select form-select-lg" name="style">
+                        <option value="">편집 스타일 (전체)</option>
+                        <option value="dynamic">화려함 / 빠른 호흡</option>
+                        <option value="calm">잔잔함 / 감성적</option>
+                        <option value="funny">예능형 / 자막 중심</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <input type="text" class="form-control form-control-lg" placeholder="검색어 (ex. 마인크래프트, 먹방)">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-search"><i class="fas fa-search me-2"></i>검색</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Portfolio List Section -->
+<div class="list-section">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold m-0">최근 작업물 <span class="text-muted fs-6 fw-normal">(총 3건)</span></h4>
+            <select class="form-select w-auto">
+                <option>최신순</option>
+                <option>조회수 높은순</option>
+            </select>
+        </div>
+
+        <div class="row g-4">
+            <!-- Video Card 1 -->
+            <div class="col-lg-4 col-md-6">
+                <div class="video-card">
+                    <div class="video-thumbnail">
+                        <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Gaming Thumbnail">
+                        <i class="fab fa-youtube play-btn"></i>
+                        <span class="duration-badge">12:45</span>
+                    </div>
+                    <div class="video-content">
+                        <div>
+                            <span class="item-badge">게임 하이라이트</span>
+                            <span class="item-badge badge-shorts">예능형</span>
+                        </div>
+                        <a href="#" class="video-title">[발로란트] 100일 동안 지하에서만 생존하기?! 레전드 하이라이트 모음</a>
+                        <div class="video-meta mt-3">
+                            <div><i class="fas fa-eye"></i> 조회수: 125회</div>
+                            <div><i class="fas fa-clock"></i> 작업 소요 시간: 3일</div>
+                            <div><i class="fas fa-tools"></i> 사용 툴: Premiere Pro, After Effects</div>
+                        </div>
+                        <hr class="text-muted">
+                        <a href="#" class="btn btn-outline-primary w-100 fw-bold">작업 결과 보기</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Card 2 -->
+            <div class="col-lg-4 col-md-6">
+                <div class="video-card">
+                    <div class="video-thumbnail">
+                        <img src="https://images.unsplash.com/photo-1511884642898-4c92249e20b6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Vlog Thumbnail">
+                        <i class="fab fa-youtube play-btn"></i>
+                        <span class="duration-badge">08:20</span>
+                    </div>
+                    <div class="video-content">
+                        <div>
+                            <span class="item-badge">브이로그</span>
+                            <span class="item-badge" style="background:#e8f5e9; color:#2e7d32;">감성적</span>
+                        </div>
+                        <a href="#" class="video-title">도쿄 여행 3박 4일 브이로그 | 신주쿠 맛집 털기, 지브리 미술관 방문기</a>
+                        <div class="video-meta mt-3">
+                            <div><i class="fas fa-eye"></i> 조회수: 45회</div>
+                            <div><i class="fas fa-clock"></i> 작업 소요 시간: 2일</div>
+                            <div><i class="fas fa-tools"></i> 사용 툴: Premiere Pro, 색보정(LUT)</div>
+                        </div>
+                        <hr class="text-muted">
+                        <a href="#" class="btn btn-outline-primary w-100 fw-bold">작업 결과 보기</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Card 3 -->
+            <div class="col-lg-4 col-md-6">
+                <div class="video-card">
+                    <div class="video-thumbnail">
+                        <img src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Shorts Thumbnail">
+                        <i class="fab fa-youtube play-btn"></i>
+                        <span class="duration-badge">00:59</span>
+                    </div>
+                    <div class="video-content">
+                        <div>
+                            <span class="item-badge badge-shorts">YouTube Shorts</span>
+                            <span class="item-badge">정보전달</span>
+                        </div>
+                        <a href="#" class="video-title">아이폰 15 프로 숨겨진 꿀기능 5가지 (1분 요약)</a>
+                        <div class="video-meta mt-3">
+                            <div><i class="fas fa-eye"></i> 조회수: 210회</div>
+                            <div><i class="fas fa-clock"></i> 작업 소요 시간: 6시간</div>
+                            <div><i class="fas fa-tools"></i> 사용 툴: Premiere Pro, Photoshop</div>
+                        </div>
+                        <hr class="text-muted">
+                        <a href="#" class="btn btn-outline-primary w-100 fw-bold">작업 결과 보기</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <nav class="mt-5">
+            <ul class="pagination justify-content-center">
+                <li class="page-item disabled"><a class="page-link" href="#">이전</a></li>
+                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#">다음</a></li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<!-- Tools & Skills Section -->
+<div class="tools-section text-center">
+    <div class="container">
+        <h3 class="fw-bold mb-5" style="color: var(--dark-blue);">사용 가능한 편집 툴</h3>
+        <div class="row justify-content-center g-4">
+            <div class="col-md-3 col-6">
+                <div class="tool-icon pr-color">
+                    <i class="fas fa-video"></i>
+                </div>
+                <h5 class="fw-bold">Premiere Pro</h5>
+                <p class="text-muted small">컷편집 / 오디오 / 기본 자막</p>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="tool-icon ae-color">
+                    <i class="fas fa-layer-group"></i>
+                </div>
+                <h5 class="fw-bold">After Effects</h5>
+                <p class="text-muted small">모션 그래픽 / 인트로 제작</p>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="tool-icon ps-color">
+                    <i class="fas fa-image"></i>
+                </div>
+                <h5 class="fw-bold">Photoshop</h5>
+                <p class="text-muted small">썸네일 제작 / 이미지 소스</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+    <div class="container">
+        <div class="mb-3">
+            <a href="#">이용약관</a>
+            <a href="#">개인정보처리방침</a>
+            <a href="#">포트폴리오 문의</a>
+        </div>
+        <div class="copyright text-muted small">
+            &copy; 2026 Wone Video Editing. All rights reserved.
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap 5 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
