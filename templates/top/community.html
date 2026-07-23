@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ko">
+{% include 'common/header.html' %}
+<style>
+    /* 커뮤니티 전용 추가 스타일 */
+    .post-item {
+        transition: all 0.2s ease-in-out;
+    }
+    .post-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.05)!important;
+        border-color: #0d6efd !important;
+    }
+    .tag-badge {
+        background-color: #f8f9fa;
+        color: #6c757d;
+        border: 1px solid #dee2e6;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    .tag-badge:hover {
+        background-color: #e9ecef;
+        color: #495057;
+    }
+</style>
+<body>
+
+<!-- Navbar -->
+{% include 'common/topbar.html' %}
+
+<!-- Dashboard Header -->
+<div class="dash-header">
+    <div class="container d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+            <h2>직무별 소통 라운지 ☕</h2>
+            <p>다양한 업종의 동료들과 업무 노하우, 고민, 최신 트렌드를 나누어 보세요.</p>
+        </div>
+        <div class="input-group" style="max-width: 300px;">
+            <input type="text" class="form-control rounded-start-pill pl-3" placeholder="관심있는 주제 검색...">
+            <button class="btn btn-light rounded-end-pill px-3 text-primary" type="button"><i class="fas fa-search"></i></button>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="container pb-5">
+    <div class="row mt-2">
+        <!-- Left Column: Community Posts -->
+        <div class="col-lg-8">
+            <div class="content-card">
+                <!-- Category Tabs -->
+                <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+                    <ul class="nav nav-pills gap-2" id="communityTabs">
+                        <li class="nav-item">
+                            <a class="nav-link active rounded-pill px-3 py-1" href="#">전체보기</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark bg-light rounded-pill px-3 py-1" href="#">💻 IT/개발</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark bg-light rounded-pill px-3 py-1" href="#">📊 경영/사무</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark bg-light rounded-pill px-3 py-1" href="#">🎨 디자인</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark bg-light rounded-pill px-3 py-1" href="#">📢 영업/마케팅</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="post-list">
+                    <!-- Post 1 (IT/개발) -->
+                    <div class="p-3 mb-3 border rounded bg-white post-item shadow-sm">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="badge bg-primary bg-opacity-10 text-primary border border-primary px-2 py-1">💻 IT/개발</span>
+                            <span class="small text-muted"><i class="far fa-clock me-1"></i>10분 전</span>
+                        </div>
+                        <h5 class="fw-bold mb-2">
+                            <a href="#" class="text-dark text-decoration-none stretched-link">웹 접근성 개선 팁 공유합니다 (스크린 리더 최적화)</a>
+                        </h5>
+                        <p class="text-muted small mb-3 text-truncate">
+                            최근 프로젝트에서 스크린 리더 호환성을 높이기 위해 적용했던 aria 속성 활용법을 정리해 보았습니다. 특히 모달 창 띄울 때 포커스 이동 처리가 중요하더라고요...
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center small text-muted">
+                            <span><i class="fas fa-user-circle me-1"></i>김개발 (프론트엔드)</span>
+                            <div>
+                                <span class="me-3"><i class="far fa-eye me-1"></i>124</span>
+                                <span class="me-3 text-primary"><i class="far fa-comment-dots me-1"></i>5</span>
+                                <span class="text-danger"><i class="fas fa-heart me-1"></i>12</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Post 2 (경영/사무) -->
+                    <div class="p-3 mb-3 border rounded bg-white post-item shadow-sm">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="badge bg-success bg-opacity-10 text-success border border-success px-2 py-1">📊 경영/사무</span>
+                            <span class="small text-muted"><i class="far fa-clock me-1"></i>1시간 전</span>
+                        </div>
+                        <h5 class="fw-bold mb-2">
+                            <a href="#" class="text-dark text-decoration-none stretched-link">엑셀 매크로 활용해서 영수증 처리 시간 단축한 후기</a>
+                        </h5>
+                        <p class="text-muted small mb-3 text-truncate">
+                            매달 500건씩 들어오는 법인카드 영수증 내역을 엑셀 VBA 매크로를 짜서 자동 분류되게 만들었더니 업무 시간이 절반으로 줄었습니다! 코드 원하시는 분 계시면 공유할게요.
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center small text-muted">
+                            <span><i class="fas fa-user-circle me-1"></i>이사무 (재무회계)</span>
+                            <div>
+                                <span class="me-3"><i class="far fa-eye me-1"></i>342</span>
+                                <span class="me-3 text-primary"><i class="far fa-comment-dots me-1"></i>18</span>
+                                <span class="text-danger"><i class="fas fa-heart me-1"></i>45</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Post 3 (디자인) -->
+                    <div class="p-3 mb-3 border rounded bg-white post-item shadow-sm">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="badge bg-warning bg-opacity-10 text-warning border border-warning px-2 py-1">🎨 디자인</span>
+                            <span class="small text-muted"><i class="far fa-clock me-1"></i>3시간 전</span>
+                        </div>
+                        <h5 class="fw-bold mb-2">
+                            <a href="#" class="text-dark text-decoration-none stretched-link">실무에서 자주 쓰는 피그마(Figma) 플러그인 추천 5가지</a>
+                        </h5>
+                        <p class="text-muted small mb-3 text-truncate">
+                            디자인 작업 속도를 2배 올려주는 피그마 플러그인 리스트입니다. 아이콘 삽입, 이미지 배경 제거, 더미 텍스트 생성 등 유용한 것들만 모아봤어요.
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center small text-muted">
+                            <span><i class="fas fa-user-circle me-1"></i>박디잔 (UI/UX)</span>
+                            <div>
+                                <span class="me-3"><i class="far fa-eye me-1"></i>210</span>
+                                <span class="me-3 text-primary"><i class="far fa-comment-dots me-1"></i>8</span>
+                                <span class="text-danger"><i class="fas fa-heart me-1"></i>27</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Post 4 (영업/마케팅) -->
+                    <div class="p-3 mb-3 border rounded bg-white post-item shadow-sm">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger px-2 py-1">📢 영업/마케팅</span>
+                            <span class="small text-muted"><i class="far fa-clock me-1"></i>어제</span>
+                        </div>
+                        <h5 class="fw-bold mb-2">
+                            <a href="#" class="text-dark text-decoration-none stretched-link">B2B 콜드메일 오픈율 높이는 제목 작성 노하우 질문드립니다 ㅠㅠ</a>
+                        </h5>
+                        <p class="text-muted small mb-3 text-truncate">
+                            요즘 신규 고객사 발굴 때문에 콜드메일을 돌리고 있는데 오픈율이 10%도 안 나오네요. 선배님들만의 메일 제목 작성 꿀팁이 있다면 조언 부탁드립니다.
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center small text-muted">
+                            <span><i class="fas fa-user-circle me-1"></i>최영업 (B2B세일즈)</span>
+                            <div>
+                                <span class="me-3"><i class="far fa-eye me-1"></i>156</span>
+                                <span class="me-3 text-primary"><i class="far fa-comment-dots me-1"></i>12</span>
+                                <span class="text-danger"><i class="far fa-heart me-1"></i>4</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center mb-0">
+                        <li class="page-item disabled"><a class="page-link" href="#">이전</a></li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item"><a class="page-link" href="#">다음</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Right Column: Profile & Tools -->
+        <div class="col-lg-4">
+            <!-- My Activity Summary -->
+            <div class="content-card text-center py-4">
+                <div class="mb-3">
+                    <i class="fas fa-user-circle fa-4x text-secondary"></i>
+                </div>
+                <h5 class="fw-bold mb-1">김민수 님</h5>
+                <p class="text-muted small mb-3">경영지원팀 / 사원</p>
+
+                <div class="bg-light rounded p-3 mb-3 text-start">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="small text-muted">커뮤니티 등급</span>
+                        <span class="small fw-bold text-primary">Lv.3 열심멤버</span>
+                    </div>
+                    <div class="progress" style="height: 6px;">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: 65%" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-around text-center border-top pt-3">
+                    <div>
+                        <h5 class="text-dark mb-0 fw-bold">12</h5>
+                        <span class="small text-muted">작성글</span>
+                    </div>
+                    <div>
+                        <h5 class="text-dark mb-0 fw-bold">48</h5>
+                        <span class="small text-muted">댓글</span>
+                    </div>
+                    <div>
+                        <h5 class="text-danger mb-0 fw-bold">156</h5>
+                        <span class="small text-muted">받은 좋아요</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Tools -->
+            <div class="content-card mt-4">
+                <a href="/write_post" class="btn btn-primary w-100 rounded-pill mb-3 fw-bold shadow-sm">
+                    <i class="fas fa-pen me-2"></i>새 게시글 작성하기
+                </a>
+                <a href="/my_bookmarks" class="tool-btn">
+                    <i class="far fa-bookmark"></i> 내가 스크랩한 글
+                </a>
+                <a href="/my_posts" class="tool-btn">
+                    <i class="far fa-list-alt"></i> 내가 쓴 글/댓글
+                </a>
+            </div>
+
+            <!-- Popular Tags -->
+            <div class="content-card mt-4">
+                <div class="card-title mb-3">
+                    <span><i class="fas fa-hashtag me-2 text-primary"></i>이번 주 인기 태그</span>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="#" class="badge tag-badge px-3 py-2 rounded-pill">#엑셀꿀팁</a>
+                    <a href="#" class="badge tag-badge px-3 py-2 rounded-pill">#웹접근성</a>
+                    <a href="#" class="badge tag-badge px-3 py-2 rounded-pill">#칼퇴기원</a>
+                    <a href="#" class="badge tag-badge px-3 py-2 rounded-pill">#이직고민</a>
+                    <a href="#" class="badge tag-badge px-3 py-2 rounded-pill">#피그마</a>
+                    <a href="#" class="badge tag-badge px-3 py-2 rounded-pill">#업무자동화</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap 5 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

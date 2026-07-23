@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ko">
+{% include 'common/header.html' %}
+<body>
+
+<!-- Navbar -->
+{% include 'common/topbar.html' %}
+
+<!-- Dashboard Header -->
+<div class="dash-header">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div>
+            <h2>이번 주 완료 업무 ✅</h2>
+            <p>이번 주에 성공적으로 마무리한 12건의 업무 내역입니다.</p>
+        </div>
+        <div>
+            <a href="/emp_dash" class="btn btn-light rounded-pill px-4 shadow-sm">
+                <i class="fas fa-arrow-left me-2"></i>대시보드로 돌아가기
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="container pb-5">
+    <div class="row mt-2">
+        <!-- Left Column: Completed Task List -->
+        <div class="col-lg-8">
+            <div class="content-card">
+                <div class="card-title d-flex justify-content-between align-items-center mb-4">
+                    <span><i class="fas fa-check-double me-2 text-success"></i>완료된 업무 목록 (12건)</span>
+                    <!-- Search/Filter Placeholder -->
+                    <div class="input-group" style="width: 250px;">
+                        <input type="text" class="form-control form-control-sm" placeholder="업무 검색...">
+                        <button class="btn btn-sm btn-outline-secondary" type="button"><i class="fas fa-search"></i></button>
+                    </div>
+                </div>
+
+                <div class="task-list">
+                    <!-- Task 1 -->
+                    <div class="task-item opacity-50">
+                        <input class="form-check-input task-checkbox" type="checkbox" id="ctask1" checked disabled>
+                        <div class="task-content">
+                            <label class="task-title text-decoration-line-through" for="ctask1">전일자 업무 일지 제출</label>
+                            <div class="task-meta d-flex align-items-center gap-3">
+                                <span class="badge-status status-done">완료</span>
+                                <span><i class="fas fa-check"></i> 오늘 09:00 제출됨</span>
+                                <span><i class="far fa-folder"></i> 공통 업무</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Task 2 -->
+                    <div class="task-item opacity-50">
+                        <input class="form-check-input task-checkbox" type="checkbox" id="ctask2" checked disabled>
+                        <div class="task-content">
+                            <label class="task-title text-decoration-line-through" for="ctask2">주간 회의록 작성 및 팀 내 공유</label>
+                            <div class="task-meta d-flex align-items-center gap-3">
+                                <span class="badge-status status-done">완료</span>
+                                <span><i class="fas fa-check"></i> 어제 17:30 완료</span>
+                                <span><i class="far fa-folder"></i> 기획팀</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Task 3 -->
+                    <div class="task-item opacity-50">
+                        <input class="form-check-input task-checkbox" type="checkbox" id="ctask3" checked disabled>
+                        <div class="task-content">
+                            <label class="task-title text-decoration-line-through" for="ctask3">1분기 부서 지출 결의서 1차 검토</label>
+                            <div class="task-meta d-flex align-items-center gap-3">
+                                <span class="badge-status status-done">완료</span>
+                                <span><i class="fas fa-check"></i> 어제 15:00 완료</span>
+                                <span><i class="far fa-folder"></i> 경영지원팀</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Task 4 -->
+                    <div class="task-item opacity-50">
+                        <input class="form-check-input task-checkbox" type="checkbox" id="ctask4" checked disabled>
+                        <div class="task-content">
+                            <label class="task-title text-decoration-line-through" for="ctask4">신규 입사자(디자인팀) PC 세팅 및 권한 부여</label>
+                            <div class="task-meta d-flex align-items-center gap-3">
+                                <span class="badge-status status-done">완료</span>
+                                <span><i class="fas fa-check"></i> 어제 11:00 완료</span>
+                                <span><i class="far fa-folder"></i> IT 지원팀</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Task 5 -->
+                    <div class="task-item opacity-50">
+                        <input class="form-check-input task-checkbox" type="checkbox" id="ctask5" checked disabled>
+                        <div class="task-content">
+                            <label class="task-title text-decoration-line-through" for="ctask5">사내 인트라넷 메인 페이지 오타 및 링크 수정</label>
+                            <div class="task-meta d-flex align-items-center gap-3">
+                                <span class="badge-status status-done">완료</span>
+                                <span><i class="fas fa-check"></i> 수요일 16:45 완료</span>
+                                <span><i class="far fa-folder"></i> 개발팀</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Task 6 -->
+                    <div class="task-item opacity-50">
+                        <input class="form-check-input task-checkbox" type="checkbox" id="ctask6" checked disabled>
+                        <div class="task-content">
+                            <label class="task-title text-decoration-line-through" for="ctask6">고객사 A사 미팅 발표 자료(PPT) 초안 완성</label>
+                            <div class="task-meta d-flex align-items-center gap-3">
+                                <span class="badge-status status-done">완료</span>
+                                <span><i class="fas fa-check"></i> 수요일 14:20 완료</span>
+                                <span><i class="far fa-folder"></i> 영업팀</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Task 7 -->
+                    <div class="task-item opacity-50">
+                        <input class="form-check-input task-checkbox" type="checkbox" id="ctask7" checked disabled>
+                        <div class="task-content">
+                            <label class="task-title text-decoration-line-through" for="ctask7">5월 부서 비품 및 소모품 구매 기안 상신</label>
+                            <div class="task-meta d-flex align-items-center gap-3">
+                                <span class="badge-status status-done">완료</span>
+                                <span><i class="fas fa-check"></i> 수요일 10:00 완료</span>
+                                <span><i class="far fa-folder"></i> 경영지원팀</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Task 8 -->
+                    <div class="task-item opacity-50">
+                        <input class="form-check-input task-checkbox" type="checkbox" id="ctask8" checked disabled>
+                        <div class="task-content">
+                            <label class="task-title text-decoration-line-through" for="ctask8">전사 필수 정보보안 교육 이수</label>
+                            <div class="task-meta d-flex align-items-center gap-3">
+                                <span class="badge-status status-done">완료</span>
+                                <span><i class="fas fa-check"></i> 화요일 17:00 완료</span>
+                                <span><i class="far fa-folder"></i> 공통 업무</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Task 9 -->
+                    <div class="task-item opacity-50">
+                        <input class="form-check-input task-checkbox" type="checkbox" id="ctask9" checked disabled>
+                        <div class="task-content">
+                            <label class="task-title text-decoration-line-through" for="ctask9">웹 접근성 진단 툴 연간 라이선스 갱신 처리</label>
+                            <div class="task-meta d-flex align-items-center gap-3">
+                                <span class="badge-status status-done">완료</span>
+                                <span><i class="fas fa-check"></i> 화요일 13:30 완료</span>
+                                <span><i class="far fa-folder"></i> IT 지원팀</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Task 10 -->
+                    <div class="task-item opacity-50">
+                        <input class="form-check-input task-checkbox" type="checkbox" id="ctask10" checked disabled>
+                        <div class="task-content">
+                            <label class="task-title text-decoration-line-through" for="ctask10">홍보 영상 자막 싱크 오류 3건 수정</label>
+                            <div class="task-meta d-flex align-items-center gap-3">
+                                <span class="badge-status status-done">완료</span>
+                                <span><i class="fas fa-check"></i> 화요일 11:15 완료</span>
+                                <span><i class="far fa-folder"></i> 마케팅팀</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Task 11 -->
+                    <div class="task-item opacity-50">
+                        <input class="form-check-input task-checkbox" type="checkbox" id="ctask11" checked disabled>
+                        <div class="task-content">
+                            <label class="task-title text-decoration-line-through" for="ctask11">상반기 팀 워크샵 장소 예약 및 식당 섭외</label>
+                            <div class="task-meta d-flex align-items-center gap-3">
+                                <span class="badge-status status-done">완료</span>
+                                <span><i class="fas fa-check"></i> 월요일 16:00 완료</span>
+                                <span><i class="far fa-folder"></i> 기획팀</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Task 12 -->
+                    <div class="task-item opacity-50">
+                        <input class="form-check-input task-checkbox" type="checkbox" id="ctask12" checked disabled>
+                        <div class="task-content">
+                            <label class="task-title text-decoration-line-through" for="ctask12">하반기 신규 프로젝트 WBS(일정표) 초안 작성</label>
+                            <div class="task-meta d-flex align-items-center gap-3">
+                                <span class="badge-status status-done">완료</span>
+                                <span><i class="fas fa-check"></i> 월요일 14:30 완료</span>
+                                <span><i class="far fa-folder"></i> 기획팀</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Pagination -->
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center mb-0">
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">이전</a>
+                        </li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">다음</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Right Column: Summary & Tools -->
+        <div class="col-lg-4">
+            <!-- Achievement Summary -->
+            <div class="content-card text-center py-4">
+                <div class="mb-3">
+                    <i class="fas fa-trophy fa-3x text-warning"></i>
+                </div>
+                <h5 class="fw-bold">훌륭합니다!</h5>
+                <p class="text-muted small mb-0">이번 주 목표한 업무를<br>성실하게 수행하고 계십니다.</p>
+                <hr class="my-3">
+                <div class="d-flex justify-content-around text-center">
+                    <div>
+                        <h4 class="text-success mb-0 fw-bold">12</h4>
+                        <span class="small text-muted">완료 업무</span>
+                    </div>
+                    <div>
+                        <h4 class="text-primary mb-0 fw-bold">3</h4>
+                        <span class="small text-muted">진행 중</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Tools -->
+            <div class="content-card">
+                <div class="card-title">
+                    <span><i class="fas fa-toolbox me-2 text-primary"></i>업무 도구</span>
+                </div>
+                <a href="/new_job" class="tool-btn">
+                    <i class="fas fa-plus-circle"></i> 새 업무 추가하기
+                </a>
+                <a href="/job_diary" class="tool-btn">
+                    <i class="fas fa-file-signature"></i> 업무 일지 작성하기
+                </a>
+                <a href="/report_export" class="tool-btn">
+                    <i class="fas fa-file-excel"></i> 완료 내역 엑셀 다운로드
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap 5 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

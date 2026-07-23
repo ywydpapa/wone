@@ -163,6 +163,88 @@ async def real_trans(request: Request):
         }
     )
 
+
+@app.get("/job_diary", response_class=HTMLResponse)
+async def jobdiary(request: Request):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+
+    return templates.TemplateResponse(
+        request=request, name="/apps/job_diary.html", context={
+            "request": request,
+            "page_title": "관리자 대시보드",
+            "user_name": request.session.get("username", "관리자")
+        }
+    )
+
+
+@app.get("/completed_jobs", response_class=HTMLResponse)
+async def cedjob(request: Request):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+
+    return templates.TemplateResponse(
+        request=request, name="/apps/complete_job.html", context={
+            "request": request,
+            "page_title": "관리자 대시보드",
+            "user_name": request.session.get("username", "관리자")
+        }
+    )
+
+
+@app.get("/newarrived_jobs", response_class=HTMLResponse)
+async def newarrived_jobs(request: Request):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+
+    return templates.TemplateResponse(
+        request=request, name="/apps/new_arrived_job.html", context={
+            "request": request,
+            "page_title": "관리자 대시보드",
+            "user_name": request.session.get("username", "관리자")
+        }
+    )
+
+@app.get("/new_job", response_class=HTMLResponse)
+async def new_job(request: Request):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+
+    return templates.TemplateResponse(
+        request=request, name="/top/new_job.html", context={
+            "request": request,
+            "page_title": "관리자 대시보드",
+            "user_name": request.session.get("username", "관리자")
+        }
+    )
+
+@app.get("/community", response_class=HTMLResponse)
+async def communi(request: Request):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+
+    return templates.TemplateResponse(
+        request=request, name="/top/community.html", context={
+            "request": request,
+            "page_title": "관리자 대시보드",
+            "user_name": request.session.get("username", "관리자")
+        }
+    )
+
+@app.get("/contact", response_class=HTMLResponse)
+async def contact(request: Request):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+
+    return templates.TemplateResponse(
+        request=request, name="/top/contact.html", context={
+            "request": request,
+            "page_title": "관리자 대시보드",
+            "user_name": request.session.get("username", "관리자")
+        }
+    )
+
+
 @app.get("/login", response_class=HTMLResponse)
 async def login(request: Request):
     # 이미 로그인된 상태라면 메인 페이지(/)로 리다이렉트
