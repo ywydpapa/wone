@@ -121,10 +121,7 @@
             transition: left 0.1s, top 0.1s;
         }
 
-        /* =========================================
-           WebGazer 카메라 화면 커스텀 스타일 (v2.0.1 직접 제어)
-           ========================================= */
-        /* WebGazer가 생성하는 4개의 요소를 모두 우측 하단으로 강제 이동 */
+        /* WebGazer 카메라 화면 우측 하단 고정 */
         #webgazerVideoFeed,
         #webgazerVideoCanvas,
         #webgazerFaceOverlay,
@@ -141,7 +138,6 @@
             display: block !important;
         }
 
-        /* 비디오 테두리에만 그림자 효과 부여 */
         #webgazerVideoFeed {
             box-shadow: 0 4px 15px rgba(0,0,0,0.5) !important;
             background-color: #333 !important;
@@ -193,7 +189,7 @@
         function resetCalibration() {
             if(confirm("기존 학습 데이터를 지우고 다시 학습하시겠습니까?")) {
                 localStorage.removeItem(CALIBRATION_KEY);
-                webgazer.clearData();
+                webgazer.clearData(); // WebGazer 내부 데이터 삭제
                 location.reload();
             }
         }
@@ -201,34 +197,18 @@
         window.onload = async function() {
             const gazeDot = document.getElementById('gaze-dot');
             const zones = document.querySelectorAll('.zone');
-            const zonesContainer = document.getElementById('zones-container');
             const progressBar = document.getElementById('progress-bar');
             const statusText = document.getElementById('status-text');
 
-            if (localStorage.getItem(CALIBRATION_KEY) === 'true') {
-                setUIAsCalibrated();
-            } else {
-                webgazer.clearData();
-            }
-
-            document.addEventListener('click', function() {
-                if (!isCalibrated) {
-                    clickCount++;
-                    const percentage = Math.min((clickCount / MAX_CLICKS) * 100, 100);
-                    progressBar.style.width = percentage + '%';
-                    statusText.innerText = `[학습 중] 화면 곳곳을 마우스로 클릭하며, 클릭하는 곳을 쳐다보세요! (${clickCount} / ${MAX_CLICKS})`;
-
-                    if (clickCount >= MAX_CLICKS) {
-                        setUIAsCalibrated();
-                        localStorage.setItem(CALIBRATION_KEY, 'true');
-                    }
-                }
-            });
-
             if (typeof webgazer !== 'undefined') {
+                // 1. 비디오 프리뷰 켜기
                 webgazer.params.showVideoPreview = true;
+
+                // 2. 이전에 저장된 데이터 복원 허용
+                // (WebGazer는 기본적으로 로컬스토리지의 'webgazerGlobalData'를 찾아 로드합니다)
                 webgazer.setRegression('ridge');
 
+                // 3. 리스너 등록
                 webgazer.setGazeListener(function(data, clock) {
                     if (data == null) return;
 
@@ -251,10 +231,39 @@
                     }
                 });
 
+                // 4. WebGazer 시작 (이때 내부적으로 기존 데이터를 불러옴)
                 await webgazer.begin();
+
+                // 5. begin() 완료 후, 우리가 만든 UI 상태 업데이트
+                if (localStorage.getItem(CALIBRATION_KEY) === 'true') {
+                    // 기존 학습 데이터가 있다고 판단되면 UI를 학습 완료 상태로 변경
+                    setUIAsCalibrated();
+                } else {
+                    // 처음 접속이거나 리셋한 경우 내부 데이터 확실히 지우기
+                    webgazer.clearData();
+                }
+
             } else {
                 console.error("WebGazer 스크립트를 불러오지 못했습니다.");
             }
+
+            // 클릭 이벤트 (학습용)
+            document.addEventListener('click', function(e) {
+                // 버튼 클릭은 학습 카운트에서 제외
+                if (e.target.classList.contains('reset-btn')) return;
+
+                if (!isCalibrated) {
+                    clickCount++;
+                    const percentage = Math.min((clickCount / MAX_CLICKS) * 100, 100);
+                    progressBar.style.width = percentage + '%';
+                    statusText.innerText = `[학습 중] 화면 곳곳을 마우스로 클릭하며, 클릭하는 곳을 쳐다보세요! (${clickCount} / ${MAX_CLICKS})`;
+
+                    if (clickCount >= MAX_CLICKS) {
+                        setUIAsCalibrated();
+                        localStorage.setItem(CALIBRATION_KEY, 'true');
+                    }
+                }
+            });
         };
 
         window.onbeforeunload = function() {
