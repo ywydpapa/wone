@@ -326,3 +326,102 @@ async def logout(request: Request):
     request.session.clear()
     # 로그아웃 후 로그인 페이지로 리다이렉트
     return RedirectResponse(url="/login", status_code=303)
+
+@app.get("/erp_dash", response_class=HTMLResponse)
+async def erp_dash(request: Request):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+    return templates.TemplateResponse(
+        request=request, name="/erp/erp_dash.html", context={
+            "request": request,
+            "page_title": "업무 대시보드",
+            "user_name": request.session.get("username", "관리자")
+        }
+    )
+
+
+@app.get("/erp_hr", response_class=HTMLResponse)
+async def erp_hr(request: Request):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+    return templates.TemplateResponse(
+        request=request, name="/erp/erp_hr.html", context={
+            "request": request,
+            "page_title": "업무 대시보드",
+            "user_name": request.session.get("username", "관리자")
+        }
+    )
+
+@app.get("/erp_fa", response_class=HTMLResponse)
+async def erp_fa(request: Request):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+    return templates.TemplateResponse(
+        request=request, name="/erp/erp_fa.html", context={
+            "request": request,
+            "page_title": "업무 대시보드",
+            "user_name": request.session.get("username", "관리자")
+        }
+    )
+
+
+@app.get("/erp_scrm", response_class=HTMLResponse)
+async def erp_scrm(request: Request):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+    return templates.TemplateResponse(
+        request=request, name="/erp/erp_scrm.html", context={
+            "request": request,
+            "page_title": "업무 대시보드",
+            "user_name": request.session.get("username", "관리자")
+        }
+    )
+
+@app.get("/erp_purch", response_class=HTMLResponse)
+async def erp_purch(request: Request):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+    return templates.TemplateResponse(
+        request=request, name="/erp/erp_purch.html", context={
+            "request": request,
+            "page_title": "업무 대시보드",
+            "user_name": request.session.get("username", "관리자")
+        }
+    )
+
+@app.get("/erp_inventory", response_class=HTMLResponse)
+async def erp_invent(request: Request):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+    return templates.TemplateResponse(
+        request=request, name="/erp/erp_inventory.html", context={
+            "request": request,
+            "page_title": "업무 대시보드",
+            "user_name": request.session.get("username", "관리자")
+        }
+    )
+
+
+@app.get("/erp_product", response_class=HTMLResponse)
+async def erp_product(request: Request):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+    return templates.TemplateResponse(
+        request=request, name="/erp/erp_product.html", context={
+            "request": request,
+            "page_title": "업무 대시보드",
+            "user_name": request.session.get("username", "관리자")
+        }
+    )
+
+@app.get("/erp_groupware", response_class=HTMLResponse)
+async def erp_groupware(request: Request):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+    return templates.TemplateResponse(
+        request=request, name="/erp/erp_groupware.html", context={
+            "request": request,
+            "page_title": "업무 대시보드",
+            "user_name": request.session.get("username", "관리자")
+        }
+    )
