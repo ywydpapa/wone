@@ -140,6 +140,20 @@ async def voice(request: Request):
     )
 
 
+@app.get("/eyemouse", response_class=HTMLResponse)
+async def eyemouse(request: Request):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+
+    return templates.TemplateResponse(
+        request=request, name="/apps/eyemouse.html", context={
+            "request": request,
+            "page_title": "채용/인재",
+            "user_name": request.session.get("username", "관리자")
+        }
+    )
+
+
 @app.get("/emp_dash", response_class=HTMLResponse)
 async def emp_dash(request: Request):
     if not check_login(request):
