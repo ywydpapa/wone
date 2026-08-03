@@ -9,8 +9,8 @@
 <!-- Dashboard Header -->
 <div class="dash-header">
     <div class="container">
-        <h2>환영합니다, 김민수 님! 👋</h2>
-        <p>오늘 처리해야 할 새로운 업무가 3건 있습니다. 힘찬 하루 보내세요!</p>
+        <h2>구매관리 대시보드 🛒</h2>
+        <p>김민수 님, 오늘의 발주 현황 및 협력사 납기 일정입니다. 원활한 자재 수급을 위해 확인해 주세요.</p>
     </div>
 </div>
 
@@ -21,36 +21,36 @@
         <div class="col-lg-4 col-md-6">
             <div class="stat-card">
                 <div class="stat-icon bg-blue-light">
-                    <i class="fas fa-tasks"></i>
+                    <i class="fas fa-shopping-cart"></i>
                 </div>
                 <div class="stat-info">
-                    <p>진행 중인 업무</p>
-                    <h3>3<span>건</span></h3>
+                    <p>신규 구매 요청 (PR)</p>
+                    <h3>12<span> 건</span></h3>
                 </div>
             </div>
         </div>
         <div class="col-lg-4 col-md-6">
-            <a href="/completed_jobs" class="text-decoration-none small">
+            <a href="/po_status" class="text-decoration-none small">
             <div class="stat-card">
                 <div class="stat-icon bg-green-light">
-                    <i class="fas fa-check-circle"></i>
+                    <i class="fas fa-file-signature"></i>
                 </div>
                 <div class="stat-info">
-                    <p>이번 주 완료 업무</p>
-                    <h3>12<span>건</span></h3>
+                    <p>금일 발주 완료 (PO)</p>
+                    <h3>8<span> 건</span></h3>
                 </div>
             </div>
             </a>
         </div>
         <div class="col-lg-4 col-md-6">
-            <a href="/newarrived_jobs" class="text-decoration-none small">
+            <a href="/delayed_delivery" class="text-decoration-none small">
             <div class="stat-card">
-                <div class="stat-icon bg-yellow-light">
-                    <i class="far fa-envelope"></i>
+                <div class="stat-icon bg-red-light" style="background-color: #ffe5e5; color: #dc3545;">
+                    <i class="fas fa-truck-loading"></i>
                 </div>
                 <div class="stat-info">
-                    <p>새로운 메시지</p>
-                    <h3>2<span>건</span></h3>
+                    <p>납기 지연 / 미입고</p>
+                    <h3 style="color: #dc3545;">3<span> 건</span></h3>
                 </div>
             </div>
             </a>
@@ -58,24 +58,24 @@
     </div>
 
     <div class="row mt-2">
-        <!-- Left Column: Task List -->
+        <!-- Left Column: Purchasing Task List -->
         <div class="col-lg-8">
             <div class="content-card">
                 <div class="card-title">
-                    <span><i class="fas fa-clipboard-list me-2 text-primary"></i>오늘의 할 일</span>
-                    <button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="location.href='/new_job'">+ 새 업무 추가</button>
+                    <span><i class="fas fa-clipboard-list me-2 text-primary"></i>구매 요청 검토 및 발주 업무</span>
+                    <button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="location.href='/new_po'">+ 발주서 작성</button>
                 </div>
 
                 <div class="task-list">
                     <!-- Task 1 -->
                     <div class="task-item">
-                        <input class="form-check-input task-checkbox" type="checkbox" id="task1">
+                        <input class="form-check-input task-checkbox" type="checkbox" id="pur1">
                         <div class="task-content">
-                            <label class="task-title" for="task1">웹 접근성 모니터링 결과 보고서 작성</label>
+                            <label class="task-title" for="pur1">[긴급발주] 생산 1라인 포장용 부자재(대형 박스) 긴급 발주</label>
                             <div class="task-meta d-flex align-items-center gap-3">
                                 <span class="badge-status status-urgent">긴급</span>
-                                <span><i class="far fa-clock"></i> 오늘 18:00 까지</span>
-                                <span><i class="far fa-folder-open"></i> IT 지원팀</span>
+                                <span><i class="far fa-clock"></i> 오늘 14:00 마감</span>
+                                <span><i class="fas fa-industry"></i> 생산팀 요청</span>
                             </div>
                         </div>
                         <button class="btn btn-light btn-sm"><i class="fas fa-ellipsis-v"></i></button>
@@ -83,13 +83,13 @@
 
                     <!-- Task 2 -->
                     <div class="task-item">
-                        <input class="form-check-input task-checkbox" type="checkbox" id="task2">
+                        <input class="form-check-input task-checkbox" type="checkbox" id="pur2">
                         <div class="task-content">
-                            <label class="task-title" for="task2">고객사 영수증 데이터 엑셀 입력 (200건)</label>
+                            <label class="task-title" for="pur2">[견적비교] 2026년 하반기 사무용품 연간 단가계약 견적서 검토</label>
                             <div class="task-meta d-flex align-items-center gap-3">
                                 <span class="badge-status status-progress">진행중</span>
-                                <span><i class="far fa-clock"></i> 내일 12:00 까지</span>
-                                <span><i class="far fa-folder-open"></i> 경영지원팀</span>
+                                <span><i class="far fa-clock"></i> 내일 18:00 까지</span>
+                                <span><i class="fas fa-calculator"></i> 3개사 비교</span>
                             </div>
                         </div>
                         <button class="btn btn-light btn-sm"><i class="fas fa-ellipsis-v"></i></button>
@@ -97,13 +97,13 @@
 
                     <!-- Task 3 -->
                     <div class="task-item">
-                        <input class="form-check-input task-checkbox" type="checkbox" id="task3">
+                        <input class="form-check-input task-checkbox" type="checkbox" id="pur3">
                         <div class="task-content">
-                            <label class="task-title" for="task3">주간 팀 화상 회의 참석</label>
+                            <label class="task-title" for="pur3">[업체등록] 신규 원부자재(알루미늄 패널) 공급사 신용평가 및 등록</label>
                             <div class="task-meta d-flex align-items-center gap-3">
-                                <span class="badge-status status-progress">대기</span>
-                                <span><i class="far fa-clock"></i> 오늘 14:00 (Zoom)</span>
-                                <span><i class="far fa-folder-open"></i> 공통 업무</span>
+                                <span class="badge-status status-progress" style="background-color:#e2e3e5; color:#383d41;">대기</span>
+                                <span><i class="far fa-calendar-alt"></i> 이번 주 금요일 마감</span>
+                                <span><i class="fas fa-handshake"></i> 협력사 관리</span>
                             </div>
                         </div>
                         <button class="btn btn-light btn-sm"><i class="fas fa-ellipsis-v"></i></button>
@@ -111,12 +111,12 @@
 
                     <!-- Task 4 (Completed) -->
                     <div class="task-item opacity-50">
-                        <input class="form-check-input task-checkbox" type="checkbox" id="task4" checked disabled>
+                        <input class="form-check-input task-checkbox" type="checkbox" id="pur4" checked disabled>
                         <div class="task-content">
-                            <label class="task-title text-decoration-line-through" for="task4">전일자 업무 일지 제출</label>
+                            <label class="task-title text-decoration-line-through" for="pur4">[발주완료] IT지원팀 요청 개발용 고사양 노트북 5대 발주서 전송</label>
                             <div class="task-meta d-flex align-items-center gap-3">
                                 <span class="badge-status status-done">완료</span>
-                                <span><i class="fas fa-check"></i> 오늘 09:00 제출됨</span>
+                                <span><i class="fas fa-check"></i> 오늘 10:00 전송됨</span>
                             </div>
                         </div>
                     </div>
@@ -129,27 +129,27 @@
             <!-- Messages -->
             <div class="content-card">
                 <div class="card-title">
-                    <span><i class="far fa-comments me-2 text-primary"></i>담당자 메시지</span>
+                    <span><i class="far fa-bell me-2 text-primary"></i>구매/납기 알림</span>
                     <a href="#" class="text-decoration-none small">전체보기</a>
                 </div>
 
                 <div class="msg-item">
                     <div class="msg-header">
-                        <span class="msg-sender"><i class="fas fa-user-circle me-1"></i>이매니저</span>
-                        <span class="msg-time">오전 10:30</span>
+                        <span class="msg-sender"><i class="fas fa-exclamation-circle me-1 text-danger"></i>ERP 시스템</span>
+                        <span class="msg-time">오전 11:20</span>
                     </div>
                     <div class="msg-body">
-                        민수님, 오늘 오후 2시 화상회의 링크 메일로 보내드렸습니다. 수어 통역사분도 함께 참석하실 예정입니다.
+                        [납기경고] (주)제일정밀 발주건(PO-2608-001)의 입고 예정일이 2일 지났습니다. 협력사에 납기 독촉 연락 요망.
                     </div>
                 </div>
 
                 <div class="msg-item">
                     <div class="msg-header">
-                        <span class="msg-sender"><i class="fas fa-user-circle me-1"></i>박팀장</span>
+                        <span class="msg-sender"><i class="fas fa-user-circle me-1"></i>생산팀 박대리</span>
                         <span class="msg-time">어제</span>
                     </div>
                     <div class="msg-body">
-                        접근성 보고서 초안 확인했습니다. 수정 요청사항 코멘트로 남겨두었으니 확인 부탁드립니다. 수고하셨습니다!
+                        민수님, 다음 주 화요일부터 시작되는 신제품 라인에 들어갈 특수 나사(M4) 자재 수급 일정 한 번 더 확인 부탁드립니다.
                     </div>
                 </div>
             </div>
@@ -157,22 +157,22 @@
             <!-- Quick Tools -->
             <div class="content-card">
                 <div class="card-title">
-                    <span><i class="fas fa-toolbox me-2 text-primary"></i>업무 도구</span>
+                    <span><i class="fas fa-toolbox me-2 text-primary"></i>구매관리 도구</span>
                 </div>
-                <a href="/job_diary" class="tool-btn">
-                    <i class="fas fa-file-signature"></i> 업무 일지 작성하기
+                <a href="#" class="tool-btn">
+                    <i class="fas fa-file-import"></i> 구매 요청(PR) 접수 및 조회
                 </a>
-                <a href="/youtube_edit" class="tool-btn">
-                    <i class="fas fa-video"></i> 영상자료 편집 작업
+                <a href="#" class="tool-btn">
+                    <i class="fas fa-file-export"></i> 발주서(PO) 작성 및 전송
                 </a>
-                <a href="/real_trans" class="tool-btn">
-                    <i class="fas fa-headphones-alt"></i> 실시간 자막/통역 지원 요청
+                <a href="#" class="tool-btn">
+                    <i class="fas fa-handshake"></i> 협력사(Vendor) 정보 관리
                 </a>
-                <a href="/voice" class="tool-btn">
-                    <i class="fas fa-file-text"></i> 실시간 텍스트 입력 지원
+                <a href="#" class="tool-btn">
+                    <i class="fas fa-file-contract"></i> 단가 및 연간 계약 관리
                 </a>
-                <a href="/eyemouse" class="tool-btn">
-                    <i class="fas fa-eye"></i> 시선 이동 지원
+                <a href="#" class="tool-btn">
+                    <i class="fas fa-boxes"></i> 입고 현황 및 매입 마감
                 </a>
             </div>
         </div>
