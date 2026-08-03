@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>실시간 음성 인식 및 읽어주기</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            background-color: #f9f9f9;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+        .start-btn {
+            flex: 1;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            user-select: none;
+            -webkit-user-select: none;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        .start-btn:active { transform: scale(0.98); }
+        .start-btn.recording {
+            background-color: #f44336;
+            animation: pulse 1.5s infinite;
+        }
+        .read-btn {
+            padding: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        .read-btn:active { transform: scale(0.98); }
+        .read-btn.speaking { background-color: #0b7dda; }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(244, 67, 54, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(244, 67, 54, 0); }
+        }
+        textarea {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            resize: vertical;
+            box-sizing: border-box;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <h2>📝 실시간 음성 입력 및 읽어주기</h2>
+    <p>버튼을 <strong>누르고 있는 동안</strong> 실시간으로 텍스트가 입력됩니다.</p>
+
+    <div class="container">
+        <!-- 1번 입력창 -->
+        <div class="input-group">
+            <div class="button-group">
+                <button class="start-btn">🎤 1번 누르고 말하기</button>
+                <button class="read-btn">🔊 읽어주기</button>
+            </div>
+            <textarea class="result-textarea" rows="4" placeholder="1번 항목의 텍스트가 여기에 표시됩니다..."></textarea>
+        </div>
+
+        <!-- 2번 입력창 -->
+        <div class="input-group">
+            <div class="button-group">
+                <button class="start-btn">🎤 2번 누르고 말하기</button>
+                <button class="read-btn">🔊 읽어주기</button>
+            </div>
+            <textarea class="result-textarea" rows="4" placeholder="2번 항목의 텍스트가 여기에 표시됩니다..."></textarea>
+        </div>
+
+        <!-- 3번 입력창 -->
+        <div class="input-group">
+            <div class="button-group">
+                <button class="start-btn">🎤 3번 누르고 말하기</button>
+                <button class="read-btn">🔊 읽어주기</button>
+            </div>
+            <textarea class="result-textarea" rows="4" placeholder="3번 항목의 텍스트가 여기에 표시됩니다..."></textarea>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. 음성 인식 (STT) 설정 ---
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = SpeechRecognition ? new SpeechRecognition() : null;
+
+        if (recognition) {
+            recognition.lang = 'ko-KR';
+            recognition.interimResults = true;
+            recognition.continuous = true;
+        } else {
+            alert("이 브라우저는 음성 인식을 지원하지 않습니다. Chrome을 사용해주세요.");
+        }
+
+        // --- 2. 텍스트 읽어주기 (TTS) 설정 ---
+        const synth = window.speechSynthesis;
+
+        let isRecording = false;
+        let activeTextarea = null;
+        let activeButton = null;
+        let baseText = "";
+        let originalBtnText = ""; // 버튼의 원래 텍스트를 저장할 변수 추가
+
+        const groups = document.querySelectorAll('.input-group');
+
+        groups.forEach((group) => {
+            const startBtn = group.querySelector('.start-btn');
+            const readBtn = group.querySelector('.read-btn');
+            const ta = group.querySelector('.result-textarea');
+
+            // ==========================================
+            // [음성 인식 (STT) 로직]
+            // ==========================================
+            const startRecording = (e) => {
+                if (e) e.preventDefault();
+                if (isRecording || !recognition) return;
+
+                if (synth.speaking) synth.cancel();
+
+                activeTextarea = ta;
+                activeButton = startBtn;
+                baseText = ta.value.trim();
+                originalBtnText = startBtn.innerText; // "🎤 1번 누르고 말하기" 등을 저장
+
+                try {
+                    recognition.start();
+                    isRecording = true;
+                    startBtn.classList.add('recording');
+                    startBtn.innerText = "🎙️ 실시간 입력 중...";
+                } catch (error) {
+                    console.error("인식 시작 오류:", error);
+                }
+            };
+
+            const stopRecording = (e) => {
+                if (e) e.preventDefault();
+                if (!isRecording || activeButton !== startBtn) return;
+
+                recognition.stop();
+            };
+
+            startBtn.addEventListener('mousedown', startRecording);
+            startBtn.addEventListener('mouseup', stopRecording);
+            startBtn.addEventListener('mouseleave', stopRecording);
+            startBtn.addEventListener('touchstart', startRecording, { passive: false });
+            startBtn.addEventListener('touchend', stopRecording, { passive: false });
+
+            // ==========================================
+            // [텍스트 읽어주기 (TTS) 로직]
+            // ==========================================
+            readBtn.addEventListener('click', () => {
+                const textToRead = ta.value.trim();
+                if (textToRead === "") {
+                    alert("읽을 텍스트가 없습니다.");
+                    return;
+                }
+                if (synth.speaking) synth.cancel();
+
+                const utterance = new SpeechSynthesisUtterance(textToRead);
+                utterance.lang = 'ko-KR';
+                utterance.rate = 1.0;
+
+                utterance.onstart = () => {
+                    readBtn.innerText = "상태: 읽는 중...";
+                    readBtn.classList.add('speaking');
+                };
+                utterance.onend = () => {
+                    readBtn.innerText = "🔊 읽어주기";
+                    readBtn.classList.remove('speaking');
+                };
+                utterance.onerror = () => {
+                    readBtn.innerText = "🔊 읽어주기";
+                    readBtn.classList.remove('speaking');
+                };
+
+                synth.speak(utterance);
+            });
+        });
+
+        // --- 음성 인식 결과 실시간 처리 ---
+        if (recognition) {
+            recognition.onresult = (event) => {
+                if (!activeTextarea) return;
+
+                let currentTranscript = '';
+                for (let i = 0; i < event.results.length; i++) {
+                    currentTranscript += event.results[i][0].transcript;
+                }
+
+                if (baseText !== "") {
+                    activeTextarea.value = baseText + " " + currentTranscript;
+                } else {
+                    activeTextarea.value = currentTranscript;
+                }
+
+                activeTextarea.scrollTop = activeTextarea.scrollHeight;
+            };
+
+            recognition.onend = () => {
+                if (activeButton) {
+                    activeButton.classList.remove('recording');
+                    // 에러가 발생했던 부분을 안전한 변수 참조로 변경
+                    activeButton.innerText = originalBtnText;
+                }
+                isRecording = false;
+                activeTextarea = null;
+                activeButton = null;
+                originalBtnText = "";
+            };
+        }
+    </script>
+</body>
+</html>

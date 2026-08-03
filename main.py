@@ -27,6 +27,9 @@ import funchub
 from typing import Optional
 import shutil
 import uvicorn
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+
 
 dotenv.load_dotenv()
 DATABASE_URL = os.getenv("dburl")
@@ -40,6 +43,7 @@ engine = create_async_engine(
     pool_recycle=1800,
 )
 
+
 async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
 app = FastAPI()
@@ -51,7 +55,11 @@ app.add_middleware(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:8000",
+        "http://127.0.0.1:8000",
+        "https://www.wno1.kr"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -67,6 +75,9 @@ EXT_BY_CONTENT_TYPE = {
     "image/webp": ".webp",
 }
 security = HTTPBearer()
+
+class VoiceInput(BaseModel):
+    text: str
 
 
 async def get_db():
@@ -95,6 +106,12 @@ async def read_dashboard(request: Request):
     )
 
 
+@app.post("/api/text")
+async def receive_voice_text(data: VoiceInput):
+    print(f"인식된 텍스트: {data.text}")
+    return {"status": "success", "received_text": data.text}
+
+
 @app.get("/resume", response_class=HTMLResponse)
 async def resume(request: Request):
     if not check_login(request):
@@ -102,6 +119,20 @@ async def resume(request: Request):
 
     return templates.TemplateResponse(
         request=request, name="/top/resume.html", context={
+            "request": request,
+            "page_title": "채용/인재",
+            "user_name": request.session.get("username", "관리자")
+        }
+    )
+
+
+@app.get("/voice", response_class=HTMLResponse)
+async def voice(request: Request):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+
+    return templates.TemplateResponse(
+        request=request, name="/top/voice.html", context={
             "request": request,
             "page_title": "채용/인재",
             "user_name": request.session.get("username", "관리자")
