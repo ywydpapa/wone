@@ -749,8 +749,9 @@ async def list_posts(request: Request):
 async def my_posts(request: Request):
     if not check_login(request):
         return RedirectResponse(url="/login", status_code=303)
+    uid = request.session.get("user_id", 1)
     conn = get_sqlite()
-    rows = conn.execute("SELECT * FROM posts WHERE user_id=1 ORDER BY created_at DESC").fetchall()
+    rows = conn.execute("SELECT * FROM posts WHERE user_id=? ORDER BY created_at DESC", (uid,)).fetchall()
     conn.close()
     return templates.TemplateResponse(
         request=request, name="top/my_posts.html", context={
@@ -766,8 +767,12 @@ async def my_posts(request: Request):
 async def my_bookmarks(request: Request):
     if not check_login(request):
         return RedirectResponse(url="/login", status_code=303)
+    uid = request.session.get("user_id", 1)
     conn = get_sqlite()
-    rows = conn.execute("SELECT * FROM posts WHERE bookmarked=1 ORDER BY created_at DESC").fetchall()
+    rows = conn.execute(
+        "SELECT p.* FROM posts p JOIN bookmarks b ON b.post_id=p.id AND b.user_id=? ORDER BY p.created_at DESC",
+        (uid,)
+    ).fetchall()
     conn.close()
     return templates.TemplateResponse(
         request=request, name="top/my_bookmarks.html", context={
@@ -907,31 +912,86 @@ async def job_detail(request: Request, job_id: int):
 async def post_detail(request: Request, post_id: int):
     if not check_login(request):
         return RedirectResponse(url="/login", status_code=303)
+    uid = request.session.get("user_id", 1)
     conn = get_sqlite()
+    conn.execute("UPDATE posts SET views=views+1 WHERE id=?", (post_id,))
+    conn.commit()
     row = conn.execute("SELECT * FROM posts WHERE id=?", (post_id,)).fetchone()
-    conn.close()
     if not row:
+        conn.close()
         return HTMLResponse("<h2>게시글을 찾을 수 없습니다</h2><a href='/community'>돌아가기</a>", status_code=404)
-    r = dict(row)
+    comments = [dict(c) for c in conn.execute(
+        "SELECT * FROM comments WHERE post_id=? ORDER BY id ASC", (post_id,)).fetchall()]
+    like_count = conn.execute("SELECT COUNT(*) FROM post_likes WHERE post_id=?", (post_id,)).fetchone()[0]
+    liked = conn.execute("SELECT 1 FROM post_likes WHERE post_id=? AND user_id=?", (post_id, uid)).fetchone() is not None
+    bookmarked = conn.execute("SELECT 1 FROM bookmarks WHERE post_id=? AND user_id=?", (post_id, uid)).fetchone() is not None
+    conn.close()
     return templates.TemplateResponse(
-        request=request, name="common/detail.html", context={
+        request=request, name="top/post_detail.html", context={
             "request": request,
-            "page_title": r['title'],
-            "badges": [{"text": r['category'], "color": "info"}],
-            "detail_title": r['title'],
-            "detail_date": r['created_at'],
-            "detail_content": r['content'],
-            "author": r.get('author', ''),
-            "dept": r.get('dept', ''),
-            "views": r.get('views', ''),
-            "comments": r.get('comments', ''),
-            "likes": r.get('likes', ''),
-            "extra_content": '',
-            "extra_label": '',
-            "back_url": "/community",
+            "page_title": dict(row)['title'],
+            "post": dict(row),
+            "comments": comments,
+            "like_count": like_count,
+            "liked": liked,
+            "bookmarked": bookmarked,
+            "categories": POST_CATEGORIES,
             "user_name": request.session.get("user_name", "김민수")
         }
     )
+
+
+@app.post("/api/posts/{post_id}/comments")
+async def add_comment(request: Request, post_id: int, content: str = Form(...)):
+    if not check_login(request):
+        return JSONResponse({"error": "not logged in"}, status_code=401)
+    uid = request.session.get("user_id", 1)
+    author = request.session.get("user_name", "익명")
+    conn = get_sqlite()
+    conn.execute(
+        "INSERT INTO comments (post_id, user_id, author, content) VALUES (?, ?, ?, ?)",
+        (post_id, uid, author, content)
+    )
+    conn.commit()
+    conn.close()
+    return RedirectResponse(url=f"/post/{post_id}", status_code=303)
+
+
+@app.post("/api/posts/{post_id}/like")
+async def toggle_like(request: Request, post_id: int):
+    if not check_login(request):
+        return JSONResponse({"error": "not logged in"}, status_code=401)
+    uid = request.session.get("user_id", 1)
+    conn = get_sqlite()
+    existing = conn.execute("SELECT 1 FROM post_likes WHERE post_id=? AND user_id=?", (post_id, uid)).fetchone()
+    if existing:
+        conn.execute("DELETE FROM post_likes WHERE post_id=? AND user_id=?", (post_id, uid))
+        liked = False
+    else:
+        conn.execute("INSERT INTO post_likes (post_id, user_id) VALUES (?, ?)", (post_id, uid))
+        liked = True
+    conn.commit()
+    count = conn.execute("SELECT COUNT(*) FROM post_likes WHERE post_id=?", (post_id,)).fetchone()[0]
+    conn.close()
+    return {"liked": liked, "count": count}
+
+
+@app.post("/api/posts/{post_id}/bookmark")
+async def toggle_bookmark(request: Request, post_id: int):
+    if not check_login(request):
+        return JSONResponse({"error": "not logged in"}, status_code=401)
+    uid = request.session.get("user_id", 1)
+    conn = get_sqlite()
+    existing = conn.execute("SELECT 1 FROM bookmarks WHERE post_id=? AND user_id=?", (post_id, uid)).fetchone()
+    if existing:
+        conn.execute("DELETE FROM bookmarks WHERE post_id=? AND user_id=?", (post_id, uid))
+        bookmarked = False
+    else:
+        conn.execute("INSERT INTO bookmarks (post_id, user_id) VALUES (?, ?)", (post_id, uid))
+        bookmarked = True
+    conn.commit()
+    conn.close()
+    return {"bookmarked": bookmarked}
 
 
 @app.get("/erp_doc/{doc_id}", response_class=HTMLResponse)
