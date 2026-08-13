@@ -32,11 +32,11 @@
             </ul>
             <div class="d-flex align-items-center gap-4">
                 <!-- Accessibility Settings -->
-                <a href="#" class="text-secondary text-decoration-none" title="접근성 설정" data-bs-toggle="tooltip">
+                <a href="/accessibility" class="text-secondary text-decoration-none" title="접근성 설정" data-bs-toggle="tooltip">
                     <i class="fas fa-universal-access fs-4"></i>
                 </a>
                 <!-- Notifications -->
-                <a href="#" class="text-secondary text-decoration-none position-relative">
+                <a href="/notifications" class="text-secondary text-decoration-none position-relative">
                     <i class="far fa-bell fs-4"></i>
                     <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle">
                         <span class="visually-hidden">새로운 알림</span>
@@ -45,11 +45,11 @@
                 <!-- User Dropdown -->
                 <div class="dropdown">
                     <div class="user-profile" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer;">
-                        <img src="https://ui-avatars.com/api/?name=김+민수&background=eef4fb&color=0056b3" alt="User" class="rounded-circle" width="32" height="32">
-                        <span class="name ms-2">김민수 님 <i class="fas fa-chevron-down ms-1 small"></i></span>
+                        <img src="https://ui-avatars.com/api/?name={{ user_name|replace(' ', '+') }}&background=eef4fb&color=0056b3" alt="User" class="rounded-circle" width="32" height="32">
+                        <span class="name ms-2">{{ user_name }} 님 <i class="fas fa-chevron-down ms-1 small"></i></span>
                     </div>
                     <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm mt-2">
-                        <li><a class="dropdown-item" href="#"><i class="far fa-user me-2"></i>내 프로필</a></li>
+                        <li><a class="dropdown-item" href="/profile"><i class="far fa-user me-2"></i>내 프로필</a></li>
                         <li><a class="dropdown-item" href="/emp_dash"><i class="fas fa-cog me-2"></i>설정</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item text-danger" href="/logout"><i class="fas fa-sign-out-alt me-2"></i>로그아웃</a></li>

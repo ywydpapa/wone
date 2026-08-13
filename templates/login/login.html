@@ -162,11 +162,19 @@
 <div class="login-wrapper">
     <div class="login-card">
         <!-- 로고 영역 -->
-        <a href="#" class="brand-logo"><span>W</span>no1</a>
+        <a href="/login" class="brand-logo"><span>W</span>no1</a>
         <div class="login-title">포털 서비스에 오신 것을 환영합니다</div>
+
+        <!-- 테스트 계정 안내 -->
+        <div class="alert alert-info py-2 small text-center mb-3">
+            <i class="fas fa-info-circle me-1"></i>테스트 계정: <strong>admin</strong> / <strong>1234</strong>
+        </div>
 
         <!-- 로그인 폼 -->
         <form action="/login_check" method="post">
+            {% if error %}
+            <div class="alert alert-danger py-2 small mb-3">아이디 또는 비밀번호가 올바르지 않습니다.</div>
+            {% endif %}
             <div class="mb-3 input-icon-wrapper">
                 <input type="text" name="username" class="form-control form-control-lg" placeholder="아이디 또는 이메일" required>
                 <i class="far fa-user"></i>
@@ -184,7 +192,7 @@
                         로그인 유지
                     </label>
                 </div>
-                <a href="#" class="link-custom" style="font-size: 0.95rem;">비밀번호 찾기</a>
+                <span class="text-muted small">비밀번호 찾기 → 관리자 내선 119</span>
             </div>
 
             <button type="submit" class="btn btn-primary-custom">로그인</button>
@@ -193,11 +201,11 @@
         <!-- 하단 링크 -->
         <div class="text-center mt-4">
             <span class="text-muted" style="font-size: 0.95rem;">계정이 없으신가요?</span>
-            <a href="#" class="link-custom ms-1">회원가입</a>
+            <a href="/signup" class="link-custom ms-1">회원가입</a>
         </div>
     </div>
 
-    <a href="#" class="back-to-home"><i class="fas fa-arrow-left me-1"></i> 메인 페이지로 돌아가기</a>
+    <a href="/login" class="back-to-home"><i class="fas fa-arrow-left me-1"></i> 메인 페이지로 돌아가기</a>
 </div>
 
 <!-- Bootstrap 5 JS Bundle -->
