@@ -45,11 +45,11 @@
 
                     <!-- 좋아요 / 스크랩 -->
                     <div class="d-flex gap-2 justify-content-center my-4">
-                        <button id="likeBtn" class="btn {{ 'btn-danger' if liked else 'btn-outline-danger' }} rounded-pill px-4" onclick="toggleLike()">
-                            <i class="fas fa-heart me-1"></i>좋아요 <span id="likeCount">{{ like_count }}</span>
+                        <button id="likeBtn" class="btn btn-outline-danger rounded-pill px-4" onclick="toggleLike()">
+                            <i id="likeIcon" class="{{ 'fas' if liked else 'far' }} fa-heart me-1 {{ 'text-danger' if liked else '' }}"></i>좋아요 <span id="likeCount">{{ like_count }}</span>
                         </button>
-                        <button id="bmBtn" class="btn {{ 'btn-primary' if bookmarked else 'btn-outline-primary' }} rounded-pill px-4" onclick="toggleBookmark()">
-                            <i class="far fa-bookmark me-1"></i>스크랩
+                        <button id="bmBtn" class="btn btn-outline-secondary rounded-pill px-4" onclick="toggleBookmark()">
+                            <i id="bmIcon" class="{{ 'fas' if bookmarked else 'far' }} fa-bookmark me-1 {{ 'text-warning' if bookmarked else '' }}"></i>스크랩
                         </button>
                     </div>
                 </div>
@@ -96,17 +96,18 @@
     </div>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 function toggleLike() {
     fetch('/api/posts/{{ post.id }}/like', {method: 'POST'}).then(r => r.json()).then(d => {
         document.getElementById('likeCount').textContent = d.count;
-        document.getElementById('likeBtn').className = 'btn rounded-pill px-4 ' + (d.liked ? 'btn-danger' : 'btn-outline-danger');
+        var icon = document.getElementById('likeIcon');
+        icon.className = (d.liked ? 'fas text-danger' : 'far') + ' fa-heart me-1';
     });
 }
 function toggleBookmark() {
     fetch('/api/posts/{{ post.id }}/bookmark', {method: 'POST'}).then(r => r.json()).then(d => {
-        document.getElementById('bmBtn').className = 'btn rounded-pill px-4 ' + (d.bookmarked ? 'btn-primary' : 'btn-outline-primary');
+        var icon = document.getElementById('bmIcon');
+        icon.className = (d.bookmarked ? 'fas text-warning' : 'far') + ' fa-bookmark me-1';
     });
 }
 </script>

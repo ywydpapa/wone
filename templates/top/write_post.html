@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko">
+{% include 'common/header.html' %}
+<body>
+
+<!-- Navbar -->
+{% include 'common/topbar.html' %}
+
+<!-- Dashboard Header -->
+<div class="dash-header">
+    <div class="container d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+            <h2>새 글 작성</h2>
+            <p>커뮤니티에 새로운 글을 작성합니다.</p>
+        </div>
+        <div>
+            <a href="/community" class="btn btn-light rounded-pill px-4 shadow-sm">
+                <i class="fas fa-arrow-left me-2"></i>돌아가기
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="list-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="content-card">
+                    <div class="card-title mb-4 border-bottom pb-3">
+                        <span><i class="fas fa-pencil-alt me-2 text-primary"></i>글 작성</span>
+                    </div>
+
+                    <form action="/api/posts" method="POST">
+
+                        <!-- 카테고리 -->
+                        <div class="mb-3">
+                            <label for="postCategory" class="form-label fw-bold">카테고리 <span class="text-danger">*</span></label>
+                            <select class="form-select form-select-lg" id="postCategory" name="category" required>
+                                <option value="" disabled selected>카테고리를 선택하세요</option>
+                                <option value="general">일반</option>
+                                <option value="notice">공지</option>
+                                <option value="question">질문</option>
+                            </select>
+                        </div>
+
+                        <!-- 제목 -->
+                        <div class="mb-3">
+                            <label for="postTitle" class="form-label fw-bold">제목 <span class="text-danger">*</span></label>
+                            <input type="text"
+                                   class="form-control form-control-lg"
+                                   id="postTitle"
+                                   name="title"
+                                   placeholder="글 제목을 입력하세요"
+                                   required>
+                        </div>
+
+                        <!-- 내용 -->
+                        <div class="mb-4">
+                            <label for="postContent" class="form-label fw-bold">내용 <span class="text-danger">*</span></label>
+                            <textarea class="form-control form-control-lg"
+                                      id="postContent"
+                                      name="content"
+                                      rows="12"
+                                      placeholder="글 내용을 입력하세요"
+                                      required></textarea>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="/community" class="btn btn-light px-4">
+                                <i class="fas fa-times me-2"></i>취소
+                            </a>
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="fas fa-paper-plane me-2"></i>게시하기
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-menu mb-4">
+            <a href="/about">소개</a>
+            <a href="/contact">문의하기</a>
+            <a href="/accessibility">접근성</a>
+        </div>
+        <div class="social-icons mb-4">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-youtube"></i></a>
+        </div>
+        <p class="mb-0 opacity-50 small">&copy; 2024 Wno1. All Rights Reserved.</p>
+    </div>
+</footer>
+
+<!-- Bootstrap 5 JS Bundle -->
+</body>
+</html>

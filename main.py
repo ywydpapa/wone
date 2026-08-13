@@ -1334,8 +1334,9 @@ async def add_comment(request: Request, post_id: int, content: str = Form(...)):
     if not check_login(request):
         return JSONResponse({"error": "not logged in"}, status_code=401)
     uid = request.session.get("user_id", 1)
-    author = request.session.get("user_name", "익명")
     conn = get_sqlite()
+    user_row = conn.execute("SELECT name FROM users WHERE id=?", (uid,)).fetchone()
+    author = user_row["name"] if user_row else request.session.get("user_name", "익명")
     conn.execute(
         "INSERT INTO comments (post_id, user_id, author, content) VALUES (?, ?, ?, ?)",
         (post_id, uid, author, content)

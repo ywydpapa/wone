@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ko">
+{% include 'common/header.html' %}
+<body>
+
+<!-- Navbar -->
+{% include 'common/topbar.html' %}
+
+<!-- Dashboard Header -->
+<div class="dash-header">
+    <div class="container d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+            <h2>{{ page_title }}</h2>
+        </div>
+        <div>
+            <a href="{{ back_url }}" class="btn btn-light rounded-pill px-4 shadow-sm">
+                <i class="fas fa-arrow-left me-2"></i>돌아가기
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="list-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-9">
+                <div class="content-card">
+
+                    <!-- Badges -->
+                    {% if badges %}
+                    <div class="mb-3">
+                        {% for badge in badges %}
+                        <span class="item-badge
+                            {% if badge.color == 'info' %}bg-blue-light
+                            {% elif badge.color == 'warning' %}bg-yellow-light
+                            {% elif badge.color == 'success' %}badge-green
+                            {% elif badge.color == 'danger' %}status-urgent
+                            {% endif %}">
+                            {{ badge.text }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <!-- Title -->
+                    <h3 class="fw-bold text-dark mb-2">{{ detail_title }}</h3>
+
+                    <!-- Author & Date -->
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        {% if author %}
+                        <span class="text-muted small"><i class="fas fa-user-circle me-1"></i>{{ author }}{% if dept %} ({{ dept }}){% endif %}</span>
+                        {% endif %}
+                        <span class="text-muted small"><i class="far fa-clock me-1"></i>{{ detail_date }}</span>
+                    </div>
+
+                    <!-- Stats -->
+                    {% if views or comments or likes %}
+                    <div class="d-flex gap-4 mb-4 small text-muted">
+                        {% if views %}<span><i class="far fa-eye me-1"></i>조회 {{ views }}</span>{% endif %}
+                        {% if comments %}<span class="text-primary"><i class="far fa-comment-dots me-1"></i>댓글 {{ comments }}</span>{% endif %}
+                        {% if likes %}<span class="text-danger"><i class="fas fa-heart me-1"></i>좋아요 {{ likes }}</span>{% endif %}
+                    </div>
+                    {% endif %}
+
+                    <hr class="mb-4">
+
+                    <!-- Body -->
+                    <div class="detail-body" style="line-height: 1.8; color: #444;">
+                        {{ detail_content }}
+                    </div>
+
+                    <!-- Extra Content -->
+                    {% if extra_content %}
+                    <div class="mt-4 p-3 bg-light rounded">
+                        <h6 class="fw-bold text-muted"><i class="fas fa-exclamation-circle me-1"></i>{{ extra_label }}</h6>
+                        <p class="mb-0">{{ extra_content }}</p>
+                    </div>
+                    {% endif %}
+
+                    <hr class="mt-4 mb-3">
+
+                    <!-- Back Button -->
+                    <div class="d-flex justify-content-end">
+                        <a href="{{ back_url }}" class="btn btn-light px-4">
+                            <i class="fas fa-arrow-left me-2"></i>돌아가기
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-menu mb-4">
+            <a href="/about">소개</a>
+            <a href="/contact">문의하기</a>
+            <a href="/accessibility">접근성</a>
+        </div>
+        <div class="social-icons mb-4">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-youtube"></i></a>
+        </div>
+        <p class="mb-0 opacity-50 small">&copy; 2024 Wno1. All Rights Reserved.</p>
+    </div>
+</footer>
+
+<!-- Bootstrap 5 JS Bundle -->
+</body>
+</html>
