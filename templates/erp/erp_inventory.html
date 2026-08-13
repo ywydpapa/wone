@@ -10,7 +10,7 @@
 <div class="dash-header">
     <div class="container">
         <h2>재고관리 대시보드 📦</h2>
-        <p>김민수 님, 오늘의 입출고 현황 및 재고 부족 알림입니다. 원활한 물류 흐름을 위해 확인해 주세요.</p>
+        <p>{{ user_name }} 님, 오늘의 입출고 현황 및 재고 부족 알림입니다. 원활한 물류 흐름을 위해 확인해 주세요.</p>
     </div>
 </div>
 
@@ -66,61 +66,7 @@
                     <button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="location.href='/new_stock_move'">+ 입출고 등록</button>
                 </div>
 
-                <div class="task-list">
-                    <!-- Task 1 -->
-                    <div class="task-item">
-                        <input class="form-check-input task-checkbox" type="checkbox" id="inv1">
-                        <div class="task-content">
-                            <label class="task-title" for="inv1">[출고지시] A대리점 8월 1차 정기 발주 물량 출고</label>
-                            <div class="task-meta d-flex align-items-center gap-3">
-                                <span class="badge-status status-urgent">긴급</span>
-                                <span><i class="far fa-clock"></i> 오늘 14:00 상차</span>
-                                <span><i class="fas fa-warehouse"></i> 제1물류센터</span>
-                            </div>
-                        </div>
-                        <button class="btn btn-light btn-sm"><i class="fas fa-ellipsis-v"></i></button>
-                    </div>
-
-                    <!-- Task 2 -->
-                    <div class="task-item">
-                        <input class="form-check-input task-checkbox" type="checkbox" id="inv2">
-                        <div class="task-content">
-                            <label class="task-title" for="inv2">[입고검수] B공장 생산품(노트북 거치대) 500개 입고 검수</label>
-                            <div class="task-meta d-flex align-items-center gap-3">
-                                <span class="badge-status status-progress">진행중</span>
-                                <span><i class="far fa-clock"></i> 오늘 17:00 까지</span>
-                                <span><i class="fas fa-clipboard-check"></i> 품질검수장</span>
-                            </div>
-                        </div>
-                        <button class="btn btn-light btn-sm"><i class="fas fa-ellipsis-v"></i></button>
-                    </div>
-
-                    <!-- Task 3 -->
-                    <div class="task-item">
-                        <input class="form-check-input task-checkbox" type="checkbox" id="inv3">
-                        <div class="task-content">
-                            <label class="task-title" for="inv3">[재고실사] 3분기 정기 재고실사 계획안 작성 및 담당자 배정</label>
-                            <div class="task-meta d-flex align-items-center gap-3">
-                                <span class="badge-status status-progress" style="background-color:#e2e3e5; color:#383d41;">대기</span>
-                                <span><i class="far fa-calendar-alt"></i> 이번 주 금요일 마감</span>
-                                <span><i class="far fa-folder-open"></i> 재고관리팀</span>
-                            </div>
-                        </div>
-                        <button class="btn btn-light btn-sm"><i class="fas fa-ellipsis-v"></i></button>
-                    </div>
-
-                    <!-- Task 4 (Completed) -->
-                    <div class="task-item opacity-50">
-                        <input class="form-check-input task-checkbox" type="checkbox" id="inv4" checked disabled>
-                        <div class="task-content">
-                            <label class="task-title text-decoration-line-through" for="inv4">[발주요청] 포장용 박스(대형) 재고 부족에 따른 긴급 발주</label>
-                            <div class="task-meta d-flex align-items-center gap-3">
-                                <span class="badge-status status-done">완료</span>
-                                <span><i class="fas fa-check"></i> 오늘 09:30 구매팀 이관</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                {% include 'erp/_doc_list.html' %}
             </div>
         </div>
 
@@ -130,7 +76,7 @@
             <div class="content-card">
                 <div class="card-title">
                     <span><i class="far fa-bell me-2 text-primary"></i>물류/재고 알림</span>
-                    <a href="#" class="text-decoration-none small">전체보기</a>
+                    <a href="/erp_inventory" class="text-decoration-none small">전체보기</a>
                 </div>
 
                 <div class="msg-item">
@@ -159,19 +105,19 @@
                 <div class="card-title">
                     <span><i class="fas fa-toolbox me-2 text-primary"></i>재고관리 도구</span>
                 </div>
-                <a href="#" class="tool-btn">
+                <a href="/erp_inventory" class="tool-btn">
                     <i class="fas fa-search"></i> 실시간 재고 조회
                 </a>
-                <a href="#" class="tool-btn">
+                <a href="/erp_inventory" class="tool-btn">
                     <i class="fas fa-exchange-alt"></i> 입고 / 출고 등록
                 </a>
-                <a href="#" class="tool-btn">
+                <a href="/erp_inventory" class="tool-btn">
                     <i class="fas fa-barcode"></i> 재고 실사 및 조정
                 </a>
-                <a href="#" class="tool-btn">
+                <a href="/erp_inventory" class="tool-btn">
                     <i class="fas fa-shopping-cart"></i> 구매 / 발주 요청
                 </a>
-                <a href="#" class="tool-btn">
+                <a href="/erp_inventory" class="tool-btn">
                     <i class="fas fa-pallet"></i> 창고 및 로케이션 관리
                 </a>
             </div>

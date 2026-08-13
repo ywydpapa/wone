@@ -10,7 +10,7 @@
 <div class="dash-header">
     <div class="container">
         <h2>자금관리 대시보드 📊</h2>
-        <p>김민수 님, 오늘의 자금 현황 및 결제 대기 목록입니다. 정확한 자금 집행을 확인해 주세요.</p>
+        <p>{{ user_name }} 님, 오늘의 자금 현황 및 결제 대기 목록입니다. 정확한 자금 집행을 확인해 주세요.</p>
     </div>
 </div>
 
@@ -66,61 +66,7 @@
                     <button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="location.href='/new_slip'">+ 전표 입력</button>
                 </div>
 
-                <div class="task-list">
-                    <!-- Task 1 -->
-                    <div class="task-item">
-                        <input class="form-check-input task-checkbox" type="checkbox" id="pay1">
-                        <div class="task-content">
-                            <label class="task-title" for="pay1">[대금지급] (주)ABC상사 7월 물품 대금 결제</label>
-                            <div class="task-meta d-flex align-items-center gap-3">
-                                <span class="badge-status status-urgent">긴급</span>
-                                <span><i class="fas fa-coins"></i> 15,400,000 원</span>
-                                <span><i class="far fa-clock"></i> 오늘 16:00 마감</span>
-                            </div>
-                        </div>
-                        <button class="btn btn-light btn-sm"><i class="fas fa-ellipsis-v"></i></button>
-                    </div>
-
-                    <!-- Task 2 -->
-                    <div class="task-item">
-                        <input class="form-check-input task-checkbox" type="checkbox" id="pay2">
-                        <div class="task-content">
-                            <label class="task-title" for="pay2">[비용정산] 영업부 7월 법인카드 사용 내역 정산</label>
-                            <div class="task-meta d-flex align-items-center gap-3">
-                                <span class="badge-status status-progress">검토중</span>
-                                <span><i class="fas fa-coins"></i> 3,250,000 원</span>
-                                <span><i class="far fa-folder-open"></i> 영업1팀</span>
-                            </div>
-                        </div>
-                        <button class="btn btn-light btn-sm"><i class="fas fa-ellipsis-v"></i></button>
-                    </div>
-
-                    <!-- Task 3 -->
-                    <div class="task-item">
-                        <input class="form-check-input task-checkbox" type="checkbox" id="pay3">
-                        <div class="task-content">
-                            <label class="task-title" for="pay3">[급여이체] 8월 임직원 급여 대장 승인 요청</label>
-                            <div class="task-meta d-flex align-items-center gap-3">
-                                <span class="badge-status status-progress" style="background-color:#e2e3e5; color:#383d41;">대기</span>
-                                <span><i class="fas fa-coins"></i> 85,000,000 원</span>
-                                <span><i class="far fa-folder-open"></i> 인사총무팀</span>
-                            </div>
-                        </div>
-                        <button class="btn btn-light btn-sm"><i class="fas fa-ellipsis-v"></i></button>
-                    </div>
-
-                    <!-- Task 4 (Completed) -->
-                    <div class="task-item opacity-50">
-                        <input class="form-check-input task-checkbox" type="checkbox" id="pay4" checked disabled>
-                        <div class="task-content">
-                            <label class="task-title text-decoration-line-through" for="pay4">[세금납부] 2026년 1기 확정 부가가치세 납부</label>
-                            <div class="task-meta d-flex align-items-center gap-3">
-                                <span class="badge-status status-done">완료</span>
-                                <span><i class="fas fa-check"></i> 오늘 09:30 이체완료</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                {% include 'erp/_doc_list.html' %}
             </div>
         </div>
 
@@ -130,7 +76,7 @@
             <div class="content-card">
                 <div class="card-title">
                     <span><i class="far fa-bell me-2 text-primary"></i>재무/회계 알림</span>
-                    <a href="#" class="text-decoration-none small">전체보기</a>
+                    <a href="/erp_fa" class="text-decoration-none small">전체보기</a>
                 </div>
 
                 <div class="msg-item">
@@ -159,19 +105,19 @@
                 <div class="card-title">
                     <span><i class="fas fa-wallet me-2 text-primary"></i>자금관리 도구</span>
                 </div>
-                <a href="#" class="tool-btn">
+                <a href="/erp_fa" class="tool-btn">
                     <i class="fas fa-edit"></i> 전표 입력 및 조회
                 </a>
-                <a href="#" class="tool-btn">
+                <a href="/erp_fa" class="tool-btn">
                     <i class="fas fa-exchange-alt"></i> 은행 계좌 이체 실행
                 </a>
-                <a href="#" class="tool-btn">
+                <a href="/erp_fa" class="tool-btn">
                     <i class="far fa-credit-card"></i> 법인카드 사용내역 조회
                 </a>
-                <a href="#" class="tool-btn">
+                <a href="/erp_fa" class="tool-btn">
                     <i class="fas fa-chart-line"></i> 자금수지일보 생성
                 </a>
-                <a href="#" class="tool-btn">
+                <a href="/erp_fa" class="tool-btn">
                     <i class="fas fa-file-invoice"></i> 전자세금계산서 발행/조회
                 </a>
             </div>

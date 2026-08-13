@@ -10,7 +10,7 @@
 <div class="dash-header">
     <div class="container">
         <h2>인사관리 대시보드 👥</h2>
-        <p>김민수 님, 오늘의 인사/노무 현황 및 결재 대기 목록입니다. 원활한 조직 운영을 위해 확인해 주세요.</p>
+        <p>{{ user_name }} 님, 오늘의 인사/노무 현황 및 결재 대기 목록입니다. 원활한 조직 운영을 위해 확인해 주세요.</p>
     </div>
 </div>
 
@@ -66,61 +66,7 @@
                     <button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="location.href='/new_hr_task'">+ 업무 추가</button>
                 </div>
 
-                <div class="task-list">
-                    <!-- Task 1 -->
-                    <div class="task-item">
-                        <input class="form-check-input task-checkbox" type="checkbox" id="hr1">
-                        <div class="task-content">
-                            <label class="task-title" for="hr1">[휴가승인] 개발팀 이대리 연차 휴가 신청 (8/10 ~ 8/12)</label>
-                            <div class="task-meta d-flex align-items-center gap-3">
-                                <span class="badge-status status-urgent">긴급</span>
-                                <span><i class="far fa-clock"></i> 오늘 18:00 마감</span>
-                                <span><i class="far fa-user"></i> 개발1팀</span>
-                            </div>
-                        </div>
-                        <button class="btn btn-light btn-sm"><i class="fas fa-ellipsis-v"></i></button>
-                    </div>
-
-                    <!-- Task 2 -->
-                    <div class="task-item">
-                        <input class="form-check-input task-checkbox" type="checkbox" id="hr2">
-                        <div class="task-content">
-                            <label class="task-title" for="hr2">[채용] 마케팅팀 신입 사원 1차 면접 평가표 취합</label>
-                            <div class="task-meta d-flex align-items-center gap-3">
-                                <span class="badge-status status-progress">진행중</span>
-                                <span><i class="far fa-clock"></i> 내일 14:00 까지</span>
-                                <span><i class="fas fa-briefcase"></i> 채용관리</span>
-                            </div>
-                        </div>
-                        <button class="btn btn-light btn-sm"><i class="fas fa-ellipsis-v"></i></button>
-                    </div>
-
-                    <!-- Task 3 -->
-                    <div class="task-item">
-                        <input class="form-check-input task-checkbox" type="checkbox" id="hr3">
-                        <div class="task-content">
-                            <label class="task-title" for="hr3">[온보딩] 신규 입사자(영업팀) 사원증 및 웰컴키트 준비</label>
-                            <div class="task-meta d-flex align-items-center gap-3">
-                                <span class="badge-status status-progress" style="background-color:#e2e3e5; color:#383d41;">대기</span>
-                                <span><i class="far fa-calendar-alt"></i> 차주 월요일 입사</span>
-                                <span><i class="far fa-folder-open"></i> 인사총무팀</span>
-                            </div>
-                        </div>
-                        <button class="btn btn-light btn-sm"><i class="fas fa-ellipsis-v"></i></button>
-                    </div>
-
-                    <!-- Task 4 (Completed) -->
-                    <div class="task-item opacity-50">
-                        <input class="form-check-input task-checkbox" type="checkbox" id="hr4" checked disabled>
-                        <div class="task-content">
-                            <label class="task-title text-decoration-line-through" for="hr4">[급여] 7월 임직원 급여명세서 이메일 발송</label>
-                            <div class="task-meta d-flex align-items-center gap-3">
-                                <span class="badge-status status-done">완료</span>
-                                <span><i class="fas fa-check"></i> 오늘 10:00 발송됨</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                {% include 'erp/_doc_list.html' %}
             </div>
         </div>
 
@@ -130,7 +76,7 @@
             <div class="content-card">
                 <div class="card-title">
                     <span><i class="far fa-bell me-2 text-primary"></i>인사/노무 알림</span>
-                    <a href="#" class="text-decoration-none small">전체보기</a>
+                    <a href="/erp_hr" class="text-decoration-none small">전체보기</a>
                 </div>
 
                 <div class="msg-item">
@@ -159,19 +105,19 @@
                 <div class="card-title">
                     <span><i class="fas fa-toolbox me-2 text-primary"></i>인사관리 도구</span>
                 </div>
-                <a href="#" class="tool-btn">
+                <a href="/erp_hr" class="tool-btn">
                     <i class="fas fa-address-book"></i> 임직원 정보 조회
                 </a>
-                <a href="#" class="tool-btn">
+                <a href="/erp_hr" class="tool-btn">
                     <i class="fas fa-user-clock"></i> 근태 및 휴가 관리
                 </a>
-                <a href="#" class="tool-btn">
+                <a href="/erp_hr" class="tool-btn">
                     <i class="fas fa-file-invoice-dollar"></i> 급여 대장 및 정산 관리
                 </a>
-                <a href="#" class="tool-btn">
+                <a href="/erp_hr" class="tool-btn">
                     <i class="fas fa-id-badge"></i> 채용 공고 및 이력서 관리
                 </a>
-                <a href="#" class="tool-btn">
+                <a href="/erp_hr" class="tool-btn">
                     <i class="fas fa-print"></i> 제증명서(재직/경력) 발급 대장
                 </a>
             </div>

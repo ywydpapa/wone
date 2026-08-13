@@ -10,7 +10,7 @@
 <div class="dash-header">
     <div class="container">
         <h2>생산관리 대시보드 ⚙️</h2>
-        <p>김민수 님, 오늘의 생산 계획 및 설비 가동 현황입니다. 차질 없는 생산 일정을 위해 확인해 주세요.</p>
+        <p>{{ user_name }} 님, 오늘의 생산 계획 및 설비 가동 현황입니다. 차질 없는 생산 일정을 위해 확인해 주세요.</p>
     </div>
 </div>
 
@@ -66,61 +66,7 @@
                     <button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="location.href='/new_work_order'">+ 작업 지시</button>
                 </div>
 
-                <div class="task-list">
-                    <!-- Task 1 -->
-                    <div class="task-item">
-                        <input class="form-check-input task-checkbox" type="checkbox" id="prod1">
-                        <div class="task-content">
-                            <label class="task-title" for="prod1">[생산지시] A라인 오후조 스마트폰 케이스(블랙) 조립 공정</label>
-                            <div class="task-meta d-flex align-items-center gap-3">
-                                <span class="badge-status status-urgent">긴급</span>
-                                <span><i class="far fa-clock"></i> 오늘 13:00 시작</span>
-                                <span><i class="fas fa-industry"></i> 제1공장 A라인</span>
-                            </div>
-                        </div>
-                        <button class="btn btn-light btn-sm"><i class="fas fa-ellipsis-v"></i></button>
-                    </div>
-
-                    <!-- Task 2 -->
-                    <div class="task-item">
-                        <input class="form-check-input task-checkbox" type="checkbox" id="prod2">
-                        <div class="task-content">
-                            <label class="task-title" for="prod2">[품질검사] B라인 오전 생산품(무선 충전기) 초도품 검사(IQC)</label>
-                            <div class="task-meta d-flex align-items-center gap-3">
-                                <span class="badge-status status-progress">진행중</span>
-                                <span><i class="far fa-clock"></i> 오늘 11:30 까지</span>
-                                <span><i class="fas fa-check-double"></i> 품질관리팀</span>
-                            </div>
-                        </div>
-                        <button class="btn btn-light btn-sm"><i class="fas fa-ellipsis-v"></i></button>
-                    </div>
-
-                    <!-- Task 3 -->
-                    <div class="task-item">
-                        <input class="form-check-input task-checkbox" type="checkbox" id="prod3">
-                        <div class="task-content">
-                            <label class="task-title" for="prod3">[설비점검] 포장기계 3호기 정기 예방 정비 (PM)</label>
-                            <div class="task-meta d-flex align-items-center gap-3">
-                                <span class="badge-status status-progress" style="background-color:#e2e3e5; color:#383d41;">대기</span>
-                                <span><i class="far fa-calendar-alt"></i> 내일 09:00 예정</span>
-                                <span><i class="fas fa-tools"></i> 공무팀</span>
-                            </div>
-                        </div>
-                        <button class="btn btn-light btn-sm"><i class="fas fa-ellipsis-v"></i></button>
-                    </div>
-
-                    <!-- Task 4 (Completed) -->
-                    <div class="task-item opacity-50">
-                        <input class="form-check-input task-checkbox" type="checkbox" id="prod4" checked disabled>
-                        <div class="task-content">
-                            <label class="task-title text-decoration-line-through" for="prod4">[자재청구] 금일 오후 생산용 원부자재 출고 요청</label>
-                            <div class="task-meta d-flex align-items-center gap-3">
-                                <span class="badge-status status-done">완료</span>
-                                <span><i class="fas fa-check"></i> 오늘 09:00 자재팀 이관</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                {% include 'erp/_doc_list.html' %}
             </div>
         </div>
 
@@ -130,7 +76,7 @@
             <div class="content-card">
                 <div class="card-title">
                     <span><i class="far fa-bell me-2 text-primary"></i>생산/설비 알림</span>
-                    <a href="#" class="text-decoration-none small">전체보기</a>
+                    <a href="/erp_product" class="text-decoration-none small">전체보기</a>
                 </div>
 
                 <div class="msg-item">
@@ -159,19 +105,19 @@
                 <div class="card-title">
                     <span><i class="fas fa-toolbox me-2 text-primary"></i>생산관리 도구</span>
                 </div>
-                <a href="#" class="tool-btn">
+                <a href="/erp_product" class="tool-btn">
                     <i class="fas fa-calendar-alt"></i> 생산 계획 및 지시
                 </a>
-                <a href="#" class="tool-btn">
+                <a href="/erp_product" class="tool-btn">
                     <i class="fas fa-sitemap"></i> BOM (자재명세서) 관리
                 </a>
-                <a href="#" class="tool-btn">
+                <a href="/erp_product" class="tool-btn">
                     <i class="fas fa-chart-pie"></i> 공정 실적 및 불량 등록
                 </a>
-                <a href="#" class="tool-btn">
+                <a href="/erp_product" class="tool-btn">
                     <i class="fas fa-microscope"></i> 품질 검사 (QC) 관리
                 </a>
-                <a href="#" class="tool-btn">
+                <a href="/erp_product" class="tool-btn">
                     <i class="fas fa-wrench"></i> 설비 및 금형 이력 관리
                 </a>
             </div>

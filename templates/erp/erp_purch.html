@@ -10,7 +10,7 @@
 <div class="dash-header">
     <div class="container">
         <h2>구매관리 대시보드 🛒</h2>
-        <p>김민수 님, 오늘의 발주 현황 및 협력사 납기 일정입니다. 원활한 자재 수급을 위해 확인해 주세요.</p>
+        <p>{{ user_name }} 님, 오늘의 발주 현황 및 협력사 납기 일정입니다. 원활한 자재 수급을 위해 확인해 주세요.</p>
     </div>
 </div>
 
@@ -66,61 +66,7 @@
                     <button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="location.href='/new_po'">+ 발주서 작성</button>
                 </div>
 
-                <div class="task-list">
-                    <!-- Task 1 -->
-                    <div class="task-item">
-                        <input class="form-check-input task-checkbox" type="checkbox" id="pur1">
-                        <div class="task-content">
-                            <label class="task-title" for="pur1">[긴급발주] 생산 1라인 포장용 부자재(대형 박스) 긴급 발주</label>
-                            <div class="task-meta d-flex align-items-center gap-3">
-                                <span class="badge-status status-urgent">긴급</span>
-                                <span><i class="far fa-clock"></i> 오늘 14:00 마감</span>
-                                <span><i class="fas fa-industry"></i> 생산팀 요청</span>
-                            </div>
-                        </div>
-                        <button class="btn btn-light btn-sm"><i class="fas fa-ellipsis-v"></i></button>
-                    </div>
-
-                    <!-- Task 2 -->
-                    <div class="task-item">
-                        <input class="form-check-input task-checkbox" type="checkbox" id="pur2">
-                        <div class="task-content">
-                            <label class="task-title" for="pur2">[견적비교] 2026년 하반기 사무용품 연간 단가계약 견적서 검토</label>
-                            <div class="task-meta d-flex align-items-center gap-3">
-                                <span class="badge-status status-progress">진행중</span>
-                                <span><i class="far fa-clock"></i> 내일 18:00 까지</span>
-                                <span><i class="fas fa-calculator"></i> 3개사 비교</span>
-                            </div>
-                        </div>
-                        <button class="btn btn-light btn-sm"><i class="fas fa-ellipsis-v"></i></button>
-                    </div>
-
-                    <!-- Task 3 -->
-                    <div class="task-item">
-                        <input class="form-check-input task-checkbox" type="checkbox" id="pur3">
-                        <div class="task-content">
-                            <label class="task-title" for="pur3">[업체등록] 신규 원부자재(알루미늄 패널) 공급사 신용평가 및 등록</label>
-                            <div class="task-meta d-flex align-items-center gap-3">
-                                <span class="badge-status status-progress" style="background-color:#e2e3e5; color:#383d41;">대기</span>
-                                <span><i class="far fa-calendar-alt"></i> 이번 주 금요일 마감</span>
-                                <span><i class="fas fa-handshake"></i> 협력사 관리</span>
-                            </div>
-                        </div>
-                        <button class="btn btn-light btn-sm"><i class="fas fa-ellipsis-v"></i></button>
-                    </div>
-
-                    <!-- Task 4 (Completed) -->
-                    <div class="task-item opacity-50">
-                        <input class="form-check-input task-checkbox" type="checkbox" id="pur4" checked disabled>
-                        <div class="task-content">
-                            <label class="task-title text-decoration-line-through" for="pur4">[발주완료] IT지원팀 요청 개발용 고사양 노트북 5대 발주서 전송</label>
-                            <div class="task-meta d-flex align-items-center gap-3">
-                                <span class="badge-status status-done">완료</span>
-                                <span><i class="fas fa-check"></i> 오늘 10:00 전송됨</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                {% include 'erp/_doc_list.html' %}
             </div>
         </div>
 
@@ -130,7 +76,7 @@
             <div class="content-card">
                 <div class="card-title">
                     <span><i class="far fa-bell me-2 text-primary"></i>구매/납기 알림</span>
-                    <a href="#" class="text-decoration-none small">전체보기</a>
+                    <a href="/erp_purch" class="text-decoration-none small">전체보기</a>
                 </div>
 
                 <div class="msg-item">
@@ -159,19 +105,19 @@
                 <div class="card-title">
                     <span><i class="fas fa-toolbox me-2 text-primary"></i>구매관리 도구</span>
                 </div>
-                <a href="#" class="tool-btn">
+                <a href="/erp_purch" class="tool-btn">
                     <i class="fas fa-file-import"></i> 구매 요청(PR) 접수 및 조회
                 </a>
-                <a href="#" class="tool-btn">
+                <a href="/erp_purch" class="tool-btn">
                     <i class="fas fa-file-export"></i> 발주서(PO) 작성 및 전송
                 </a>
-                <a href="#" class="tool-btn">
+                <a href="/erp_purch" class="tool-btn">
                     <i class="fas fa-handshake"></i> 협력사(Vendor) 정보 관리
                 </a>
-                <a href="#" class="tool-btn">
+                <a href="/erp_purch" class="tool-btn">
                     <i class="fas fa-file-contract"></i> 단가 및 연간 계약 관리
                 </a>
-                <a href="#" class="tool-btn">
+                <a href="/erp_purch" class="tool-btn">
                     <i class="fas fa-boxes"></i> 입고 현황 및 매입 마감
                 </a>
             </div>

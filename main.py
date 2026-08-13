@@ -484,14 +484,57 @@ async def signup_submit(
 async def forgot_password(request: Request):
     return RedirectResponse(url="/signup", status_code=303)
 
+ERP_PAGE_DOCTYPE = {
+    "erp_hr":         "hr_task",
+    "erp_fa":         "expense",
+    "erp_inventory":  "stock_move",
+    "erp_product":    "work_order",
+    "erp_purch":      "po",
+    "erp_scrm":       "activity",
+    "erp_groupware":  "draft",
+}
+
+_ERP_ROUTE_MAP = {
+    "erp_hr":        ("/erp/erp_hr.html",         "인사관리 대시보드"),
+    "erp_fa":        ("/erp/erp_fa.html",          "자금관리 대시보드"),
+    "erp_inventory": ("/erp/erp_inventory.html",   "재고관리 대시보드"),
+    "erp_product":   ("/erp/erp_product.html",     "생산관리 대시보드"),
+    "erp_purch":     ("/erp/erp_purch.html",       "구매관리 대시보드"),
+    "erp_scrm":      ("/erp/erp_scrm.html",        "영업/고객관리 대시보드"),
+    "erp_groupware": ("/erp/erp_groupware.html",   "사내 그룹웨어"),
+}
+
+
+def _erp_docs_for(dtype: str):
+    conn = get_sqlite()
+    rows = with_status_meta(conn.execute(
+        "SELECT * FROM erp_docs WHERE doc_type=? ORDER BY CASE status WHEN 'urgent' THEN 0 WHEN 'progress' THEN 1 WHEN 'wait' THEN 2 ELSE 3 END, id DESC",
+        (dtype,)
+    ).fetchall())
+    conn.close()
+    return rows
+
+
 @app.get("/erp_dash", response_class=HTMLResponse)
 async def erp_dash(request: Request):
     if not check_login(request):
         return RedirectResponse(url="/login", status_code=303)
+    conn = get_sqlite()
+    counts = {r["doc_type"]: r["cnt"] for r in [
+        dict(r) for r in conn.execute(
+            "SELECT doc_type, COUNT(*) AS cnt FROM erp_docs GROUP BY doc_type"
+        ).fetchall()
+    ]}
+    recent = with_status_meta(conn.execute(
+        "SELECT * FROM erp_docs ORDER BY id DESC LIMIT 5"
+    ).fetchall())
+    conn.close()
     return templates.TemplateResponse(
         request=request, name="/erp/erp_dash.html", context={
             "request": request,
             "page_title": "업무 대시보드",
+            "doc_counts": counts,
+            "recent_docs": recent,
             "user_name": request.session.get("user_name", "김민수")
         }
     )
@@ -503,11 +546,12 @@ async def erp_hr(request: Request):
         return RedirectResponse(url="/login", status_code=303)
     return templates.TemplateResponse(
         request=request, name="/erp/erp_hr.html", context={
-            "request": request,
-            "page_title": "업무 대시보드",
+            "request": request, "page_title": "인사관리 대시보드",
+            "docs": _erp_docs_for("hr_task"),
             "user_name": request.session.get("user_name", "김민수")
         }
     )
+
 
 @app.get("/erp_fa", response_class=HTMLResponse)
 async def erp_fa(request: Request):
@@ -515,8 +559,8 @@ async def erp_fa(request: Request):
         return RedirectResponse(url="/login", status_code=303)
     return templates.TemplateResponse(
         request=request, name="/erp/erp_fa.html", context={
-            "request": request,
-            "page_title": "업무 대시보드",
+            "request": request, "page_title": "자금관리 대시보드",
+            "docs": _erp_docs_for("expense"),
             "user_name": request.session.get("user_name", "김민수")
         }
     )
@@ -528,11 +572,12 @@ async def erp_scrm(request: Request):
         return RedirectResponse(url="/login", status_code=303)
     return templates.TemplateResponse(
         request=request, name="/erp/erp_scrm.html", context={
-            "request": request,
-            "page_title": "업무 대시보드",
+            "request": request, "page_title": "영업/고객관리 대시보드",
+            "docs": _erp_docs_for("activity"),
             "user_name": request.session.get("user_name", "김민수")
         }
     )
+
 
 @app.get("/erp_purch", response_class=HTMLResponse)
 async def erp_purch(request: Request):
@@ -540,11 +585,12 @@ async def erp_purch(request: Request):
         return RedirectResponse(url="/login", status_code=303)
     return templates.TemplateResponse(
         request=request, name="/erp/erp_purch.html", context={
-            "request": request,
-            "page_title": "업무 대시보드",
+            "request": request, "page_title": "구매관리 대시보드",
+            "docs": _erp_docs_for("po"),
             "user_name": request.session.get("user_name", "김민수")
         }
     )
+
 
 @app.get("/erp_inventory", response_class=HTMLResponse)
 async def erp_invent(request: Request):
@@ -552,8 +598,8 @@ async def erp_invent(request: Request):
         return RedirectResponse(url="/login", status_code=303)
     return templates.TemplateResponse(
         request=request, name="/erp/erp_inventory.html", context={
-            "request": request,
-            "page_title": "업무 대시보드",
+            "request": request, "page_title": "재고관리 대시보드",
+            "docs": _erp_docs_for("stock_move"),
             "user_name": request.session.get("user_name", "김민수")
         }
     )
@@ -565,11 +611,12 @@ async def erp_product(request: Request):
         return RedirectResponse(url="/login", status_code=303)
     return templates.TemplateResponse(
         request=request, name="/erp/erp_product.html", context={
-            "request": request,
-            "page_title": "업무 대시보드",
+            "request": request, "page_title": "생산관리 대시보드",
+            "docs": _erp_docs_for("work_order"),
             "user_name": request.session.get("user_name", "김민수")
         }
     )
+
 
 @app.get("/erp_groupware", response_class=HTMLResponse)
 async def erp_groupware(request: Request):
@@ -577,8 +624,8 @@ async def erp_groupware(request: Request):
         return RedirectResponse(url="/login", status_code=303)
     return templates.TemplateResponse(
         request=request, name="/erp/erp_groupware.html", context={
-            "request": request,
-            "page_title": "업무 대시보드",
+            "request": request, "page_title": "사내 그룹웨어",
+            "docs": _erp_docs_for("draft"),
             "user_name": request.session.get("user_name", "김민수")
         }
     )
@@ -803,6 +850,7 @@ ERP_REDIRECTS = {
     "work_order": "/erp_product",
     "po": "/erp_purch",
     "activity": "/erp_scrm",
+    "expense": "/erp_fa",
 }
 
 

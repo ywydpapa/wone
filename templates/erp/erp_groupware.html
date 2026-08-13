@@ -10,7 +10,7 @@
 <div class="dash-header">
     <div class="container">
         <h2>사내 그룹웨어 포털 🌐</h2>
-        <p>김민수 님, 좋은 아침입니다! 오늘의 결재 대기 문서와 주요 일정을 확인해 주세요.</p>
+        <p>{{ user_name }} 님, 좋은 아침입니다! 오늘의 결재 대기 문서와 주요 일정을 확인해 주세요.</p>
     </div>
 </div>
 
@@ -66,61 +66,7 @@
                     <button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="location.href='/draft_doc'">+ 새 결재 기안</button>
                 </div>
 
-                <div class="task-list">
-                    <!-- Task 1 -->
-                    <div class="task-item">
-                        <input class="form-check-input task-checkbox" type="checkbox" id="gw1">
-                        <div class="task-content">
-                            <label class="task-title" for="gw1">[결재요청] 8월 부서 운영비 지출 결의서 승인 (기안자: 이대리)</label>
-                            <div class="task-meta d-flex align-items-center gap-3">
-                                <span class="badge-status status-urgent">긴급</span>
-                                <span><i class="far fa-clock"></i> 오늘 15:00 마감</span>
-                                <span><i class="fas fa-file-invoice-dollar"></i> 재무결재함</span>
-                            </div>
-                        </div>
-                        <button class="btn btn-light btn-sm"><i class="fas fa-ellipsis-v"></i></button>
-                    </div>
-
-                    <!-- Task 2 -->
-                    <div class="task-item">
-                        <input class="form-check-input task-checkbox" type="checkbox" id="gw2">
-                        <div class="task-content">
-                            <label class="task-title" for="gw2">[사내일정] 주간 업무 보고 및 부서 간 이슈 점검 회의</label>
-                            <div class="task-meta d-flex align-items-center gap-3">
-                                <span class="badge-status status-progress">진행중</span>
-                                <span><i class="far fa-clock"></i> 오늘 14:00 ~ 15:30</span>
-                                <span><i class="fas fa-map-marker-alt"></i> 본관 3층 대회의실</span>
-                            </div>
-                        </div>
-                        <button class="btn btn-light btn-sm"><i class="fas fa-ellipsis-v"></i></button>
-                    </div>
-
-                    <!-- Task 3 -->
-                    <div class="task-item">
-                        <input class="form-check-input task-checkbox" type="checkbox" id="gw3">
-                        <div class="task-content">
-                            <label class="task-title" for="gw3">[협업요청] 2026년 하반기 신규 프로젝트 기획안 리뷰 및 피드백</label>
-                            <div class="task-meta d-flex align-items-center gap-3">
-                                <span class="badge-status status-progress" style="background-color:#e2e3e5; color:#383d41;">대기</span>
-                                <span><i class="far fa-calendar-alt"></i> 내일 11:00 까지</span>
-                                <span><i class="fas fa-users"></i> 기획팀 공유</span>
-                            </div>
-                        </div>
-                        <button class="btn btn-light btn-sm"><i class="fas fa-ellipsis-v"></i></button>
-                    </div>
-
-                    <!-- Task 4 (Completed) -->
-                    <div class="task-item opacity-50">
-                        <input class="form-check-input task-checkbox" type="checkbox" id="gw4" checked disabled>
-                        <div class="task-content">
-                            <label class="task-title text-decoration-line-through" for="gw4">[결재완료] 하계 정기 휴가 신청서 (8/10 ~ 8/12)</label>
-                            <div class="task-meta d-flex align-items-center gap-3">
-                                <span class="badge-status status-done">완료</span>
-                                <span><i class="fas fa-check"></i> 오늘 09:10 최종 승인됨</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                {% include 'erp/_doc_list.html' %}
             </div>
         </div>
 
@@ -130,7 +76,7 @@
             <div class="content-card">
                 <div class="card-title">
                     <span><i class="fas fa-bullhorn me-2 text-primary"></i>사내 공지 및 알림</span>
-                    <a href="#" class="text-decoration-none small">전체보기</a>
+                    <a href="/erp_groupware" class="text-decoration-none small">전체보기</a>
                 </div>
 
                 <div class="msg-item">
@@ -159,19 +105,19 @@
                 <div class="card-title">
                     <span><i class="fas fa-th me-2 text-primary"></i>그룹웨어 도구</span>
                 </div>
-                <a href="#" class="tool-btn">
+                <a href="/erp_groupware" class="tool-btn">
                     <i class="fas fa-stamp"></i> 전자결재 기안 및 수신함
                 </a>
-                <a href="#" class="tool-btn">
+                <a href="/erp_groupware" class="tool-btn">
                     <i class="fas fa-envelope-open-text"></i> 사내 웹메일
                 </a>
-                <a href="#" class="tool-btn">
+                <a href="/erp_groupware" class="tool-btn">
                     <i class="far fa-calendar-alt"></i> 전사 / 부서 일정 관리
                 </a>
-                <a href="#" class="tool-btn">
+                <a href="/erp_groupware" class="tool-btn">
                     <i class="fas fa-door-open"></i> 회의실 및 공용차량 예약
                 </a>
-                <a href="#" class="tool-btn">
+                <a href="/erp_groupware" class="tool-btn">
                     <i class="fas fa-clipboard"></i> 사내 게시판 및 커뮤니티
                 </a>
             </div>
