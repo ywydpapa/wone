@@ -38,17 +38,17 @@
                         <span><i class="fas fa-user-circle me-1"></i>{{ post.author }}{% if post.dept %} ({{ post.dept }}){% endif %}</span>
                         <span><i class="far fa-clock me-1"></i>{{ post.created_at }}</span>
                         <span><i class="far fa-eye me-1"></i>조회 {{ post.views }}</span>
-                        <span class="text-primary"><i class="far fa-comment-dots me-1"></i>댓글 {{ comments|length }}</span>
+                        <span class="text-primary"><i class="far fa-comment-dots me-1"></i>댓글 <span id="commentCountTop">{{ comments|length }}</span></span>
                     </div>
                     <hr class="mb-4">
                     <div class="detail-body" style="line-height: 1.8; color: #444; white-space: pre-wrap;">{{ post.content }}</div>
 
                     <!-- 좋아요 / 스크랩 -->
                     <div class="d-flex gap-2 justify-content-center my-4">
-                        <button id="likeBtn" class="btn btn-outline-danger rounded-pill px-4" onclick="toggleLike()">
+                        <button id="likeBtn" class="btn btn-outline-danger rounded-pill px-4">
                             <i id="likeIcon" class="{{ 'fas' if liked else 'far' }} fa-heart me-1 {{ 'text-danger' if liked else '' }}"></i>좋아요 <span id="likeCount">{{ like_count }}</span>
                         </button>
-                        <button id="bmBtn" class="btn btn-outline-secondary rounded-pill px-4" onclick="toggleBookmark()">
+                        <button id="bmBtn" class="btn btn-outline-secondary rounded-pill px-4">
                             <i id="bmIcon" class="{{ 'fas' if bookmarked else 'far' }} fa-bookmark me-1 {{ 'text-warning' if bookmarked else '' }}"></i>스크랩
                         </button>
                     </div>
@@ -56,12 +56,17 @@
 
                 <!-- 댓글 -->
                 <div class="content-card mt-4">
-                    <div class="card-title mb-3"><span><i class="far fa-comment-dots me-2 text-primary"></i>댓글 {{ comments|length }}</span></div>
+                    <div class="card-title mb-3"><span><i class="far fa-comment-dots me-2 text-primary"></i>댓글 <span id="commentCount">{{ comments|length }}</span></span></div>
                     {% for c in comments %}
-                    <div class="border-bottom py-3">
+                    <div class="border-bottom py-3" id="comment-{{ c.id }}">
                         <div class="d-flex justify-content-between small mb-1">
                             <span class="fw-bold"><i class="fas fa-user-circle me-1 text-secondary"></i>{{ c.author }}</span>
-                            <span class="text-muted">{{ c.created_at }}</span>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="text-muted">{{ c.created_at }}</span>
+                                {% if c.user_id == session_uid %}
+                                <button class="btn btn-link btn-sm text-danger p-0 js-delete-comment" data-comment-id="{{ c.id }}"><i class="fas fa-trash-alt"></i></button>
+                                {% endif %}
+                            </div>
                         </div>
                         <p class="mb-0 small">{{ c.content }}</p>
                     </div>
@@ -97,19 +102,59 @@
 </footer>
 
 <script>
-function toggleLike() {
-    fetch('/api/posts/{{ post.id }}/like', {method: 'POST'}).then(r => r.json()).then(d => {
-        document.getElementById('likeCount').textContent = d.count;
-        var icon = document.getElementById('likeIcon');
-        icon.className = (d.liked ? 'fas text-danger' : 'far') + ' fa-heart me-1';
+(function () {
+    'use strict';
+
+    function updateCommentCount(delta) {
+        ['commentCount', 'commentCountTop'].forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el) el.textContent = Math.max(0, parseInt(el.textContent, 10) + delta);
+        });
+    }
+
+    function toggleLike() {
+        fetch('/api/posts/{{ post.id }}/like', {method: 'POST'})
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+                document.getElementById('likeCount').textContent = d.count;
+                document.getElementById('likeIcon').className =
+                    (d.liked ? 'fas text-danger' : 'far') + ' fa-heart me-1';
+            });
+    }
+
+    function toggleBookmark() {
+        fetch('/api/posts/{{ post.id }}/bookmark', {method: 'POST'})
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+                document.getElementById('bmIcon').className =
+                    (d.bookmarked ? 'fas text-warning' : 'far') + ' fa-bookmark me-1';
+            });
+    }
+
+    function deleteComment(commentId) {
+        if (!confirm('댓글을 삭제하시겠습니까?')) return;
+        fetch('/api/comments/' + commentId, {method: 'DELETE'})
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+                if (d.ok) {
+                    document.getElementById('comment-' + commentId).remove();
+                    updateCommentCount(-1);
+                } else {
+                    alert(d.error || '삭제 실패');
+                }
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('likeBtn').addEventListener('click', toggleLike);
+        document.getElementById('bmBtn').addEventListener('click', toggleBookmark);
+        document.querySelectorAll('.js-delete-comment').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                deleteComment(parseInt(btn.dataset.commentId, 10));
+            });
+        });
     });
-}
-function toggleBookmark() {
-    fetch('/api/posts/{{ post.id }}/bookmark', {method: 'POST'}).then(r => r.json()).then(d => {
-        var icon = document.getElementById('bmIcon');
-        icon.className = (d.bookmarked ? 'fas text-warning' : 'far') + ' fa-bookmark me-1';
-    });
-}
+}());
 </script>
 </body>
 </html>

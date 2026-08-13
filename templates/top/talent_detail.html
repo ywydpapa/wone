@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko">
+{% include 'common/header.html' %}
+<body>
+
+{% include 'common/topbar.html' %}
+
+<div class="dash-header">
+    <div class="container d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+            <h2>인재 이력서</h2>
+            <p>{{ talent.category }} 분야 구직자 프로필입니다.</p>
+        </div>
+        <div>
+            <a href="/resume" class="btn btn-light rounded-pill px-4 shadow-sm">
+                <i class="fas fa-arrow-left me-2"></i>인재 목록으로
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="list-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+
+                <!-- 기본 정보 -->
+                <div class="content-card">
+                    <div class="d-flex align-items-center gap-4 mb-4">
+                        <img src="{{ talent.avatar }}" alt="프로필" style="width:80px;height:80px;border-radius:50%;">
+                        <div>
+                            <span class="item-badge mb-2 d-inline-block">{{ talent.category }}</span>
+                            <h3 class="fw-bold mb-1">{{ talent.name }} ({{ talent.gender }}, {{ talent.age }}세)</h3>
+                            <p class="text-muted mb-0">{{ talent.career }} · {{ talent.summary }}</p>
+                        </div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <div class="p-3 bg-light rounded">
+                                <p class="small text-muted mb-1">장애 유형</p>
+                                <p class="fw-bold mb-0"><i class="fas fa-wheelchair me-1 text-primary"></i>{{ talent.disability }}</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="p-3 bg-light rounded">
+                                <p class="small text-muted mb-1">근무 희망</p>
+                                <p class="fw-bold mb-0"><i class="fas fa-briefcase me-1 text-primary"></i>{{ talent.work_pref }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 보유 기술 -->
+                <div class="content-card mt-4">
+                    <h6 class="fw-bold text-muted mb-3"><i class="fas fa-tools me-2 text-primary"></i>보유 기술</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for skill in talent.skills %}
+                        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary px-3 py-2">{{ skill }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- 경력 -->
+                <div class="content-card mt-4">
+                    <h6 class="fw-bold text-muted mb-3"><i class="fas fa-history me-2 text-primary"></i>경력 사항</h6>
+                    {% for exp in talent.experience %}
+                    <div class="border-start border-primary border-3 ps-3 mb-4">
+                        <p class="small text-muted mb-1">{{ exp.period }}</p>
+                        <p class="fw-bold mb-0">{{ exp.company }} · {{ exp.role }}</p>
+                        <p class="text-secondary small mb-0 mt-1">{{ exp.desc }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- 학력 -->
+                <div class="content-card mt-4">
+                    <h6 class="fw-bold text-muted mb-3"><i class="fas fa-graduation-cap me-2 text-primary"></i>학력</h6>
+                    <p class="mb-0">{{ talent.education }}</p>
+                </div>
+
+                <!-- 채용 제안 -->
+                <div class="content-card mt-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <p class="text-muted mb-0 small">본 이력서는 구직자 동의 하에 열람됩니다.</p>
+                        <a href="/contact" class="btn btn-primary rounded-pill px-5">
+                            <i class="fas fa-envelope me-2"></i>채용 제안하기
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-menu mb-4">
+            <a href="/about">소개</a>
+            <a href="/contact">문의하기</a>
+            <a href="/accessibility">접근성</a>
+        </div>
+        <div class="social-icons mb-4">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-youtube"></i></a>
+        </div>
+        <p class="mb-0 opacity-50 small">&copy; 2024 Wno1. All Rights Reserved.</p>
+    </div>
+</footer>
+
+</body>
+</html>
