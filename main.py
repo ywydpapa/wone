@@ -1042,6 +1042,17 @@ async def toggle_bookmark(request: Request, post_id: int):
     return {"bookmarked": bookmarked}
 
 
+ERP_DOC_TYPE_LABELS = {
+    "draft":      "결재 기안",
+    "hr_task":    "HR 업무",
+    "stock_move": "입출고",
+    "work_order": "작업 지시",
+    "po":         "구매 발주",
+    "activity":   "영업 활동",
+    "expense":    "자금관리",
+}
+
+
 @app.get("/erp_doc/{doc_id}", response_class=HTMLResponse)
 async def erp_doc_detail(request: Request, doc_id: int):
     if not check_login(request):
@@ -1051,21 +1062,34 @@ async def erp_doc_detail(request: Request, doc_id: int):
     conn.close()
     if not row:
         return HTMLResponse("<h2>문서를 찾을 수 없습니다</h2><a href='/'>홈으로</a>", status_code=404)
-    r = dict(row)
+    doc = with_status_meta([row])[0]
+    doc["doc_type_label"] = ERP_DOC_TYPE_LABELS.get(doc["doc_type"], doc["doc_type"])
+    back_url = ERP_REDIRECTS.get(doc["doc_type"], "/erp_dash")
     return templates.TemplateResponse(
-        request=request, name="common/detail.html", context={
+        request=request, name="erp/erp_doc_detail.html", context={
             "request": request,
-            "page_title": r['title'],
-            "badges": [{"text": r['doc_type'], "color": "primary"}, {"text": r['status'], "color": "secondary"}],
-            "detail_title": r['title'],
-            "detail_date": r['created_at'],
-            "detail_content": r['content'],
-            "extra_content": '',
-            "extra_label": '',
-            "back_url": "/",
+            "page_title": doc['title'],
+            "doc": doc,
+            "back_url": back_url,
             "user_name": request.session.get("user_name", "김민수")
         }
     )
+
+
+@app.post("/api/erp_docs/{doc_id}/status")
+async def update_erp_doc_status(request: Request, doc_id: int, status: str = Form(...)):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+    if status not in ("approved", "rejected", "done"):
+        return JSONResponse({"error": "invalid status"}, status_code=400)
+    conn = get_sqlite()
+    row = conn.execute("SELECT doc_type FROM erp_docs WHERE id=?", (doc_id,)).fetchone()
+    if row:
+        conn.execute("UPDATE erp_docs SET status=? WHERE id=?", (status, doc_id))
+        conn.commit()
+    conn.close()
+    back = ERP_REDIRECTS.get(row["doc_type"], "/erp_dash") if row else "/erp_dash"
+    return RedirectResponse(url=back, status_code=303)
 
 
 @app.get("/resume/{resume_id}", response_class=HTMLResponse)

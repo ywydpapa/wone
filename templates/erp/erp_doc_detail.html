@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko">
+{% include 'common/header.html' %}
+<body>
+
+<!-- Navbar -->
+{% include 'common/topbar.html' %}
+
+<!-- Dashboard Header -->
+<div class="dash-header">
+    <div class="container d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+            <h2>문서 상세</h2>
+            <p>ERP 문서 내용을 확인하고 결재 처리합니다.</p>
+        </div>
+        <div>
+            <a href="{{ back_url }}" class="btn btn-light rounded-pill px-4 shadow-sm">
+                <i class="fas fa-arrow-left me-2"></i>돌아가기
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="list-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-9">
+                <div class="content-card">
+
+                    <!-- 상태 뱃지 & 유형 -->
+                    <div class="mb-3 d-flex gap-2 flex-wrap">
+                        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary px-2 py-1">{{ doc.doc_type_label }}</span>
+                        <span class="badge-status {{ doc.status_class }}" {% if doc.status_style %}style="{{ doc.status_style }}"{% endif %}>{{ doc.status_label }}</span>
+                    </div>
+
+                    <h3 class="fw-bold text-dark mb-3">{{ doc.title }}</h3>
+
+                    <div class="d-flex align-items-center gap-3 mb-3 small text-muted">
+                        {% if doc.dept %}<span><i class="far fa-folder-open me-1"></i>{{ doc.dept }}</span>{% endif %}
+                        {% if doc.due_label %}<span><i class="far fa-clock me-1"></i>{{ doc.due_label }}</span>{% endif %}
+                        <span><i class="far fa-calendar-alt me-1"></i>{{ doc.created_at }}</span>
+                    </div>
+
+                    <hr class="mb-4">
+
+                    <div class="detail-body" style="line-height: 1.8; color: #444; white-space: pre-wrap;">{{ doc.content or '(내용 없음)' }}</div>
+
+                    <hr class="mt-4 mb-3">
+
+                    <!-- 결재 버튼 -->
+                    {% if doc.status not in ['approved', 'done', 'rejected'] %}
+                    <form action="/api/erp_docs/{{ doc.id }}/status" method="POST" class="d-flex gap-2 justify-content-end">
+                        <input type="hidden" name="status" value="" id="statusInput">
+                        <button type="button" class="btn btn-light px-4" onclick="location.href='{{ back_url }}'">
+                            <i class="fas fa-arrow-left me-1"></i>돌아가기
+                        </button>
+                        <button type="submit" class="btn btn-success px-4" onclick="document.getElementById('statusInput').value='approved'">
+                            <i class="fas fa-check me-1"></i>승인
+                        </button>
+                        <button type="submit" class="btn btn-outline-danger px-4" onclick="document.getElementById('statusInput').value='rejected'">
+                            <i class="fas fa-times me-1"></i>반려
+                        </button>
+                    </form>
+                    {% else %}
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="alert alert-secondary mb-0">이미 처리된 문서입니다 ({{ doc.status_label }})</div>
+                        <a href="{{ back_url }}" class="btn btn-light px-4">
+                            <i class="fas fa-arrow-left me-2"></i>돌아가기
+                        </a>
+                    </div>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-menu mb-4">
+            <a href="/about">소개</a>
+            <a href="/contact">문의하기</a>
+            <a href="/accessibility">접근성</a>
+        </div>
+        <div class="social-icons mb-4">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-youtube"></i></a>
+        </div>
+        <p class="mb-0 opacity-50 small">&copy; 2024 Wno1. All Rights Reserved.</p>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
