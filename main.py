@@ -342,16 +342,58 @@ async def new_job(request: Request):
         }
     )
 
+POST_CATEGORIES = {
+    "it":      ("💻 IT/개발",      "primary"),
+    "biz":     ("📊 경영/사무",    "success"),
+    "design":  ("🎨 디자인",       "warning"),
+    "sales":   ("📢 영업/마케팅",  "danger"),
+    "notice":  ("📌 공지",         "dark"),
+    "general": ("💬 자유",         "secondary"),
+    "qna":     ("❓ Q&A",          "info"),
+}
+
+
 @app.get("/community", response_class=HTMLResponse)
-async def communi(request: Request):
+async def communi(request: Request, category: str = "all", q: str = "", page: int = 1):
     if not check_login(request):
         return RedirectResponse(url="/login", status_code=303)
-
+    uid = request.session.get("user_id", 1)
+    conn = get_sqlite()
+    per_page = 10
+    sql = """SELECT p.*,
+        (SELECT COUNT(*) FROM comments c WHERE c.post_id=p.id) AS comment_count,
+        (SELECT COUNT(*) FROM post_likes l WHERE l.post_id=p.id) AS like_count
+        FROM posts p WHERE 1=1"""
+    params: list = []
+    if category != "all":
+        sql += " AND p.category=?"; params.append(category)
+    if q:
+        sql += " AND (p.title LIKE '%'||?||'%' OR p.content LIKE '%'||?||'%')"; params += [q, q]
+    count_sql = sql.replace("SELECT p.*,\n        (SELECT COUNT(*) FROM comments c WHERE c.post_id=p.id) AS comment_count,\n        (SELECT COUNT(*) FROM post_likes l WHERE l.post_id=p.id) AS like_count\n        FROM posts p WHERE 1=1", "SELECT COUNT(*) FROM posts p WHERE 1=1")
+    total = conn.execute(count_sql, params).fetchone()[0]
+    sql += " ORDER BY p.id DESC LIMIT ? OFFSET ?"; params += [per_page, (page - 1) * per_page]
+    posts = [dict(r) for r in conn.execute(sql, params).fetchall()]
+    my_post_count = conn.execute("SELECT COUNT(*) FROM posts WHERE user_id=?", (uid,)).fetchone()[0]
+    my_comment_count = conn.execute("SELECT COUNT(*) FROM comments WHERE user_id=?", (uid,)).fetchone()[0]
+    my_like_received = conn.execute(
+        "SELECT COUNT(*) FROM post_likes l JOIN posts p ON p.id=l.post_id WHERE p.user_id=?", (uid,)
+    ).fetchone()[0]
+    conn.close()
+    total_pages = max(1, (total + per_page - 1) // per_page)
     return templates.TemplateResponse(
         request=request, name="/top/community.html", context={
             "request": request,
-            "page_title": "관리자 대시보드",
-            "user_name": request.session.get("user_name", "김민수")
+            "page_title": "커뮤니티",
+            "user_name": request.session.get("user_name", "김민수"),
+            "posts": posts,
+            "categories": POST_CATEGORIES,
+            "current_category": category,
+            "q": q,
+            "page": page,
+            "total_pages": total_pages,
+            "my_post_count": my_post_count,
+            "my_comment_count": my_comment_count,
+            "my_like_received": my_like_received,
         }
     )
 
@@ -679,10 +721,14 @@ async def create_post(
 ):
     if not check_login(request):
         return RedirectResponse(url="/login", status_code=303)
+    uid = request.session.get("user_id", 1)
     conn = get_sqlite()
+    user = conn.execute("SELECT name, dept FROM users WHERE id=?", (uid,)).fetchone()
+    author = user["name"] if user else ""
+    dept = user["dept"] if user else ""
     conn.execute(
-        "INSERT INTO posts (user_id, category, title, content) VALUES (?,?,?,?)",
-        (1, category, title, content),
+        "INSERT INTO posts (user_id, category, title, content, author, dept) VALUES (?,?,?,?,?,?)",
+        (uid, category, title, content, author, dept),
     )
     conn.commit()
     conn.close()
