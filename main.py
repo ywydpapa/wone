@@ -144,14 +144,28 @@ async def receive_voice_text(data: VoiceInput):
 
 
 @app.get("/resume", response_class=HTMLResponse)
-async def resume(request: Request):
+async def resume(request: Request, q: str = "", region: str = ""):
     if not check_login(request):
         return RedirectResponse(url="/login", status_code=303)
-
+    conn = get_sqlite()
+    sql = "SELECT * FROM job_postings WHERE 1=1"
+    params = []
+    if q:
+        sql += " AND (title LIKE '%'||?||'%' OR company LIKE '%'||?||'%')"
+        params += [q, q]
+    if region:
+        sql += " AND region LIKE '%'||?||'%'"
+        params.append(region)
+    sql += " ORDER BY id DESC"
+    postings = [dict(r) for r in conn.execute(sql, params).fetchall()]
+    conn.close()
     return templates.TemplateResponse(
         request=request, name="/top/resume.html", context={
             "request": request,
             "page_title": "채용/인재",
+            "postings": postings,
+            "q": q,
+            "region": region,
             "user_name": request.session.get("user_name", "김민수")
         }
     )
@@ -1096,10 +1110,16 @@ async def update_erp_doc_status(request: Request, doc_id: int, status: str = For
 async def resume_detail(request: Request, resume_id: int):
     if not check_login(request):
         return RedirectResponse(url="/login", status_code=303)
+    conn = get_sqlite()
+    row = conn.execute("SELECT * FROM job_postings WHERE id=?", (resume_id,)).fetchone()
+    conn.close()
+    if not row:
+        return HTMLResponse("<h2>공고를 찾을 수 없습니다</h2><a href='/resume'>목록으로</a>", status_code=404)
     return templates.TemplateResponse(
-        request=request, name="common/stub.html", context={
+        request=request, name="top/resume_detail.html", context={
             "request": request,
-            "page_title": f"이력서 상세 (#{resume_id})",
+            "page_title": dict(row)["title"],
+            "jp": dict(row),
             "user_name": request.session.get("user_name", "김민수")
         }
     )
