@@ -36,15 +36,15 @@
                     <div class="row mb-3 bg-light p-3 rounded mx-0">
                         <div class="col-md-4 mb-2 mb-md-0">
                             <span class="text-muted small d-block">신청자</span>
-                            <strong class="text-dark">김민수 사원</strong>
+                            <strong class="text-dark">{{ user_info.name }}</strong>
                         </div>
                         <div class="col-md-4 mb-2 mb-md-0">
                             <span class="text-muted small d-block">소속 부서</span>
-                            <strong class="text-dark">경영지원팀</strong>
+                            <strong class="text-dark">{{ user_info.dept }}</strong>
                         </div>
                         <div class="col-md-4">
                             <span class="text-muted small d-block">연락처 (내선)</span>
-                            <strong class="text-dark">070-1234-5678</strong>
+                            <strong class="text-dark">{{ user_info.phone }}</strong>
                         </div>
                     </div>
 
@@ -128,15 +128,28 @@
                 <div class="card-title">
                     <span><i class="fas fa-compass me-2 text-primary"></i>지원 메뉴</span>
                 </div>
-                <a href="#" class="tool-btn">
+                <a href="/as_request/1" class="tool-btn">
                     <i class="fas fa-clipboard-check"></i> 나의 AS 접수/처리 내역
                 </a>
-                <a href="#" class="tool-btn">
+                <a href="/faq" class="tool-btn">
                     <i class="fas fa-question-circle"></i> 자주 묻는 질문 (FAQ)
                 </a>
-                <a href="#" class="tool-btn">
+                <a href="/guide" class="tool-btn">
                     <i class="fas fa-book"></i> 사내 시스템 사용 매뉴얼
                 </a>
+            </div>
+
+            <!-- 최근 접수 내역 -->
+            <div class="content-card mt-4">
+                <div class="card-title"><span><i class="fas fa-history me-2 text-primary"></i>나의 최근 접수 내역</span></div>
+                {% for r in my_requests %}
+                <a href="/as_request/{{ r.id }}" class="d-flex justify-content-between align-items-center py-2 border-bottom text-decoration-none">
+                    <span class="small text-dark text-truncate me-2">{{ r.title }}</span>
+                    <span class="badge-status {{ r.status_class }}" {% if r.status_style %}style="{{ r.status_style }}"{% endif %}>{{ r.status_label }}</span>
+                </a>
+                {% else %}
+                <p class="small text-muted mb-0">접수 내역이 없습니다.</p>
+                {% endfor %}
             </div>
 
             <!-- Notice -->

@@ -415,11 +415,20 @@ async def communi(request: Request, category: str = "all", q: str = "", page: in
 async def contact(request: Request):
     if not check_login(request):
         return RedirectResponse(url="/login", status_code=303)
-
+    uid = request.session.get("user_id", 1)
+    conn = get_sqlite()
+    user_row = conn.execute("SELECT name, dept, phone FROM users WHERE id=?", (uid,)).fetchone()
+    my_requests = with_status_meta(conn.execute(
+        "SELECT * FROM as_requests WHERE user_id=? ORDER BY id DESC LIMIT 5", (uid,)
+    ).fetchall())
+    conn.close()
+    user_info = dict(user_row) if user_row else {"name": "김민수", "dept": "경영지원팀", "phone": "070-1234-5678"}
     return templates.TemplateResponse(
         request=request, name="/top/contact.html", context={
             "request": request,
-            "page_title": "관리자 대시보드",
+            "page_title": "AS 접수",
+            "user_info": user_info,
+            "my_requests": my_requests,
             "user_name": request.session.get("user_name", "김민수")
         }
     )
@@ -664,7 +673,7 @@ async def create_job(
     conn = get_sqlite()
     conn.execute(
         "INSERT INTO jobs (user_id, work_date, category, title, details, issues, status) VALUES (?,?,?,?,?,?,?)",
-        (1, workDate, workCategory, workTitle, workDetails, workIssues, progressStatus),
+        (request.session.get("user_id", 1), workDate, workCategory, workTitle, workDetails, workIssues, progressStatus),
     )
     conn.commit()
     conn.close()
@@ -740,7 +749,7 @@ async def submit_as_request(
     conn = get_sqlite()
     conn.execute(
         "INSERT INTO as_requests (user_id, category, urgency, title, details, attachment, status) VALUES (?,?,?,?,?,?,?)",
-        (1, asCategory, asUrgency, asTitle, asDetails, attachment_name, "pending"),
+        (request.session.get("user_id", 1), asCategory, asUrgency, asTitle, asDetails, attachment_name, "pending"),
     )
     conn.commit()
     conn.close()
@@ -898,7 +907,7 @@ async def create_erp_doc(
     conn = get_sqlite()
     conn.execute(
         "INSERT INTO erp_docs (user_id, doc_type, title, content, status) VALUES (?,?,?,?,?)",
-        (1, doc_type, title, content, "draft"),
+        (request.session.get("user_id", 1), doc_type, title, content, "wait"),
     )
     conn.commit()
     conn.close()
