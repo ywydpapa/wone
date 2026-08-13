@@ -1144,31 +1144,129 @@ async def updates_page(request: Request):
 
 
 # ============================================================
-# 스텁 페이지들 (href="#" 연결용)
+# 업무성 페이지 (Task 12)
 # ============================================================
-STUB_PAGES = {
-    "/calendar": "일정 관리",
-    "/leave_approvals": "휴가 승인",
-    "/recruitment_status": "채용 현황",
-    "/outflow_list": "출금 내역",
-    "/pending_payments": "미결제 내역",
-    "/approval_pending": "결재 대기",
-}
 
-for _path, _title in STUB_PAGES.items():
-    def _make_stub(_t=_title):
-        async def _handler(request: Request):
-            if not check_login(request):
-                return RedirectResponse(url="/login", status_code=303)
-            return templates.TemplateResponse(
-                request=request, name="common/stub.html", context={
-                    "request": request,
-                    "page_title": _t,
-                    "user_name": request.session.get("user_name", "김민수")
-                }
-            )
-        return _handler
-    app.add_api_route(_path, _make_stub(), methods=["GET"], response_class=HTMLResponse)
+@app.get("/calendar", response_class=HTMLResponse)
+async def calendar_page(request: Request):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+    uid = request.session.get("user_id", 1)
+    conn = get_sqlite()
+    rows = conn.execute(
+        "SELECT work_date, title, status FROM jobs WHERE user_id=? AND work_date LIKE '2026-08%'",
+        (uid,)
+    ).fetchall()
+    conn.close()
+    events = [dict(r) for r in rows]
+    events_by_date = {}
+    for ev in events:
+        d = ev["work_date"]
+        if d not in events_by_date:
+            events_by_date[d] = []
+        events_by_date[d].append(ev)
+    # Build weekly grid for August 2026 (starts Saturday=6, so offset=6)
+    import calendar as cal_mod
+    weeks = cal_mod.monthcalendar(2026, 8)
+    return templates.TemplateResponse(
+        request=request, name="apps/calendar.html", context={
+            "request": request, "page_title": "일정 관리",
+            "user_name": request.session.get("user_name", "김민수"),
+            "weeks": weeks,
+            "events": events,
+            "events_by_date": events_by_date,
+        }
+    )
+
+
+@app.get("/leave_approvals", response_class=HTMLResponse)
+async def leave_approvals_page(request: Request):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+    conn = get_sqlite()
+    docs = with_status_meta(conn.execute(
+        "SELECT * FROM erp_docs WHERE doc_type='hr_task' AND title LIKE '%휴가%' ORDER BY id DESC"
+    ).fetchall())
+    conn.close()
+    return templates.TemplateResponse(
+        request=request, name="erp/leave_approvals.html", context={
+            "request": request, "page_title": "휴가 승인",
+            "user_name": request.session.get("user_name", "김민수"),
+            "docs": docs,
+        }
+    )
+
+
+@app.get("/recruitment_status", response_class=HTMLResponse)
+async def recruitment_status_page(request: Request):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+    conn = get_sqlite()
+    postings = [dict(r) for r in conn.execute("SELECT * FROM job_postings ORDER BY id DESC").fetchall()]
+    conn.close()
+    return templates.TemplateResponse(
+        request=request, name="erp/recruitment_status.html", context={
+            "request": request, "page_title": "채용 현황",
+            "user_name": request.session.get("user_name", "김민수"),
+            "postings": postings,
+        }
+    )
+
+
+@app.get("/outflow_list", response_class=HTMLResponse)
+async def outflow_list_page(request: Request):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+    conn = get_sqlite()
+    docs = with_status_meta(conn.execute(
+        "SELECT * FROM erp_docs WHERE doc_type='expense' AND status IN ('done','approved') ORDER BY id DESC"
+    ).fetchall())
+    conn.close()
+    return templates.TemplateResponse(
+        request=request, name="erp/fa_list.html", context={
+            "request": request, "page_title": "출금 완료 내역",
+            "subtitle": "처리 완료된 지출 내역입니다.",
+            "user_name": request.session.get("user_name", "김민수"),
+            "docs": docs,
+        }
+    )
+
+
+@app.get("/pending_payments", response_class=HTMLResponse)
+async def pending_payments_page(request: Request):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+    conn = get_sqlite()
+    docs = with_status_meta(conn.execute(
+        "SELECT * FROM erp_docs WHERE doc_type='expense' AND status IN ('wait','pending','urgent') ORDER BY id DESC"
+    ).fetchall())
+    conn.close()
+    return templates.TemplateResponse(
+        request=request, name="erp/fa_list.html", context={
+            "request": request, "page_title": "미결제 내역",
+            "subtitle": "처리 대기 중인 지출 요청입니다.",
+            "user_name": request.session.get("user_name", "김민수"),
+            "docs": docs,
+        }
+    )
+
+
+@app.get("/approval_pending", response_class=HTMLResponse)
+async def approval_pending_page(request: Request):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+    conn = get_sqlite()
+    docs = with_status_meta(conn.execute(
+        "SELECT * FROM erp_docs WHERE status IN ('wait','pending','urgent') ORDER BY CASE status WHEN 'urgent' THEN 0 ELSE 1 END, id DESC"
+    ).fetchall())
+    conn.close()
+    return templates.TemplateResponse(
+        request=request, name="erp/approval_pending.html", context={
+            "request": request, "page_title": "결재 대기",
+            "user_name": request.session.get("user_name", "김민수"),
+            "docs": docs,
+        }
+    )
 
 
 # 상세보기 동적 라우트들
