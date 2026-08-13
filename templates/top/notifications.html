@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko">
+{% include 'common/header.html' %}
+<body>
+
+{% include 'common/topbar.html' %}
+
+<div class="dash-header">
+    <div class="container d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+            <h2>알림</h2>
+            <p>시스템 및 업무 알림을 확인합니다.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary btn-sm rounded-pill px-3" onclick="readAll()">모두 읽음</button>
+            <a href="/emp_dash" class="btn btn-light rounded-pill px-4 shadow-sm"><i class="fas fa-arrow-left me-2"></i>돌아가기</a>
+        </div>
+    </div>
+</div>
+
+<div class="list-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="content-card">
+                    {% for n in notifications %}
+                    <div class="msg-item {% if not n.is_read %}border-start border-primary border-3{% endif %}">
+                        <div class="msg-header">
+                            <span class="msg-sender"><i class="{{ n.icon }} me-1"></i>{{ n.title }}</span>
+                            <span class="msg-time">{{ n.time_label }}</span>
+                        </div>
+                        <div class="msg-body">{{ n.body }}</div>
+                        {% if not n.is_read %}<span class="badge bg-primary ms-2 small">NEW</span>{% endif %}
+                    </div>
+                    {% else %}
+                    <p class="text-center text-muted py-5">알림이 없습니다.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-menu mb-4">
+            <a href="/about">소개</a><a href="/contact">문의하기</a><a href="/accessibility">접근성</a>
+        </div>
+        <p class="mb-0 opacity-50 small">&copy; 2024 Wno1. All Rights Reserved.</p>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function readAll() {
+    fetch('/api/notifications/read_all', {method: 'POST'})
+        .then(() => location.reload());
+}
+</script>
+</body>
+</html>

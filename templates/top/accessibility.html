@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko">
+{% include 'common/header.html' %}
+<body>
+
+{% include 'common/topbar.html' %}
+
+<div class="dash-header">
+    <div class="container d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+            <h2>접근성 설정</h2>
+            <p>화면 글자 크기와 고대비 모드를 설정합니다. 설정은 브라우저에 저장됩니다.</p>
+        </div>
+        <div><a href="/emp_dash" class="btn btn-light rounded-pill px-4 shadow-sm"><i class="fas fa-arrow-left me-2"></i>돌아가기</a></div>
+    </div>
+</div>
+
+<div class="list-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+
+                <!-- 글자 크기 -->
+                <div class="content-card mb-4">
+                    <div class="card-title mb-3"><span><i class="fas fa-text-height me-2 text-primary"></i>글자 크기</span></div>
+                    <div class="d-flex gap-3 flex-wrap">
+                        <button class="btn btn-outline-secondary rounded-pill px-4" onclick="setFontSize('normal')">보통</button>
+                        <button class="btn btn-outline-secondary rounded-pill px-4" onclick="setFontSize('large')" style="font-size:1.1rem;">크게</button>
+                        <button class="btn btn-outline-secondary rounded-pill px-4" onclick="setFontSize('xlarge')" style="font-size:1.25rem;">아주 크게</button>
+                    </div>
+                    <p class="text-muted small mt-3 mb-0">현재 설정: <strong id="currentFont">보통</strong></p>
+                </div>
+
+                <!-- 고대비 모드 -->
+                <div class="content-card">
+                    <div class="card-title mb-3"><span><i class="fas fa-adjust me-2 text-primary"></i>고대비 모드</span></div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="contrastToggle" onchange="toggleContrast(this.checked)" style="width:3rem; height:1.5rem;">
+                        <label class="form-check-label ms-2 fw-bold" for="contrastToggle">고대비 모드 켜기</label>
+                    </div>
+                    <p class="text-muted small mt-2 mb-0">화면 대비를 높여 가독성을 향상시킵니다.</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-menu mb-4">
+            <a href="/about">소개</a><a href="/contact">문의하기</a><a href="/accessibility">접근성</a>
+        </div>
+        <p class="mb-0 opacity-50 small">&copy; 2024 Wno1. All Rights Reserved.</p>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const FONT_LABELS = {normal: '보통', large: '크게', xlarge: '아주 크게'};
+function setFontSize(size) {
+    localStorage.setItem('a11y_font', size);
+    applyA11y();
+    document.getElementById('currentFont').textContent = FONT_LABELS[size] || '보통';
+}
+function toggleContrast(on) {
+    localStorage.setItem('a11y_contrast', on ? '1' : '0');
+    applyA11y();
+}
+function applyA11y() {
+    const font = localStorage.getItem('a11y_font') || 'normal';
+    const contrast = localStorage.getItem('a11y_contrast') === '1';
+    const el = document.documentElement;
+    el.classList.remove('a11y-large', 'a11y-xlarge', 'a11y-contrast');
+    if (font === 'large') el.classList.add('a11y-large');
+    else if (font === 'xlarge') el.classList.add('a11y-xlarge');
+    if (contrast) el.classList.add('a11y-contrast');
+}
+// Init on page load
+applyA11y();
+const savedFont = localStorage.getItem('a11y_font') || 'normal';
+document.getElementById('currentFont').textContent = FONT_LABELS[savedFont] || '보통';
+document.getElementById('contrastToggle').checked = localStorage.getItem('a11y_contrast') === '1';
+</script>
+</body>
+</html>

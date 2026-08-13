@@ -589,5 +589,19 @@
         .footer-menu a:hover {
             opacity: 1;
         }
+        /* Accessibility */
+        .a11y-large body, .a11y-large { font-size: 1.15rem; }
+        .a11y-xlarge body, .a11y-xlarge { font-size: 1.3rem; }
+        .a11y-contrast { filter: contrast(1.2); }
     </style>
+    <script>
+    (function(){
+        var font = localStorage.getItem('a11y_font') || 'normal';
+        var contrast = localStorage.getItem('a11y_contrast') === '1';
+        var el = document.documentElement;
+        if (font === 'large') el.classList.add('a11y-large');
+        else if (font === 'xlarge') el.classList.add('a11y-xlarge');
+        if (contrast) el.classList.add('a11y-contrast');
+    })();
+    </script>
 </head>
