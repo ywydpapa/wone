@@ -996,15 +996,157 @@ async def accessibility_page(request: Request):
 
 
 # ============================================================
+# 정보성 페이지 (Task 11)
+# ============================================================
+FAQ_ITEMS = [
+    {"q": "로그인이 안됩니다.", "a": "아이디와 비밀번호를 다시 확인해 주세요. 비밀번호를 잊으셨다면 시스템 관리자(내선 119)에게 초기화를 요청하세요."},
+    {"q": "업무일지는 어떻게 등록하나요?", "a": "상단 메뉴 > 업무관리 > 새 업무 등록을 클릭하면 업무일지 작성 폼이 열립니다. 분류, 제목, 내용을 입력 후 저장하면 대시보드에 바로 반영됩니다."},
+    {"q": "AS 접수는 어디서 하나요?", "a": "상단 메뉴 > 고객지원 > AS 접수에서 신청할 수 있습니다. 접수 후 나의 AS 내역에서 처리 상태를 확인하세요."},
+    {"q": "접근성 도구는 어떻게 사용하나요?", "a": "상단 메뉴 > 접근성 설정에서 글자 크기(보통/크게/아주 크게)와 고대비 모드를 설정할 수 있습니다. 설정은 브라우저에 저장되어 유지됩니다."},
+    {"q": "수어통역 지원을 신청하려면?", "a": "AS 접수 메뉴에서 분류를 '접근성 지원 요청'으로 선택하고 수어통역 필요 상황을 상세히 기재해 주세요. 영업일 기준 1일 이내 담당자가 연락드립니다."},
+    {"q": "급여명세서는 어디서 확인하나요?", "a": "ERP > 자금관리 메뉴에서 월별 급여 명세서를 확인할 수 있습니다. 열람 권한이 없는 경우 경영지원팀에 문의하세요."},
+    {"q": "연차 신청은 어떻게 하나요?", "a": "ERP > 인사관리 메뉴에서 휴가 신청서를 작성해 상신합니다. 직속 상관이 결재하면 연차가 차감됩니다."},
+    {"q": "비밀번호를 변경하고 싶어요.", "a": "현재 비밀번호 변경은 시스템 관리자(내선 119)를 통해서만 가능합니다. 본인 확인 후 초기화해 드립니다."},
+]
+
+TERMS_ARTICLES = [
+    {"title": "서비스 이용 목적", "body": "본 시스템은 임직원 업무 효율화를 위해 제공됩니다. 업무 외 목적으로 사용하거나 허가받지 않은 제3자에게 접근 권한을 제공하는 행위는 금지됩니다."},
+    {"title": "계정 관리 책임", "body": "임직원은 본인 계정의 아이디와 비밀번호를 안전하게 관리할 책임이 있습니다. 계정 공유 및 양도는 금지되며, 도용 의심 시 즉시 관리자에게 신고해야 합니다."},
+    {"title": "금지 행위", "body": "시스템 및 데이터의 무단 복사, 배포, 변조 행위는 금지됩니다. 타 직원을 비방하거나 허위 정보를 유포하는 행위도 사규에 따라 징계 대상이 될 수 있습니다."},
+    {"title": "서비스 제공 및 중단", "body": "회사는 시스템 점검, 긴급 상황 등의 사유로 사전 고지 없이 서비스를 일시 중단할 수 있습니다. 정기 점검은 매주 토요일 새벽 2~4시에 진행됩니다."},
+    {"title": "면책 조항", "body": "사용자 귀책 사유로 인한 데이터 손실, 계정 도용 피해에 대해 회사는 책임을 지지 않습니다. 시스템 오류로 인한 피해는 IT지원팀을 통해 접수해 주세요."},
+    {"title": "약관 변경", "body": "본 약관은 회사 사정에 따라 변경될 수 있으며, 변경 시 사내 공지 및 시스템 팝업으로 안내합니다."},
+]
+
+PRIVACY_ARTICLES = [
+    {"title": "수집 항목", "body": "로그인 아이디, 이름, 부서, 직급, 연락처, 업무 활동 로그(게시글, 댓글, ERP 처리 내역 등)를 수집합니다."},
+    {"title": "수집 목적", "body": "업무 시스템 운영, 본인 확인, 서비스 이용 통계 분석을 목적으로 개인정보를 활용합니다."},
+    {"title": "보유 및 이용 기간", "body": "재직 기간 동안 보관하며, 퇴직 후 관련 법령이 정하는 기간(최대 5년)이 경과한 후 파기합니다."},
+    {"title": "제3자 제공", "body": "법령에 정해진 경우를 제외하고 임직원 개인정보를 외부에 제공하지 않습니다."},
+    {"title": "개인정보 보호 책임자", "body": "개인정보 관련 문의는 경영지원팀 개인정보 보호 담당자(내선 119)에게 연락해 주세요."},
+]
+
+UPDATES_LIST = [
+    {
+        "version": "v2.3.0",
+        "date": "2026-08-13",
+        "title": "전체 샘플 기능 구현 및 스텁 페이지 제거",
+        "changes": [
+            "프로필, 알림, 접근성 설정 페이지 실데이터 전환",
+            "FAQ, 가이드, 1:1문의, 이용약관, 개인정보처리방침, 업데이트 내역 콘텐츠 추가",
+            "일정관리(캘린더), 휴가승인, 채용현황, 출금/미결제 내역, 결재대기 페이지 구현",
+            "준비 중 스텁 페이지 시스템 완전 제거",
+        ],
+    },
+    {
+        "version": "v2.2.0",
+        "date": "2026-08-12",
+        "title": "ERP 결재/채용/AS 연동 완료",
+        "changes": [
+            "ERP 7개 모듈 DB 연동 및 문서 승인/반려 결재 기능",
+            "채용 공고 목록/상세 DB 연동 (장애인 친화 채용 정보 포함)",
+            "AS 접수 내역 세션 유저 기준 조회",
+            "게시글 상세: 조회수·댓글·좋아요·스크랩 DB 연동",
+        ],
+    },
+    {
+        "version": "v2.1.0",
+        "date": "2026-08-11",
+        "title": "로그인/회원가입 DB 연동 및 커뮤니티 기능",
+        "changes": [
+            "로그인 DB 검증, 회원가입, topbar 개인화",
+            "커뮤니티 목록 필터/검색/페이지네이션 구현",
+            "업무 대시보드 체크박스 완료 토글, 메시지 읽음 처리",
+            "SQLite 스키마 전면 개편 및 샘플 데이터 시드",
+        ],
+    },
+]
+
+
+@app.get("/faq", response_class=HTMLResponse)
+async def faq_page(request: Request):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+    return templates.TemplateResponse(
+        request=request, name="info/faq.html", context={
+            "request": request, "page_title": "자주 묻는 질문",
+            "faq_items": FAQ_ITEMS,
+            "user_name": request.session.get("user_name", "김민수"),
+        }
+    )
+
+
+@app.get("/guide", response_class=HTMLResponse)
+async def guide_page(request: Request):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+    return templates.TemplateResponse(
+        request=request, name="info/guide.html", context={
+            "request": request, "page_title": "가이드 문서",
+            "user_name": request.session.get("user_name", "김민수"),
+        }
+    )
+
+
+@app.get("/inquiry", response_class=HTMLResponse)
+async def inquiry_page(request: Request):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+    return templates.TemplateResponse(
+        request=request, name="info/inquiry.html", context={
+            "request": request, "page_title": "1:1 문의하기",
+            "user_name": request.session.get("user_name", "김민수"),
+        }
+    )
+
+
+@app.get("/terms", response_class=HTMLResponse)
+async def terms_page(request: Request):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+    return templates.TemplateResponse(
+        request=request, name="info/policy.html", context={
+            "request": request, "page_title": "이용약관",
+            "subtitle": "서비스 이용 전 반드시 읽어주세요.",
+            "effective_date": "2026-01-01",
+            "articles": TERMS_ARTICLES,
+            "user_name": request.session.get("user_name", "김민수"),
+        }
+    )
+
+
+@app.get("/privacy", response_class=HTMLResponse)
+async def privacy_page(request: Request):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+    return templates.TemplateResponse(
+        request=request, name="info/policy.html", context={
+            "request": request, "page_title": "개인정보처리방침",
+            "subtitle": "임직원 개인정보 보호에 관한 방침입니다.",
+            "effective_date": "2026-01-01",
+            "articles": PRIVACY_ARTICLES,
+            "user_name": request.session.get("user_name", "김민수"),
+        }
+    )
+
+
+@app.get("/updates", response_class=HTMLResponse)
+async def updates_page(request: Request):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+    return templates.TemplateResponse(
+        request=request, name="info/updates.html", context={
+            "request": request, "page_title": "업데이트 내역",
+            "updates": UPDATES_LIST,
+            "user_name": request.session.get("user_name", "김민수"),
+        }
+    )
+
+
+# ============================================================
 # 스텁 페이지들 (href="#" 연결용)
 # ============================================================
 STUB_PAGES = {
-    "/guide": "가이드 문서",
-    "/faq": "자주 묻는 질문",
-    "/inquiry": "1:1 문의하기",
-    "/terms": "이용약관",
-    "/privacy": "개인정보처리방침",
-    "/updates": "업데이트 내역",
     "/calendar": "일정 관리",
     "/leave_approvals": "휴가 승인",
     "/recruitment_status": "채용 현황",

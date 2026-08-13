@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ko">
+{% include 'common/header.html' %}
+<body>
+
+{% include 'common/topbar.html' %}
+
+<div class="dash-header">
+    <div class="container d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+            <h2>업데이트 내역</h2>
+            <p>시스템 개선 및 변경 사항을 확인하세요.</p>
+        </div>
+        <div><a href="/" class="btn btn-light rounded-pill px-4 shadow-sm"><i class="fas fa-arrow-left me-2"></i>홈으로</a></div>
+    </div>
+</div>
+
+<div class="container pb-5 mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            {% for update in updates %}
+            <div class="content-card mb-4">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary px-3 py-2 small fw-semibold">{{ update.version }}</span>
+                    <span class="text-muted small"><i class="far fa-calendar-alt me-1"></i>{{ update.date }}</span>
+                </div>
+                <div class="card-title mb-3"><span>{{ update.title }}</span></div>
+                <ul class="small text-muted mb-0 ps-3">
+                    {% for item in update.changes %}
+                    <li class="mb-1">{{ item }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

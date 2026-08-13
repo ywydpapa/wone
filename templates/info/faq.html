@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko">
+{% include 'common/header.html' %}
+<body>
+
+{% include 'common/topbar.html' %}
+
+<div class="dash-header">
+    <div class="container d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+            <h2>자주 묻는 질문</h2>
+            <p>자주 묻는 질문과 답변을 확인하세요.</p>
+        </div>
+        <div><a href="/" class="btn btn-light rounded-pill px-4 shadow-sm"><i class="fas fa-arrow-left me-2"></i>홈으로</a></div>
+    </div>
+</div>
+
+<div class="container pb-5 mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="content-card">
+                <div class="accordion" id="faqAccordion">
+                    {% for item in faq_items %}
+                    <div class="accordion-item border-0 border-bottom">
+                        <h2 class="accordion-header" id="faqHead{{ loop.index }}">
+                            <button class="accordion-button {% if not loop.first %}collapsed{% endif %} bg-white fw-semibold" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#faqBody{{ loop.index }}"
+                                    aria-expanded="{{ 'true' if loop.first else 'false' }}" aria-controls="faqBody{{ loop.index }}">
+                                <i class="far fa-question-circle me-2 text-primary"></i>{{ item.q }}
+                            </button>
+                        </h2>
+                        <div id="faqBody{{ loop.index }}" class="accordion-collapse collapse {% if loop.first %}show{% endif %}"
+                             data-bs-parent="#faqAccordion">
+                            <div class="accordion-body text-muted small ps-4">
+                                {{ item.a }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <p class="text-muted small">원하는 답변을 찾지 못하셨나요?</p>
+                <a href="/inquiry" class="btn btn-primary rounded-pill px-5">1:1 문의하기</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

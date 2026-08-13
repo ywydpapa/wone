@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ko">
+{% include 'common/header.html' %}
+<body>
+
+{% include 'common/topbar.html' %}
+
+<div class="dash-header">
+    <div class="container d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+            <h2>가이드 문서</h2>
+            <p>사내 시스템 사용 방법을 안내합니다.</p>
+        </div>
+        <div><a href="/" class="btn btn-light rounded-pill px-4 shadow-sm"><i class="fas fa-arrow-left me-2"></i>홈으로</a></div>
+    </div>
+</div>
+
+<div class="container pb-5 mt-4">
+    <div class="row">
+        <!-- 목차 -->
+        <div class="col-lg-3 mb-4">
+            <div class="content-card position-sticky" style="top: 1rem;">
+                <div class="card-title mb-3"><span><i class="fas fa-list me-2 text-primary"></i>목차</span></div>
+                <nav class="nav flex-column gap-1 small">
+                    <a class="nav-link py-1 text-dark" href="#guide-job">업무일지 작성법</a>
+                    <a class="nav-link py-1 text-dark" href="#guide-erp">ERP 결재 흐름</a>
+                    <a class="nav-link py-1 text-dark" href="#guide-community">커뮤니티 이용 수칙</a>
+                    <a class="nav-link py-1 text-dark" href="#guide-a11y">접근성 도구 안내</a>
+                    <a class="nav-link py-1 text-dark" href="#guide-as">AS 접수 절차</a>
+                    <a class="nav-link py-1 text-dark" href="#guide-account">계정 관리</a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- 본문 -->
+        <div class="col-lg-9">
+            <div class="content-card mb-4" id="guide-job">
+                <div class="card-title mb-3"><span><i class="fas fa-file-alt me-2 text-primary"></i>업무일지 작성법</span></div>
+                <p class="small text-muted">업무일지는 매일 업무 종료 전 작성하는 것을 권장합니다. 상단 메뉴 &gt; 업무관리 &gt; 새 업무 등록에서 작성할 수 있습니다.</p>
+                <p class="small text-muted">업무 분류(카테고리)와 마감일을 입력하면 대시보드에서 우선순위별로 정렬됩니다. 완료된 업무는 체크박스를 클릭해 완료 처리하면 완료 목록으로 이동합니다.</p>
+                <p class="small text-muted">긴급 업무는 상태를 "긴급"으로 설정하면 목록 최상단에 표시되며 빨간 뱃지가 붙습니다.</p>
+            </div>
+
+            <div class="content-card mb-4" id="guide-erp">
+                <div class="card-title mb-3"><span><i class="fas fa-project-diagram me-2 text-primary"></i>ERP 결재 흐름</span></div>
+                <p class="small text-muted">ERP 문서(기안서, 인사, 구매 등)는 작성 후 "대기" 상태로 제출됩니다. 결재권자가 해당 문서의 상세 페이지에서 승인 또는 반려 처리합니다.</p>
+                <p class="small text-muted">승인된 문서는 완료 상태로 전환되어 수정이 불가합니다. 반려된 문서는 빨간 "반려" 뱃지로 표시됩니다.</p>
+                <p class="small text-muted">ERP 대시보드에서 전체 모듈의 처리 현황을 한눈에 확인할 수 있습니다.</p>
+            </div>
+
+            <div class="content-card mb-4" id="guide-community">
+                <div class="card-title mb-3"><span><i class="fas fa-comments me-2 text-primary"></i>커뮤니티 이용 수칙</span></div>
+                <p class="small text-muted">커뮤니티는 사내 직원만 이용 가능한 공간입니다. 업무 관련 정보 공유, 질문, 자유 대화를 할 수 있습니다.</p>
+                <p class="small text-muted">게시글 작성 시 카테고리를 정확히 선택해 주세요. 공지 카테고리는 관리자만 작성 가능합니다. 타인을 비방하거나 불필요한 분쟁을 유발하는 게시글은 삭제될 수 있습니다.</p>
+                <p class="small text-muted">좋아요와 스크랩 기능으로 유용한 게시글을 저장해 두세요.</p>
+            </div>
+
+            <div class="content-card mb-4" id="guide-a11y">
+                <div class="card-title mb-3"><span><i class="fas fa-universal-access me-2 text-primary"></i>접근성 도구 안내</span></div>
+                <p class="small text-muted">상단 메뉴 &gt; 접근성 설정에서 글자 크기와 고대비 모드를 조절할 수 있습니다. 설정은 브라우저에 저장되어 다음 접속 시에도 유지됩니다.</p>
+                <p class="small text-muted">수어통역이 필요한 경우 AS 접수 메뉴의 분류에서 "수어통역 지원"을 선택해 요청하세요. 영업일 기준 1일 이내 담당자가 연락합니다.</p>
+                <p class="small text-muted">화면 낭독기(스크린리더) 사용 시 본 시스템은 WCAG 2.1 AA 기준을 준수하도록 설계되었습니다.</p>
+            </div>
+
+            <div class="content-card mb-4" id="guide-as">
+                <div class="card-title mb-3"><span><i class="fas fa-headset me-2 text-primary"></i>AS 접수 절차</span></div>
+                <p class="small text-muted">IT 기기 오류, 소프트웨어 문제, 접근성 지원 요청 등은 상단 메뉴 &gt; 고객지원 &gt; AS 접수에서 신청합니다.</p>
+                <p class="small text-muted">접수 후 "나의 최근 접수 내역"에서 처리 상태를 확인할 수 있습니다. 긴급한 경우 내선 119로 직접 연락하세요.</p>
+                <p class="small text-muted">접수된 요청은 IT지원팀이 접수→처리중→완료 순서로 처리합니다. 평균 처리 기간은 영업일 기준 1~3일입니다.</p>
+            </div>
+
+            <div class="content-card mb-4" id="guide-account">
+                <div class="card-title mb-3"><span><i class="fas fa-user-cog me-2 text-primary"></i>계정 관리</span></div>
+                <p class="small text-muted">내 프로필 페이지에서 이름, 부서, 연락처를 수정할 수 있습니다. 아이디(로그인 ID)는 변경할 수 없습니다.</p>
+                <p class="small text-muted">비밀번호 변경이 필요한 경우 시스템 관리자(내선 119)에게 문의하세요.</p>
+                <p class="small text-muted">장기 미사용 계정은 보안을 위해 자동으로 잠길 수 있습니다. 이 경우 관리자에게 계정 잠금 해제를 요청하세요.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
