@@ -40,6 +40,31 @@ def get_sqlite():
     return conn
 
 
+STATUS_META = {
+    "urgent":      ("긴급",  "status-urgent",   ""),
+    "progress":    ("진행중", "status-progress", ""),
+    "in_progress": ("진행중", "status-progress", ""),
+    "wait":        ("대기",  "status-progress", "background-color:#e2e3e5; color:#383d41;"),
+    "pending":     ("대기",  "status-progress", "background-color:#e2e3e5; color:#383d41;"),
+    "draft":       ("대기",  "status-progress", "background-color:#e2e3e5; color:#383d41;"),
+    "done":        ("완료",  "status-done",     ""),
+    "approved":    ("완료",  "status-done",     ""),
+    "resolved":    ("완료",  "status-done",     ""),
+    "rejected":    ("반려",  "status-urgent",   ""),
+}
+
+
+def with_status_meta(rows):
+    """sqlite Row 리스트 → dict 리스트 + status_label/status_class/status_style 부여"""
+    out = []
+    for r in rows:
+        d = dict(r)
+        label, cls, style = STATUS_META.get(d.get("status", ""), (d.get("status", ""), "status-progress", ""))
+        d["status_label"], d["status_class"], d["status_style"] = label, cls, style
+        out.append(d)
+    return out
+
+
 dotenv.load_dotenv()
 DATABASE_URL = os.getenv("dburl", "sqlite+aiosqlite:///./test.db")
 
@@ -164,12 +189,29 @@ async def eyemouse(request: Request):
 async def emp_dash(request: Request):
     if not check_login(request):
         return RedirectResponse(url="/login", status_code=303)
-
+    uid = request.session.get("user_id", 1)
+    conn = get_sqlite()
+    todos = with_status_meta(conn.execute(
+        "SELECT * FROM jobs WHERE user_id=? AND status!='done' ORDER BY CASE status WHEN 'urgent' THEN 0 WHEN 'progress' THEN 1 ELSE 2 END, id",
+        (uid,)).fetchall())
+    done_recent = with_status_meta(conn.execute(
+        "SELECT * FROM jobs WHERE user_id=? AND status='done' ORDER BY id DESC LIMIT 1",
+        (uid,)).fetchall())
+    done_count = conn.execute("SELECT COUNT(*) FROM jobs WHERE user_id=? AND status='done'", (uid,)).fetchone()[0]
+    unread_msgs = conn.execute(
+        "SELECT * FROM messages WHERE user_id=? AND is_read=0 ORDER BY id DESC", (uid,)).fetchall()
+    conn.close()
     return templates.TemplateResponse(
         request=request, name="/top/emp_dash.html", context={
             "request": request,
             "page_title": "업무 대시보드",
-            "user_name": request.session.get("user_name", "김민수")
+            "user_name": request.session.get("user_name", "김민수"),
+            "todos": todos,
+            "done_recent": done_recent,
+            "done_count": done_count,
+            "progress_count": len(todos),
+            "messages": [dict(m) for m in unread_msgs],
+            "unread_count": len(unread_msgs),
         }
     )
 
@@ -230,15 +272,36 @@ async def jobdiary(request: Request):
 
 
 @app.get("/completed_jobs", response_class=HTMLResponse)
-async def cedjob(request: Request):
+async def cedjob(request: Request, q: str = "", page: int = 1):
     if not check_login(request):
         return RedirectResponse(url="/login", status_code=303)
-
+    uid = request.session.get("user_id", 1)
+    conn = get_sqlite()
+    per_page = 10
+    params: list = [uid]
+    sql = "SELECT * FROM jobs WHERE user_id=? AND status='done'"
+    if q:
+        sql += " AND title LIKE '%'||?||'%'"
+        params.append(q)
+    total = conn.execute(sql.replace("SELECT *", "SELECT COUNT(*)"), params).fetchone()[0]
+    sql += " ORDER BY id DESC LIMIT ? OFFSET ?"
+    params += [per_page, (page - 1) * per_page]
+    done_jobs = with_status_meta(conn.execute(sql, params).fetchall())
+    progress_count = conn.execute(
+        "SELECT COUNT(*) FROM jobs WHERE user_id=? AND status!='done'", (uid,)).fetchone()[0]
+    conn.close()
+    total_pages = max(1, (total + per_page - 1) // per_page)
     return templates.TemplateResponse(
         request=request, name="/apps/complete_job.html", context={
             "request": request,
-            "page_title": "관리자 대시보드",
-            "user_name": request.session.get("user_name", "김민수")
+            "page_title": "완료 업무",
+            "user_name": request.session.get("user_name", "김민수"),
+            "done_jobs": done_jobs,
+            "done_count": total,
+            "progress_count": progress_count,
+            "q": q,
+            "page": page,
+            "total_pages": total_pages,
         }
     )
 
@@ -247,12 +310,22 @@ async def cedjob(request: Request):
 async def newarrived_jobs(request: Request):
     if not check_login(request):
         return RedirectResponse(url="/login", status_code=303)
-
+    uid = request.session.get("user_id", 1)
+    conn = get_sqlite()
+    unread_msgs = [dict(m) for m in conn.execute(
+        "SELECT * FROM messages WHERE user_id=? AND is_read=0 ORDER BY id DESC", (uid,)).fetchall()]
+    read_msgs = [dict(m) for m in conn.execute(
+        "SELECT * FROM messages WHERE user_id=? AND is_read=1 ORDER BY id DESC", (uid,)).fetchall()]
+    conn.close()
     return templates.TemplateResponse(
         request=request, name="/apps/new_arrived_job.html", context={
             "request": request,
-            "page_title": "관리자 대시보드",
-            "user_name": request.session.get("user_name", "김민수")
+            "page_title": "메시지함",
+            "user_name": request.session.get("user_name", "김민수"),
+            "unread_msgs": unread_msgs,
+            "read_msgs": read_msgs,
+            "unread_count": len(unread_msgs),
+            "read_count": len(read_msgs),
         }
     )
 
@@ -503,6 +576,45 @@ async def list_jobs(request: Request):
     rows = conn.execute("SELECT * FROM jobs ORDER BY created_at DESC").fetchall()
     conn.close()
     return [dict(r) for r in rows]
+
+
+@app.post("/api/jobs/{job_id}/toggle")
+async def toggle_job(request: Request, job_id: int):
+    if not check_login(request):
+        return JSONResponse({"error": "not logged in"}, status_code=401)
+    conn = get_sqlite()
+    row = conn.execute("SELECT status FROM jobs WHERE id=?", (job_id,)).fetchone()
+    if not row:
+        conn.close()
+        return JSONResponse({"error": "not found"}, status_code=404)
+    new_status = "progress" if row["status"] == "done" else "done"
+    conn.execute("UPDATE jobs SET status=? WHERE id=?", (new_status, job_id))
+    conn.commit()
+    conn.close()
+    return {"status": new_status}
+
+
+@app.post("/api/messages/{msg_id}/read")
+async def read_message(request: Request, msg_id: int):
+    if not check_login(request):
+        return JSONResponse({"error": "not logged in"}, status_code=401)
+    conn = get_sqlite()
+    conn.execute("UPDATE messages SET is_read=1 WHERE id=?", (msg_id,))
+    conn.commit()
+    conn.close()
+    return {"ok": True}
+
+
+@app.post("/api/messages/read_all")
+async def read_all_messages(request: Request):
+    if not check_login(request):
+        return JSONResponse({"error": "not logged in"}, status_code=401)
+    uid = request.session.get("user_id", 1)
+    conn = get_sqlite()
+    conn.execute("UPDATE messages SET is_read=1 WHERE user_id=?", (uid,))
+    conn.commit()
+    conn.close()
+    return {"ok": True}
 
 
 # ============================================================

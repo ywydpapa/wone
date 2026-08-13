@@ -9,8 +9,8 @@
 <!-- Dashboard Header -->
 <div class="dash-header">
     <div class="container">
-        <h2>환영합니다, 김민수 님! 👋</h2>
-        <p>오늘 처리해야 할 새로운 업무가 3건 있습니다. 힘찬 하루 보내세요!</p>
+        <h2>환영합니다, {{ user_name }} 님! 👋</h2>
+        <p>오늘 처리해야 할 새로운 업무가 {{ progress_count }}건 있습니다. 힘찬 하루 보내세요!</p>
     </div>
 </div>
 
@@ -25,7 +25,7 @@
                 </div>
                 <div class="stat-info">
                     <p>진행 중인 업무</p>
-                    <h3>3<span>건</span></h3>
+                    <h3>{{ progress_count }}<span>건</span></h3>
                 </div>
             </div>
         </div>
@@ -37,7 +37,7 @@
                 </div>
                 <div class="stat-info">
                     <p>이번 주 완료 업무</p>
-                    <h3>12<span>건</span></h3>
+                    <h3>{{ done_count }}<span>건</span></h3>
                 </div>
             </div>
             </a>
@@ -50,7 +50,7 @@
                 </div>
                 <div class="stat-info">
                     <p>새로운 메시지</p>
-                    <h3>2<span>건</span></h3>
+                    <h3>{{ unread_count }}<span>건</span></h3>
                 </div>
             </div>
             </a>
@@ -67,59 +67,34 @@
                 </div>
 
                 <div class="task-list">
-                    <!-- Task 1 -->
+                    {% for t in todos %}
                     <div class="task-item">
-                        <input class="form-check-input task-checkbox" type="checkbox" id="task1">
+                        <input class="form-check-input task-checkbox" type="checkbox" id="task{{ t.id }}"
+                               onchange="toggleJob({{ t.id }}, this)">
                         <div class="task-content">
-                            <label class="task-title" for="task1">웹 접근성 모니터링 결과 보고서 작성</label>
+                            <label class="task-title" for="task{{ t.id }}">{{ t.title }}</label>
                             <div class="task-meta d-flex align-items-center gap-3">
-                                <span class="badge-status status-urgent">긴급</span>
-                                <span><i class="far fa-clock"></i> 오늘 18:00 까지</span>
-                                <span><i class="far fa-folder-open"></i> IT 지원팀</span>
+                                <span class="badge-status {{ t.status_class }}" {% if t.status_style %}style="{{ t.status_style }}"{% endif %}>{{ t.status_label }}</span>
+                                {% if t.due_label %}<span><i class="far fa-clock"></i> {{ t.due_label }}</span>{% endif %}
+                                <span><i class="far fa-folder-open"></i> {{ t.dept }}</span>
                             </div>
                         </div>
-                        <button class="btn btn-light btn-sm"><i class="fas fa-ellipsis-v"></i></button>
+                        <a href="/job/{{ t.id }}" class="btn btn-light btn-sm"><i class="fas fa-ellipsis-v"></i></a>
                     </div>
-
-                    <!-- Task 2 -->
-                    <div class="task-item">
-                        <input class="form-check-input task-checkbox" type="checkbox" id="task2">
-                        <div class="task-content">
-                            <label class="task-title" for="task2">고객사 영수증 데이터 엑셀 입력 (200건)</label>
-                            <div class="task-meta d-flex align-items-center gap-3">
-                                <span class="badge-status status-progress">진행중</span>
-                                <span><i class="far fa-clock"></i> 내일 12:00 까지</span>
-                                <span><i class="far fa-folder-open"></i> 경영지원팀</span>
-                            </div>
-                        </div>
-                        <button class="btn btn-light btn-sm"><i class="fas fa-ellipsis-v"></i></button>
-                    </div>
-
-                    <!-- Task 3 -->
-                    <div class="task-item">
-                        <input class="form-check-input task-checkbox" type="checkbox" id="task3">
-                        <div class="task-content">
-                            <label class="task-title" for="task3">주간 팀 화상 회의 참석</label>
-                            <div class="task-meta d-flex align-items-center gap-3">
-                                <span class="badge-status status-progress">대기</span>
-                                <span><i class="far fa-clock"></i> 오늘 14:00 (Zoom)</span>
-                                <span><i class="far fa-folder-open"></i> 공통 업무</span>
-                            </div>
-                        </div>
-                        <button class="btn btn-light btn-sm"><i class="fas fa-ellipsis-v"></i></button>
-                    </div>
-
-                    <!-- Task 4 (Completed) -->
+                    {% endfor %}
+                    {% for t in done_recent %}
                     <div class="task-item opacity-50">
-                        <input class="form-check-input task-checkbox" type="checkbox" id="task4" checked disabled>
+                        <input class="form-check-input task-checkbox" type="checkbox" id="task{{ t.id }}" checked
+                               onchange="toggleJob({{ t.id }}, this)">
                         <div class="task-content">
-                            <label class="task-title text-decoration-line-through" for="task4">전일자 업무 일지 제출</label>
+                            <label class="task-title text-decoration-line-through" for="task{{ t.id }}">{{ t.title }}</label>
                             <div class="task-meta d-flex align-items-center gap-3">
                                 <span class="badge-status status-done">완료</span>
-                                <span><i class="fas fa-check"></i> 오늘 09:00 제출됨</span>
+                                {% if t.due_label %}<span><i class="fas fa-check"></i> {{ t.due_label }}</span>{% endif %}
                             </div>
                         </div>
                     </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
@@ -130,28 +105,20 @@
             <div class="content-card">
                 <div class="card-title">
                     <span><i class="far fa-comments me-2 text-primary"></i>담당자 메시지</span>
-                    <a href="#" class="text-decoration-none small">전체보기</a>
+                    <a href="/notifications" class="text-decoration-none small">전체보기</a>
                 </div>
 
+                {% for m in messages %}
                 <div class="msg-item">
                     <div class="msg-header">
-                        <span class="msg-sender"><i class="fas fa-user-circle me-1"></i>이매니저</span>
-                        <span class="msg-time">오전 10:30</span>
+                        <span class="msg-sender"><i class="fas fa-user-circle me-1"></i>{{ m.sender }}</span>
+                        <span class="msg-time">{{ m.time_label }}</span>
                     </div>
-                    <div class="msg-body">
-                        민수님, 오늘 오후 2시 화상회의 링크 메일로 보내드렸습니다. 수어 통역사분도 함께 참석하실 예정입니다.
-                    </div>
+                    <div class="msg-body">{{ m.body }}</div>
                 </div>
-
-                <div class="msg-item">
-                    <div class="msg-header">
-                        <span class="msg-sender"><i class="fas fa-user-circle me-1"></i>박팀장</span>
-                        <span class="msg-time">어제</span>
-                    </div>
-                    <div class="msg-body">
-                        접근성 보고서 초안 확인했습니다. 수정 요청사항 코멘트로 남겨두었으니 확인 부탁드립니다. 수고하셨습니다!
-                    </div>
-                </div>
+                {% else %}
+                <p class="text-muted small text-center py-3">새 메시지가 없습니다.</p>
+                {% endfor %}
             </div>
 
             <!-- Quick Tools -->
@@ -181,12 +148,17 @@
 
 <!-- Bootstrap 5 JS Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<!-- Tooltip Initialization -->
 <script>
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl)
     })
+    function toggleJob(id, el) {
+        fetch('/api/jobs/' + id + '/toggle', {method: 'POST'})
+            .then(r => r.json())
+            .then(() => location.reload())
+            .catch(() => { el.checked = !el.checked; });
+    }
 </script>
 </body>
 </html>
