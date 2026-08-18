@@ -183,7 +183,6 @@ async def worker_detail(request: Request, user_id: int):
     try:
         worker = conn.execute("SELECT * FROM users WHERE id=?", (user_id,)).fetchone()
         if not worker:
-            conn.close()
             return RedirectResponse(url="/workers", status_code=303)
         worker = dict(worker)
 

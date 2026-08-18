@@ -76,19 +76,19 @@ async def as_manage(
 
         where = " AND ".join(conditions)
 
-        base_sql = f"""
-            SELECT r.*, u.name AS requester_name, u.dept AS requester_dept, u.phone AS requester_phone
-            FROM as_requests r JOIN users u ON u.id = r.user_id
-            WHERE {where}
-        """
-        order_sql = """
-            ORDER BY CASE r.urgency WHEN 'high' THEN 0 WHEN 'medium' THEN 1 ELSE 2 END, r.id DESC
-        """
+        base_sql = (
+            "SELECT r.*, u.name AS requester_name, u.dept AS requester_dept, u.phone AS requester_phone"
+            " FROM as_requests r JOIN users u ON u.id = r.user_id"
+            " WHERE " + where
+        )
+        order_sql = (
+            " ORDER BY CASE r.urgency WHEN 'high' THEN 0 WHEN 'medium' THEN 1 ELSE 2 END, r.id DESC "
+        )
 
-        total_row = conn.execute(
-            f"SELECT COUNT(*) FROM as_requests r JOIN users u ON u.id = r.user_id WHERE {where}",
-            params,
-        ).fetchone()
+        count_sql = (
+            "SELECT COUNT(*) FROM as_requests r JOIN users u ON u.id = r.user_id WHERE " + where
+        )
+        total_row = conn.execute(count_sql, params).fetchone()
         total = total_row[0] if total_row else 0
         total_pages = max(1, (total + per_page - 1) // per_page)
 
