@@ -250,6 +250,28 @@ async def toggle_bookmark(request: Request, post_id: int):
     return {"bookmarked": bookmarked}
 
 
+@router.delete("/api/posts/{post_id}")
+async def delete_post(request: Request, post_id: int):
+    if not check_login(request):
+        return JSONResponse({"error": "not logged in"}, status_code=401)
+    uid = get_current_user(request)["user_id"]
+    conn = get_sqlite()
+    try:
+        row = conn.execute("SELECT user_id FROM posts WHERE id=?", (post_id,)).fetchone()
+        if not row:
+            return JSONResponse({"error": "not found"}, status_code=404)
+        if row["user_id"] != uid:
+            return JSONResponse({"error": "forbidden"}, status_code=403)
+        conn.execute("DELETE FROM comments WHERE post_id=?", (post_id,))
+        conn.execute("DELETE FROM post_likes WHERE post_id=?", (post_id,))
+        conn.execute("DELETE FROM bookmarks WHERE post_id=?", (post_id,))
+        conn.execute("DELETE FROM posts WHERE id=?", (post_id,))
+        conn.commit()
+    finally:
+        conn.close()
+    return JSONResponse({"ok": True})
+
+
 @router.delete("/api/comments/{comment_id}")
 async def delete_comment(request: Request, comment_id: int):
     if not check_login(request):

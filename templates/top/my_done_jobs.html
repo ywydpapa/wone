@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ko">
+{% include 'common/header.html' %}
+<body>
+
+{% include 'common/topbar.html' %}
+
+<div class="dash-header">
+    <div class="container d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+            <h2>완료한 업무</h2>
+            <p>내가 완료 처리한 업무 목록입니다.</p>
+        </div>
+        <div>
+            <a href="/profile" class="btn btn-light rounded-pill px-4 shadow-sm">
+                <i class="fas fa-arrow-left me-2"></i>돌아가기
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="list-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-9">
+
+                {% if jobs %}
+                    {% for job in jobs %}
+                    <div class="content-card" onclick="location.href='/job/{{ job.id }}'" style="cursor:pointer;">
+                        <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
+                            <span class="item-title">{{ job.title }}</span>
+                            <span class="badge bg-success bg-opacity-10 text-success border">완료</span>
+                        </div>
+                        {% if job.category %}
+                        <p class="text-muted small mb-1"><i class="fas fa-tag me-1"></i>{{ job.category }}</p>
+                        {% endif %}
+                        <p class="text-muted small mb-2"><i class="far fa-clock me-1"></i>{{ job.created_at }}</p>
+                        {% if job.details %}
+                        <p class="text-secondary mb-0" style="overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">{{ job.details }}</p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="content-card text-center py-5">
+                        <i class="fas fa-check-circle fa-3x text-muted opacity-50 mb-3"></i>
+                        <p class="text-muted mb-0">완료한 업무가 없습니다.</p>
+                    </div>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-menu mb-4">
+            <a href="/faq">자주묻는질문</a><a href="/contact">문의하기</a><a href="/accessibility">접근성</a>
+        </div>
+        <p class="mb-0 opacity-50 small">&copy; 2024 Wno1. All Rights Reserved.</p>
+    </div>
+</footer>
+
+</body>
+</html>

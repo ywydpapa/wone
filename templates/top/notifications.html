@@ -13,6 +13,7 @@
         </div>
         <div class="d-flex gap-2">
             <button class="btn btn-outline-secondary btn-sm rounded-pill px-3" id="btn-read-all">모두 읽음</button>
+            <button class="btn btn-outline-danger btn-sm rounded-pill px-3" id="btn-delete-all">모두 삭제</button>
             <a href="/emp_dash" class="btn btn-light rounded-pill px-4 shadow-sm"><i class="fas fa-arrow-left me-2"></i>돌아가기</a>
         </div>
     </div>
@@ -24,10 +25,13 @@
             <div class="col-lg-8">
                 <div class="content-card">
                     {% for n in notifications %}
-                    <div class="msg-item {% if not n.is_read %}border-start border-primary border-3{% endif %}">
+                    <div class="msg-item {% if not n.is_read %}border-start border-primary border-3{% endif %}" id="notif-{{ n.id }}">
                         <div class="msg-header">
                             <span class="msg-sender"><i class="{{ n.icon }} me-1"></i>{{ n.title }}</span>
-                            <span class="msg-time">{{ n.time_label }}</span>
+                            <span class="d-flex align-items-center gap-2">
+                                <span class="msg-time">{{ n.time_label }}</span>
+                                <button class="btn btn-sm btn-outline-danger py-0 px-1" onclick="deleteNotif({{ n.id }})" title="삭제"><i class="fas fa-times" style="font-size:12px;"></i></button>
+                            </span>
                         </div>
                         <div class="msg-body">{{ n.body }}</div>
                         {% if not n.is_read %}<span class="badge bg-primary ms-2 small">NEW</span>{% endif %}
@@ -55,6 +59,21 @@ document.getElementById('btn-read-all').addEventListener('click', function() {
     fetch('/api/notifications/read_all', {method: 'POST'})
         .then(() => location.reload());
 });
+document.getElementById('btn-delete-all').addEventListener('click', function() {
+    if (!confirm('모든 알림을 삭제하시겠습니까?')) return;
+    fetch('/api/notifications/delete_all', {method: 'POST'})
+        .then(() => location.reload());
+});
+function deleteNotif(id) {
+    fetch('/api/notifications/' + id, {method: 'DELETE'})
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.ok) {
+                var el = document.getElementById('notif-' + id);
+                if (el) el.remove();
+            }
+        });
+}
 </script>
 </body>
 </html>

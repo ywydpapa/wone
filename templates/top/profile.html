@@ -22,29 +22,55 @@
             <!-- 활동 통계 -->
             <div class="row g-3 mb-4">
                 <div class="col-4">
-                    <div class="stat-card text-center">
+                    <a href="/my_posts" class="text-decoration-none">
+                    <div class="stat-card text-center" style="cursor:pointer;">
                         <div class="stat-info">
                             <p>작성 글</p>
                             <h3>{{ my_post_count }}</h3>
                         </div>
                     </div>
+                    </a>
                 </div>
                 <div class="col-4">
-                    <div class="stat-card text-center">
+                    <a href="/my_posts?tab=comments" class="text-decoration-none">
+                    <div class="stat-card text-center" style="cursor:pointer;">
                         <div class="stat-info">
                             <p>작성 댓글</p>
                             <h3>{{ my_comment_count }}</h3>
                         </div>
                     </div>
+                    </a>
                 </div>
                 <div class="col-4">
-                    <div class="stat-card text-center">
+                    <a href="/my_done_jobs" class="text-decoration-none">
+                    <div class="stat-card text-center" style="cursor:pointer;">
                         <div class="stat-info">
                             <p>완료 업무</p>
                             <h3>{{ my_done_count }}</h3>
                         </div>
                     </div>
+                    </a>
                 </div>
+            </div>
+
+            <!-- 프로필 사진 -->
+            <div class="content-card text-center mb-4">
+                <div class="position-relative d-inline-block">
+                    {% if user.photo %}
+                    <img src="/static/uploads/profile/{{ user.photo }}" alt="프로필 사진" class="rounded-circle" style="width:120px;height:120px;object-fit:cover;border:3px solid #e9ecef;">
+                    {% else %}
+                    <div class="rounded-circle d-flex align-items-center justify-content-center bg-light" style="width:120px;height:120px;border:3px solid #e9ecef;margin:0 auto;">
+                        <i class="fas fa-user fa-3x text-muted"></i>
+                    </div>
+                    {% endif %}
+                    <label for="photoInput" class="position-absolute bottom-0 end-0 btn btn-sm btn-primary rounded-circle shadow" style="width:36px;height:36px;cursor:pointer;" title="사진 변경">
+                        <i class="fas fa-camera" style="font-size:14px;"></i>
+                    </label>
+                </div>
+                <form id="photoForm" action="/api/profile/photo" method="POST" enctype="multipart/form-data" style="display:none;">
+                    <input type="file" id="photoInput" name="photo" accept="image/*" onchange="document.getElementById('photoForm').submit();">
+                </form>
+                <p class="text-muted small mt-2 mb-0">{{ user.name }} · {{ user.dept }}</p>
             </div>
 
             <!-- 프로필 정보 + 수정 폼 -->

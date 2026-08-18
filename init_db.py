@@ -82,7 +82,8 @@ def init():
         dept TEXT DEFAULT '경영지원팀',
         position TEXT DEFAULT '사원',
         phone TEXT DEFAULT '070-1234-5678',
-        role TEXT DEFAULT 'employee'
+        role TEXT DEFAULT 'employee',
+        photo TEXT DEFAULT ''
     )""")
 
     _create_table(c, """CREATE TABLE jobs (
