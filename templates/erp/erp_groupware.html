@@ -8,130 +8,135 @@
 
 <!-- Dashboard Header -->
 <div class="dash-header">
-    <div class="container">
-        <h2>사내 그룹웨어 포털 🌐</h2>
-        <p>{{ user_name }} 님, 좋은 아침입니다! 오늘의 결재 대기 문서와 주요 일정을 확인해 주세요.</p>
-    </div>
+ <div class="container">
+ <h2>사내 그룹웨어 포털</h2>
+ <p>{{ user_name }} 님, 좋은 아침입니다! 오늘의 결재 대기 문서와 주요 일정을 확인해 주세요.</p>
+</div>
 </div>
 
 <!-- Main Content -->
 <div class="container pb-5">
-    <!-- Stats Row -->
-    <div class="row">
-        <div class="col-lg-4 col-md-6">
-            <div class="stat-card">
-                <div class="stat-icon bg-blue-light">
-                    <i class="far fa-envelope"></i>
-                </div>
-                <div class="stat-info">
-                    <p>미확인 사내 메일</p>
-                    <h3>12<span> 건</span></h3>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-4 col-md-6">
-            <a href="/calendar" class="text-decoration-none small">
-            <div class="stat-card">
-                <div class="stat-icon bg-green-light">
-                    <i class="far fa-calendar-check"></i>
-                </div>
-                <div class="stat-info">
-                    <p>오늘의 일정</p>
-                    <h3>3<span> 건</span></h3>
-                </div>
-            </div>
-            </a>
-        </div>
-        <div class="col-lg-4 col-md-6">
-            <a href="/approvals_pending" class="text-decoration-none small">
-            <div class="stat-card">
-                <div class="stat-icon bg-red-light" style="background-color: #ffe5e5; color: #dc3545;">
-                    <i class="fas fa-file-signature"></i>
-                </div>
-                <div class="stat-info">
-                    <p>결재 수신 대기</p>
-                    <h3 style="color: #dc3545;">5<span> 건</span></h3>
-                </div>
-            </div>
-            </a>
-        </div>
-    </div>
+ <!-- Stats Row -->
+ <div class="row">
+ <div class="col-lg-4 col-md-6">
+ <a href="/newarrived_jobs" class="text-decoration-none small">
+ <div class="stat-card">
+ <div class="stat-icon bg-blue-light">
+ <i class="far fa-envelope"></i>
+</div>
+ <div class="stat-info">
+ <p>미확인 사내 메일</p>
+ <h3>{{ unread_mail }}<span> 건</span></h3>
+</div>
+</div>
+</a>
+</div>
+ <div class="col-lg-4 col-md-6">
+ <a href="/calendar" class="text-decoration-none small">
+ <div class="stat-card">
+ <div class="stat-icon bg-green-light">
+ <i class="far fa-calendar-check"></i>
+</div>
+ <div class="stat-info">
+ <p>오늘의 일정</p>
+ <h3>{{ today_jobs }}<span> 건</span></h3>
+</div>
+</div>
+</a>
+</div>
+ <div class="col-lg-4 col-md-6">
+ <a href="/approval_pending" class="text-decoration-none small">
+ <div class="stat-card">
+ <div class="stat-icon bg-red-light" style="background-color: #ffe5e5; color: #dc3545;">
+ <i class="fas fa-file-signature"></i>
+</div>
+ <div class="stat-info">
+ <p>결재 수신 대기</p>
+ <h3 style="color: #dc3545;">{{ pending_docs }}<span> 건</span></h3>
+</div>
+</div>
+</a>
+</div>
+</div>
 
-    <div class="row mt-2">
-        <!-- Left Column: Groupware Task List -->
-        <div class="col-lg-8">
-            <div class="content-card">
-                <div class="card-title">
-                    <span><i class="fas fa-clipboard-list me-2 text-primary"></i>나의 할 일 및 전자결재</span>
-                    <button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="location.href='/draft_doc'">+ 새 결재 기안</button>
-                </div>
+ <div class="row mt-2">
+ <!-- Left Column: Groupware Task List -->
+ <div class="col-lg-8">
+ <div class="content-card">
+ <div class="card-title">
+ <span><i class="fas fa-clipboard-list me-2 text-primary"></i>나의 할 일 및 전자결재</span>
+ <a href="/draft_doc" class="btn btn-sm btn-outline-primary rounded-pill px-3">+ 새 결재 기안</a>
+</div>
 
-                {% include 'erp/_doc_list.html' %}
-            </div>
-        </div>
+ {% include 'erp/_doc_list.html' %}
+</div>
+</div>
 
-        <!-- Right Column: Messages & Tools -->
-        <div class="col-lg-4">
-            <!-- Messages -->
-            <div class="content-card">
-                <div class="card-title">
-                    <span><i class="fas fa-bullhorn me-2 text-primary"></i>사내 공지 및 알림</span>
-                    <a href="/erp_groupware" class="text-decoration-none small">전체보기</a>
-                </div>
+ <!-- Right Column: Messages & Tools -->
+ <div class="col-lg-4">
+ <!-- Messages -->
+ <div class="content-card">
+ <div class="card-title">
+ <span><i class="fas fa-bullhorn me-2 text-primary"></i>사내 공지 및 알림</span>
+ <a href="/community?category=notice" class="text-decoration-none small">전체보기</a>
+</div>
 
-                <div class="msg-item">
-                    <div class="msg-header">
-                        <span class="msg-sender"><i class="fas fa-building me-1 text-primary"></i>인사총무팀</span>
-                        <span class="msg-time">오늘 09:00</span>
-                    </div>
-                    <div class="msg-body">
-                        <strong>[전사공지]</strong> 2026년 하반기 전사 워크샵 세부 일정 및 장소 안내 (필독)
-                    </div>
-                </div>
+ {% for notice in notices %}
+ <a href="/post/{{ notice.id }}" class="text-decoration-none text-dark">
+ <div class="msg-item" style="cursor:pointer;">
+ <div class="msg-header">
+ <span class="msg-sender">
+  {% if notice.category == 'notice' %}
+  <i class="fas fa-building me-1 text-primary"></i>
+  {% else %}
+  <i class="fas fa-user-circle me-1"></i>
+  {% endif %}
+  {{ notice.dept or notice.author or '관리자' }}
+ </span>
+ <span class="msg-time">{{ notice.created_at[:10] if notice.created_at else '' }}</span>
+</div>
+ <div class="msg-body">
+ {% if notice.category == 'notice' %}<strong>[공지]</strong> {% endif %}{{ notice.title }}
+</div>
+</div>
+ </a>
+ {% else %}
+ <p class="text-muted small text-center py-3 mb-0">등록된 공지가 없습니다.</p>
+ {% endfor %}
+</div>
 
-                <div class="msg-item">
-                    <div class="msg-header">
-                        <span class="msg-sender"><i class="fas fa-user-circle me-1"></i>기획팀 이대리</span>
-                        <span class="msg-time">오전 10:20</span>
-                    </div>
-                    <div class="msg-body">
-                        민수님, 방금 사내 메일로 보내드린 주간보고 취합본 확인 부탁드립니다. 대회의실 예약은 제가 해두었습니다!
-                    </div>
-                </div>
-            </div>
-
-            <!-- Quick Tools -->
-            <div class="content-card">
-                <div class="card-title">
-                    <span><i class="fas fa-th me-2 text-primary"></i>그룹웨어 도구</span>
-                </div>
-                <a href="/erp_groupware" class="tool-btn">
-                    <i class="fas fa-stamp"></i> 전자결재 기안 및 수신함
-                </a>
-                <a href="/erp_groupware" class="tool-btn">
-                    <i class="fas fa-envelope-open-text"></i> 사내 웹메일
-                </a>
-                <a href="/erp_groupware" class="tool-btn">
-                    <i class="far fa-calendar-alt"></i> 전사 / 부서 일정 관리
-                </a>
-                <a href="/erp_groupware" class="tool-btn">
-                    <i class="fas fa-door-open"></i> 회의실 및 공용차량 예약
-                </a>
-                <a href="/erp_groupware" class="tool-btn">
-                    <i class="fas fa-clipboard"></i> 사내 게시판 및 커뮤니티
-                </a>
-            </div>
-        </div>
-    </div>
+ <!-- Quick Tools -->
+ <div class="content-card">
+ <div class="card-title">
+ <span><i class="fas fa-th me-2 text-primary"></i>그룹웨어 도구</span>
+</div>
+ <a href="/approval_pending" class="tool-btn">
+ <i class="fas fa-stamp"></i> 전자결재 수신함
+</a>
+ <a href="/newarrived_jobs" class="tool-btn">
+ <i class="fas fa-envelope-open-text"></i> 사내 메일함
+</a>
+ <a href="/calendar" class="tool-btn">
+ <i class="far fa-calendar-alt"></i> 전사 / 부서 일정 관리
+</a>
+ <a href="/leave_approvals" class="tool-btn">
+ <i class="fas fa-door-open"></i> 휴가 / 근태 승인
+</a>
+ <a href="/community" class="tool-btn">
+ <i class="fas fa-clipboard"></i> 사내 게시판 및 커뮤니티
+</a>
+</div>
+</div>
+</div>
 </div>
 
 <!-- Bootstrap 5 JS Bundle -->
 <!-- Tooltip Initialization -->
 <script>
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl)
-    })
+ var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+ var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+ return new bootstrap.Tooltip(tooltipTriggerEl)
+ })
 </script>
 </body>
 </html>

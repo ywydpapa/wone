@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ko">
+{% include 'common/header.html' %}
+<body>
+
+{% include 'common/topbar.html' %}
+
+<div class="dash-header">
+    <div class="container-fluid px-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2>지원요청 관리</h2>
+                <p class="mb-0 text-white-50">전체 AS 요청을 조회하고 처리 상태를 관리합니다.</p>
+            </div>
+            <a href="/contact" class="btn btn-light rounded-pill px-4 shadow-sm">
+                <i class="fas fa-arrow-left me-2"></i>AS 접수 페이지
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid px-4 pb-5">
+
+    <!-- 통계 카드 -->
+    <div class="row mt-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card">
+                <div class="stat-icon bg-blue-light"><i class="fas fa-clipboard-list"></i></div>
+                <div class="stat-info">
+                    <p>전체 요청</p>
+                    <h3>{{ stat_total }}<span>건</span></h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card">
+                <div class="stat-icon bg-purple-light"><i class="fas fa-hourglass-half"></i></div>
+                <div class="stat-info">
+                    <p>대기중</p>
+                    <h3>{{ stat_pending }}<span>건</span></h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card border-warning border-opacity-50">
+                <div class="stat-icon" style="background:#fff8e1;"><i class="fas fa-spinner text-warning"></i></div>
+                <div class="stat-info">
+                    <p>처리중</p>
+                    <h3 class="text-warning">{{ stat_in_progress }}<span>건</span></h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card border-success border-opacity-25">
+                <div class="stat-icon bg-green-light"><i class="fas fa-check-circle"></i></div>
+                <div class="stat-info">
+                    <p>완료</p>
+                    <h3 class="text-success">{{ stat_resolved }}<span>건</span></h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 필터바 -->
+    <div class="content-card mt-2">
+        <form action="/as_manage" method="GET" class="row g-2 align-items-end">
+            <div class="col-md-2">
+                <label class="form-label small fw-bold text-muted mb-1">상태</label>
+                <select class="form-select form-select-sm" name="status_filter">
+                    <option value="" {% if not status_filter %}selected{% endif %}>전체 상태</option>
+                    <option value="pending" {% if status_filter=='pending' %}selected{% endif %}>대기중</option>
+                    <option value="in_progress" {% if status_filter=='in_progress' %}selected{% endif %}>처리중</option>
+                    <option value="resolved" {% if status_filter=='resolved' %}selected{% endif %}>완료</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small fw-bold text-muted mb-1">긴급도</label>
+                <select class="form-select form-select-sm" name="urgency_filter">
+                    <option value="" {% if not urgency_filter %}selected{% endif %}>전체 긴급도</option>
+                    <option value="high" {% if urgency_filter=='high' %}selected{% endif %}>긴급</option>
+                    <option value="medium" {% if urgency_filter=='medium' %}selected{% endif %}>보통</option>
+                    <option value="low" {% if urgency_filter=='low' %}selected{% endif %}>낮음</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small fw-bold text-muted mb-1">카테고리</label>
+                <select class="form-select form-select-sm" name="category_filter">
+                    <option value="" {% if not category_filter %}selected{% endif %}>전체 카테고리</option>
+                    {% for key, label in AS_CATEGORIES.items() %}
+                    <option value="{{ key }}" {% if category_filter==key %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label small fw-bold text-muted mb-1">검색</label>
+                <div class="input-group input-group-sm">
+                    <input type="text" class="form-control" name="q" value="{{ q }}" placeholder="제목 또는 요청자 이름 검색...">
+                    <button class="btn btn-outline-secondary" type="submit"><i class="fas fa-search"></i></button>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <a href="/as_manage" class="btn btn-sm btn-outline-secondary w-100">
+                    <i class="fas fa-redo me-1"></i>초기화
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- 요청 목록 테이블 -->
+    <div class="content-card">
+        <div class="card-title-wrap mb-3">
+            <h5><i class="fas fa-list-alt me-2 text-primary"></i>지원요청 목록</h5>
+            <span class="text-muted small">총 {{ total }}건</span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-custom table-hover">
+                <thead>
+                    <tr>
+                        <th style="width:60px;">번호</th>
+                        <th>요청자</th>
+                        <th>카테고리</th>
+                        <th>제목</th>
+                        <th style="width:90px;">긴급도</th>
+                        <th style="width:90px;">상태</th>
+                        <th style="width:110px;">담당자</th>
+                        <th style="width:110px;">접수일</th>
+                        <th style="width:80px;">관리</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for req in requests_list %}
+                    <tr>
+                        <td class="text-muted small">{{ req.id }}</td>
+                        <td>
+                            <div class="worker-info">
+                                <img src="https://ui-avatars.com/api/?name={{ req.requester_name|replace(' ','+') }}&background=eef4fb&color=0056b3&size=32" alt="{{ req.requester_name }}" style="width:32px;height:32px;border-radius:50%;">
+                                <div>
+                                    <span class="worker-name">{{ req.requester_name }}</span>
+                                    <span class="worker-type">{{ req.requester_dept }}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="badge bg-light text-dark border">{{ req.category_label }}</span></td>
+                        <td class="fw-bold text-dark">{{ req.title }}</td>
+                        <td>
+                            {% if req.urgency == 'high' %}
+                            <span class="badge bg-danger">긴급</span>
+                            {% elif req.urgency == 'medium' %}
+                            <span class="badge bg-warning text-dark">보통</span>
+                            {% else %}
+                            <span class="badge bg-secondary">낮음</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="status-badge {{ req.status_class }}" {% if req.status_style %}style="{{ req.status_style }}"{% endif %}>{{ req.status_label }}</span>
+                        </td>
+                        <td class="text-muted small">{{ req.assigned_name or '-' }}</td>
+                        <td class="text-muted small">{{ req.created_at[:10] if req.created_at else '-' }}</td>
+                        <td>
+                            <a href="/as_request/{{ req.id }}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="9" class="text-center text-muted py-5">
+                            <i class="fas fa-inbox fa-2x mb-2 d-block text-secondary"></i>
+                            조건에 맞는 지원 요청이 없습니다.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 페이지네이션 -->
+        {% if total_pages > 1 %}
+        <nav class="mt-3">
+            <ul class="pagination pagination-sm justify-content-center mb-0">
+                <li class="page-item {% if page <= 1 %}disabled{% endif %}">
+                    <a class="page-link" href="?status_filter={{ status_filter }}&urgency_filter={{ urgency_filter }}&category_filter={{ category_filter }}&q={{ q }}&page={{ page - 1 }}">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
+                {% for p in range(1, total_pages + 1) %}
+                <li class="page-item {% if p == page %}active{% endif %}">
+                    <a class="page-link" href="?status_filter={{ status_filter }}&urgency_filter={{ urgency_filter }}&category_filter={{ category_filter }}&q={{ q }}&page={{ p }}">{{ p }}</a>
+                </li>
+                {% endfor %}
+                <li class="page-item {% if page >= total_pages %}disabled{% endif %}">
+                    <a class="page-link" href="?status_filter={{ status_filter }}&urgency_filter={{ urgency_filter }}&category_filter={{ category_filter }}&q={{ q }}&page={{ page + 1 }}">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        {% endif %}
+
+        <div class="text-center mt-3">
+            <a href="/contact" class="text-decoration-none text-muted small">
+                <i class="fas fa-arrow-left me-1"></i>AS 접수 페이지로 돌아가기
+            </a>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

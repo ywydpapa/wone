@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import BaseModel
-from core.deps import check_login, templates
+from core.deps import check_login, get_current_user, templates
 
 router = APIRouter()
 
@@ -22,7 +22,7 @@ async def voice(request: Request):
         return RedirectResponse(url="/login", status_code=303)
     return templates.TemplateResponse(request=request, name="/top/voice.html", context={
         "request": request, "page_title": "음성 지원",
-        "user_name": request.session.get("user_name", "김민수"),
+        "user_name": get_current_user(request)["user_name"],
     })
 
 
@@ -32,7 +32,7 @@ async def eyemouse(request: Request):
         return RedirectResponse(url="/login", status_code=303)
     return templates.TemplateResponse(request=request, name="/apps/eyemouse.html", context={
         "request": request, "page_title": "아이 마우스",
-        "user_name": request.session.get("user_name", "김민수"),
+        "user_name": get_current_user(request)["user_name"],
     })
 
 
@@ -42,7 +42,7 @@ async def real_trans(request: Request):
         return RedirectResponse(url="/login", status_code=303)
     return templates.TemplateResponse(request=request, name="/apps/realtime_trans.html", context={
         "request": request, "page_title": "실시간 자막",
-        "user_name": request.session.get("user_name", "김민수"),
+        "user_name": get_current_user(request)["user_name"],
     })
 
 
@@ -52,5 +52,5 @@ async def youtube_edit(request: Request):
         return RedirectResponse(url="/login", status_code=303)
     return templates.TemplateResponse(request=request, name="/top/youtube_edit.html", context={
         "request": request, "page_title": "유튜브 편집",
-        "user_name": request.session.get("user_name", "김민수"),
+        "user_name": get_current_user(request)["user_name"],
     })

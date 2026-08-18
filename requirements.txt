@@ -9,3 +9,4 @@ itsdangerous
 pillow
 pyjwt
 pydantic
+PyMySQL

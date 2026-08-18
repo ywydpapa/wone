@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ko">
+{% include 'common/header.html' %}
+<body>
+
+<!-- Navbar -->
+{% include 'common/topbar.html' %}
+
+<!-- Header -->
+<div class="dash-header">
+    <div class="container-fluid px-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2>근로자 관리</h2>
+                <p class="mb-0 text-white-50">전체 근로자 현황 및 업무 배정 관리</p>
+            </div>
+            <a href="/manage_dash" class="btn btn-primary bg-white text-dark border-0 fw-bold px-4 rounded-pill">
+                <i class="fas fa-arrow-left me-2"></i>대시보드로 돌아가기
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="container-fluid px-4 pb-5">
+
+    <!-- 필터바 -->
+    <div class="content-card mb-4">
+        <form action="/workers" method="GET" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label fw-bold small text-muted">부서 필터</label>
+                <select class="form-select" name="dept">
+                    <option value="">전체 부서</option>
+                    {% for d in depts %}
+                    <option value="{{ d }}" {% if dept == d %}selected{% endif %}>{{ d }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-5">
+                <label class="form-label fw-bold small text-muted">이름 검색</label>
+                <input type="text" class="form-control" name="q" value="{{ q }}" placeholder="근로자 이름으로 검색...">
+            </div>
+            <div class="col-md-3">
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary flex-grow-1">
+                        <i class="fas fa-search me-1"></i>검색
+                    </button>
+                    <a href="/workers" class="btn btn-outline-secondary">초기화</a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- 근로자 테이블 -->
+    <div class="content-card">
+        <div class="card-title-wrap">
+            <h5><i class="fas fa-users me-2 text-primary"></i>근로자 목록</h5>
+            <span class="text-muted small">총 <strong>{{ workers|length }}</strong>명</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-custom table-hover">
+                <thead>
+                    <tr>
+                        <th>이름 / 부서</th>
+                        <th>직급</th>
+                        <th>연락처</th>
+                        <th class="text-center">진행 업무</th>
+                        <th class="text-center">완료 업무</th>
+                        <th class="text-center">관리</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for w in workers %}
+                    <tr>
+                        <td>
+                            <div class="worker-info">
+                                <img src="https://ui-avatars.com/api/?name={{ w.name|replace(' ','+') }}&background=eef4fb&color=0056b3" alt="{{ w.name }}">
+                                <div>
+                                    <span class="worker-name">{{ w.name }}</span>
+                                    <span class="worker-type">{{ w.dept }}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-dark border">{{ w.position }}</span>
+                        </td>
+                        <td class="text-muted small">{{ w.phone }}</td>
+                        <td class="text-center">
+                            {% if w.active_jobs > 0 %}
+                            <span class="badge bg-primary bg-opacity-10 text-primary fw-bold">{{ w.active_jobs }}건</span>
+                            {% else %}
+                            <span class="text-muted small">-</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if w.done_jobs > 0 %}
+                            <span class="badge bg-success bg-opacity-10 text-success fw-bold">{{ w.done_jobs }}건</span>
+                            {% else %}
+                            <span class="text-muted small">-</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <a href="/worker/{{ w.id }}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-chevron-right me-1"></i>상세보기
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-5">
+                            <i class="fas fa-users fa-2x mb-3 d-block opacity-25"></i>
+                            검색 결과가 없습니다.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

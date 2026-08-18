@@ -29,13 +29,21 @@
 
                 <!-- 게시글 본문 -->
                 <div class="content-card">
-                    {% set meta = categories.get(post.category, ('💬 자유', 'secondary')) %}
+                    {% set meta = categories.get(post.category, ('자유', 'secondary')) %}
                     <div class="mb-3">
                         <span class="badge bg-{{ meta[1] }} bg-opacity-10 text-{{ meta[1] }} border border-{{ meta[1] }} px-2 py-1">{{ meta[0] }}</span>
                     </div>
                     <h3 class="fw-bold text-dark mb-3">{{ post.title }}</h3>
                     <div class="d-flex align-items-center gap-3 mb-3 small text-muted">
-                        <span><i class="fas fa-user-circle me-1"></i>{{ post.author }}{% if post.dept %} ({{ post.dept }}){% endif %}</span>
+                        <span>
+                            <i class="fas fa-user-circle me-1"></i>
+                            <a href="#" class="text-muted text-decoration-none author-link"
+                               data-name="{{ post.author }}"
+                               data-dept="{{ post.dept or '' }}"
+                               data-position="{{ post.author_position or '' }}"
+                               data-phone="{{ post.author_phone or '' }}"
+                               data-bs-toggle="modal" data-bs-target="#profileModal">{{ post.author }}</a>{% if post.dept %} ({{ post.dept }}){% endif %}
+                        </span>
                         <span><i class="far fa-clock me-1"></i>{{ post.created_at }}</span>
                         <span><i class="far fa-eye me-1"></i>조회 {{ post.views }}</span>
                         <span class="text-primary"><i class="far fa-comment-dots me-1"></i>댓글 <span id="commentCountTop">{{ comments|length }}</span></span>
@@ -88,7 +96,7 @@
 <footer class="footer">
     <div class="container">
         <div class="footer-menu mb-4">
-            <a href="/about">소개</a>
+            <a href="/faq">자주묻는질문</a>
             <a href="/contact">문의하기</a>
             <a href="/accessibility">접근성</a>
         </div>
@@ -100,6 +108,47 @@
         <p class="mb-0 opacity-50 small">&copy; 2024 Wno1. All Rights Reserved.</p>
     </div>
 </footer>
+
+<!-- Profile Modal -->
+<div class="modal fade" id="profileModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:400px;">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-0 pb-2 align-items-start">
+                <div class="d-flex align-items-center gap-3 w-100">
+                    <img id="prof-avatar" src="" alt="" class="rounded-circle" width="52" height="52">
+                    <div class="flex-grow-1">
+                        <div class="fw-bold fs-6" id="prof-name"></div>
+                        <div class="small text-muted" id="prof-meta"></div>
+                        <div class="small text-muted mt-1" id="prof-phone" style="display:none;">
+                            <i class="fas fa-phone me-1" style="font-size:0.7rem;"></i>
+                            <span id="prof-phone-val"></span>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-0 pb-2 px-3">
+                <div class="small text-muted mb-2 fw-semibold" style="letter-spacing:0.03em;">대화</div>
+                <div id="chat-area" style="height:220px; overflow-y:auto; display:flex; flex-direction:column; gap:10px; padding:12px; background:#fafafa; border-radius:8px;"></div>
+            </div>
+            <div class="modal-footer border-0 pt-1 px-3 pb-3 d-flex gap-2">
+                <input type="hidden" id="prof-to">
+                <input type="text" id="prof-msg-body" class="form-control form-control-sm rounded-pill px-3"
+                       placeholder="메시지를 입력하세요..." style="flex:1;">
+                <button type="button" class="btn btn-primary btn-sm rounded-pill px-3" id="profSendBtn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.chat-bubble { max-width: 75%; padding: 7px 12px; border-radius: 12px; font-size: 0.83rem; line-height: 1.5; }
+.chat-bubble.me  { background: #0d6efd; color: #fff; border-bottom-right-radius: 3px; }
+.chat-bubble.them { background: #f0f0f0; color: #222; border-bottom-left-radius: 3px; }
+.chat-time { font-size: 0.68rem; color: #9ca3af; margin-top: 2px; }
+</style>
 
 <script>
 (function () {
@@ -153,6 +202,86 @@
                 deleteComment(parseInt(btn.dataset.commentId, 10));
             });
         });
+    });
+}());
+</script>
+
+<script>
+(function () {
+    var currentName = '';
+
+    function renderChat(messages) {
+        var area = document.getElementById('chat-area');
+        area.innerHTML = '';
+        if (!messages.length) {
+            area.innerHTML = '<div class="text-muted small text-center">대화 내역이 없습니다.</div>';
+            return;
+        }
+        messages.forEach(function (m) {
+            var isMe = (m.direction === 'out');
+            var row = document.createElement('div');
+            row.className = 'd-flex flex-column ' + (isMe ? 'align-items-end' : 'align-items-start');
+            row.innerHTML =
+                '<div class="chat-bubble ' + (isMe ? 'me' : 'them') + '">' + m.body + '</div>' +
+                '<div class="chat-time">' + (m.time_label || '') + '</div>';
+            area.appendChild(row);
+        });
+        area.scrollTop = area.scrollHeight;
+    }
+
+    function loadThread(name) {
+        fetch('/api/messages/thread?with_name=' + encodeURIComponent(name))
+            .then(function (r) { return r.json(); })
+            .then(renderChat)
+            .catch(function () {
+                document.getElementById('chat-area').innerHTML =
+                    '<div class="text-muted small text-center">대화 내역이 없습니다.</div>';
+            });
+    }
+
+    document.querySelectorAll('.author-link').forEach(function (el) {
+        el.addEventListener('click', function () {
+            currentName = el.dataset.name;
+            document.getElementById('prof-name').textContent = currentName;
+            var meta = [el.dataset.dept, el.dataset.position].filter(Boolean).join(' · ');
+            document.getElementById('prof-meta').textContent = meta;
+            var phone = el.dataset.phone;
+            if (phone) {
+                document.getElementById('prof-phone').style.display = '';
+                document.getElementById('prof-phone-val').textContent = phone;
+            } else {
+                document.getElementById('prof-phone').style.display = 'none';
+            }
+            document.getElementById('prof-avatar').src =
+                'https://ui-avatars.com/api/?name=' + encodeURIComponent(currentName) +
+                '&background=eef4fb&color=0056b3&size=52&rounded=true';
+            document.getElementById('prof-to').value = currentName;
+            document.getElementById('prof-msg-body').value = '';
+            document.getElementById('chat-area').innerHTML =
+                '<div class="text-muted small text-center">불러오는 중...</div>';
+            loadThread(currentName);
+        });
+    });
+
+    function sendMessage() {
+        var body = document.getElementById('prof-msg-body').value.trim();
+        if (!body) return;
+        var fd = new FormData();
+        fd.append('to_name', currentName);
+        fd.append('body', body);
+        fetch('/api/messages/send', { method: 'POST', body: fd })
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+                if (d.ok) {
+                    document.getElementById('prof-msg-body').value = '';
+                    loadThread(currentName);
+                }
+            });
+    }
+
+    document.getElementById('profSendBtn').addEventListener('click', sendMessage);
+    document.getElementById('prof-msg-body').addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
     });
 }());
 </script>

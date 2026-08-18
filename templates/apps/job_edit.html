@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ko">
+{% include 'common/header.html' %}
+<body>
+
+{% include 'common/topbar.html' %}
+
+<div class="dash-header">
+    <div class="container d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+            <h2>업무 수정</h2>
+            <p>업무 내용을 수정합니다.</p>
+        </div>
+        <div>
+            <a href="/job/{{ job.id }}" class="btn btn-light rounded-pill px-4 shadow-sm">
+                <i class="fas fa-arrow-left me-2"></i>돌아가기
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="container pb-5 mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="content-card">
+
+                <form action="/api/jobs/{{ job.id }}" method="POST">
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="workDate" class="form-label fw-bold">작성 일자 <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" id="workDate" name="workDate"
+                                   value="{{ job.work_date }}" required>
+                        </div>
+                        <div class="col-md-6 mt-3 mt-md-0">
+                            <label for="workCategory" class="form-label fw-bold">업무 분류 <span class="text-danger">*</span></label>
+                            <select class="form-select" id="workCategory" name="workCategory" required>
+                                <option value="" disabled>분류를 선택하세요</option>
+                                <option value="development" {% if job.category == 'development' %}selected{% endif %}>개발/유지보수</option>
+                                <option value="design"      {% if job.category == 'design'      %}selected{% endif %}>디자인/기획</option>
+                                <option value="support"     {% if job.category == 'support'     %}selected{% endif %}>운영/고객지원</option>
+                                <option value="meeting"     {% if job.category == 'meeting'     %}selected{% endif %}>회의/미팅</option>
+                                <option value="other"       {% if job.category == 'other'       %}selected{% endif %}>기타 업무</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="workTitle" class="form-label fw-bold">주요 업무 제목 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="workTitle" name="workTitle"
+                               value="{{ job.title }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="workDetails" class="form-label fw-bold">상세 업무 내용 <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="workDetails" name="workDetails" rows="6" required>{{ job.details or '' }}</textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="workIssues" class="form-label fw-bold">특이사항 및 이슈 (선택)</label>
+                        <textarea class="form-control" id="workIssues" name="workIssues" rows="3">{{ job.issues or '' }}</textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold d-block">현재 진행 상태 <span class="text-danger">*</span></label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="progressStatus" id="statusDone" value="done"
+                                   {% if job.status == 'done' %}checked{% endif %}>
+                            <label class="form-check-label" for="statusDone">
+                                <span class="badge bg-success bg-opacity-10 text-success border border-success px-2 py-1">완료</span>
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="progressStatus" id="statusProgress" value="progress"
+                                   {% if job.status in ['progress', 'in_progress'] %}checked{% endif %}>
+                            <label class="form-check-label" for="statusProgress">
+                                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary px-2 py-1">진행중</span>
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="progressStatus" id="statusUrgent" value="urgent"
+                                   {% if job.status == 'urgent' %}checked{% endif %}>
+                            <label class="form-check-label" for="statusUrgent">
+                                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger px-2 py-1">긴급</span>
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="progressStatus" id="statusDelay" value="delay"
+                                   {% if job.status == 'delay' %}checked{% endif %}>
+                            <label class="form-check-label" for="statusDelay">
+                                <span class="badge bg-warning bg-opacity-10 text-warning border border-warning px-2 py-1">지연/보류</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="d-flex justify-content-between">
+                        <a href="/job/{{ job.id }}" class="btn btn-light px-4">취소</a>
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="fas fa-save me-2"></i>저장하기
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

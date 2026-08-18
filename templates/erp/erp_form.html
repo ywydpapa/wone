@@ -31,8 +31,100 @@
                         <span><i class="fas fa-file-alt me-2 text-primary"></i>{{ page_title }}</span>
                     </div>
 
-                    <form action="/api/erp_docs" method="POST">
+                    <form action="/api/erp_docs" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="doc_type" value="{{ doc_type }}">
+
+                        <!-- 결재선 -->
+                        <div class="card mb-4 border">
+                            <div class="card-header bg-white py-2">
+                                <h6 class="mb-0 fw-bold"><i class="fas fa-stamp me-2 text-primary"></i>결재선</h6>
+                            </div>
+                            <div class="card-body py-3">
+                                <div class="d-flex gap-0 border rounded overflow-hidden">
+                                    <!-- Step 0: 기안 (현재 사용자, 자동) -->
+                                    <div class="flex-fill text-center border-end p-3 bg-success bg-opacity-10">
+                                        <div class="text-muted small fw-semibold mb-2">기안</div>
+                                        <div style="width:48px;height:48px;border-radius:50%;border:2.5px solid #198754;color:#198754;display:flex;align-items:center;justify-content:center;margin:0 auto;font-weight:700;font-size:1.2rem;">&#10003;</div>
+                                        <div class="fw-bold small mt-2">{{ user_name }}</div>
+                                        <div class="text-muted" style="font-size:0.7rem;">자동 확정</div>
+                                    </div>
+                                    <!-- Step 1: 검토 -->
+                                    <div class="flex-fill text-center border-end p-3">
+                                        <div class="text-muted small fw-semibold mb-2">검토</div>
+                                        <div style="width:48px;height:48px;border-radius:50%;border:2px dashed #ccc;margin:0 auto;" class="mb-2 d-flex align-items-center justify-content-center text-muted">&mdash;</div>
+                                        <select name="reviewer_id" class="form-select form-select-sm mt-1" required>
+                                            <option value="">검토자 선택</option>
+                                            {% for u in users %}
+                                            <option value="{{ u.id }}">{{ u.name }} ({{ u.dept }}{% if u.position %} / {{ u.position }}{% endif %})</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <!-- Step 2: 승인 -->
+                                    <div class="flex-fill text-center p-3">
+                                        <div class="text-muted small fw-semibold mb-2">승인</div>
+                                        <div style="width:48px;height:48px;border-radius:50%;border:2px dashed #ccc;margin:0 auto;" class="mb-2 d-flex align-items-center justify-content-center text-muted">&mdash;</div>
+                                        <select name="approver_id" class="form-select form-select-sm mt-1" required>
+                                            <option value="">승인자 선택</option>
+                                            {% for u in users %}
+                                            <option value="{{ u.id }}">{{ u.name }} ({{ u.dept }}{% if u.position %} / {{ u.position }}{% endif %})</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 문서 정보 -->
+                        <div class="card mb-4 border">
+                            <div class="card-header bg-white py-2">
+                                <h6 class="mb-0 fw-bold"><i class="fas fa-info-circle me-2 text-primary"></i>문서 정보</h6>
+                            </div>
+                            <div class="card-body py-3">
+                                <div class="row g-3">
+                                    <div class="col-sm-4">
+                                        <label class="form-label fw-semibold small">공개구분</label>
+                                        <select name="visibility" class="form-select form-select-sm">
+                                            <option value="공개" selected>공개</option>
+                                            <option value="대외비">대외비</option>
+                                            <option value="비밀">비밀</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label class="form-label fw-semibold small">보존연한</label>
+                                        <select name="retention_period" class="form-select form-select-sm">
+                                            <option value="1년">1년</option>
+                                            <option value="3년" selected>3년</option>
+                                            <option value="5년">5년</option>
+                                            <option value="10년">10년</option>
+                                            <option value="영구">영구</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label class="form-label fw-semibold small">시행일</label>
+                                        <input type="date" name="effective_date" class="form-control form-control-sm"
+                                               id="effectiveDate">
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <label class="form-label fw-semibold small">수신부서</label>
+                                        <input type="text" name="dept" class="form-control form-control-sm"
+                                               placeholder="예: 경영지원팀, 개발팀, 전부서"
+                                               list="deptList">
+                                        <datalist id="deptList">
+                                            <option value="경영지원팀">
+                                            <option value="개발팀">
+                                            <option value="디자인팀">
+                                            <option value="영업팀">
+                                            <option value="재무팀">
+                                            <option value="인사팀">
+                                            <option value="IT 지원팀">
+                                            <option value="총무팀">
+                                            <option value="법무팀">
+                                            <option value="전부서">
+                                        </datalist>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                         <!-- 제목 -->
                         <div class="mb-3">
@@ -56,18 +148,34 @@
                                       required></textarea>
                         </div>
 
+                        <!-- 첨부 파일 -->
+                        <div class="mb-4">
+                            <label for="attachment" class="form-label fw-bold">첨부 파일 <span class="text-muted fw-normal small">(선택)</span></label>
+                            <input class="form-control" type="file" id="attachment" name="attachment"
+                                   accept=".pdf,.png,.jpg,.jpeg,.gif,.xlsx,.xls,.docx,.doc,.pptx,.ppt,.hwp,.txt,.zip">
+                            <div class="form-text">PDF, JPG, PNG, XLSX, DOCX, PPT, HWP, TXT, ZIP 등 최대 10MB</div>
+                        </div>
+
                         <hr class="my-4">
 
                         <!-- Action Buttons -->
-                        <div class="d-flex justify-content-end gap-2">
-                            <a href="{{ back_url }}" class="btn btn-light px-4">
-                                <i class="fas fa-times me-2"></i>취소
+                        <div class="d-flex gap-2 justify-content-center mt-4">
+                            <a href="{{ back_url }}" class="btn btn-light rounded-pill px-4">
+                                <i class="fas fa-times me-1"></i>취소
                             </a>
-                            <button type="submit" class="btn btn-primary px-4">
-                                <i class="fas fa-paper-plane me-2"></i>결재 상신
+                            <button type="submit" name="save_mode" value="draft" class="btn btn-outline-secondary rounded-pill px-4">
+                                <i class="fas fa-save me-1"></i>임시저장
+                            </button>
+                            <button type="submit" name="save_mode" value="submit" class="btn btn-primary rounded-pill px-5">
+                                <i class="fas fa-paper-plane me-1"></i>상신
                             </button>
                         </div>
                     </form>
+
+                    <script>
+                        // 시행일 기본값: 오늘
+                        document.getElementById('effectiveDate').valueAsDate = new Date();
+                    </script>
                 </div>
             </div>
         </div>
@@ -78,14 +186,14 @@
 <footer class="footer">
     <div class="container">
         <div class="footer-menu mb-4">
-            <a href="/about">소개</a>
+            <a href="/faq">소개</a>
             <a href="/contact">문의하기</a>
             <a href="/accessibility">접근성</a>
         </div>
         <div class="social-icons mb-4">
-            <a href="#"><i class="fab fa-facebook-f"></i></a>
-            <a href="#"><i class="fab fa-instagram"></i></a>
-            <a href="#"><i class="fab fa-youtube"></i></a>
+            <a href="https://www.facebook.com" target="_blank" rel="noopener"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://www.instagram.com" target="_blank" rel="noopener"><i class="fab fa-instagram"></i></a>
+            <a href="https://www.youtube.com" target="_blank" rel="noopener"><i class="fab fa-youtube"></i></a>
         </div>
         <p class="mb-0 opacity-50 small">&copy; 2024 Wno1. All Rights Reserved.</p>
     </div>

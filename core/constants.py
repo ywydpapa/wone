@@ -1,11 +1,11 @@
 POST_CATEGORIES = {
-    "it":      ("💻 IT/개발",      "primary"),
-    "biz":     ("📊 경영/사무",    "success"),
-    "design":  ("🎨 디자인",       "warning"),
-    "sales":   ("📢 영업/마케팅",  "danger"),
-    "notice":  ("📌 공지",         "dark"),
-    "general": ("💬 자유",         "secondary"),
-    "qna":     ("❓ Q&A",          "info"),
+    "it":      ("IT/개발",      "primary"),
+    "biz":     ("경영/사무",    "success"),
+    "design":  ("디자인",       "warning"),
+    "sales":   ("영업/마케팅",  "danger"),
+    "notice":  ("공지",         "dark"),
+    "general": ("자유",         "secondary"),
+    "qna":     ("Q&A",          "info"),
 }
 
 ERP_REDIRECTS = {
@@ -25,6 +25,7 @@ ERP_DOC_TYPES = {
     "new_work_order": ("work_order", "작업 지시"),
     "new_po":         ("po",         "발주서"),
     "new_activity":   ("activity",   "활동 등록"),
+    "new_slip":       ("expense",    "전표 입력"),
 }
 
 ERP_DOC_TYPE_LABELS = {

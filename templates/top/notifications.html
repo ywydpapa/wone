@@ -12,7 +12,7 @@
             <p>시스템 및 업무 알림을 확인합니다.</p>
         </div>
         <div class="d-flex gap-2">
-            <button class="btn btn-outline-secondary btn-sm rounded-pill px-3" onclick="readAll()">모두 읽음</button>
+            <button class="btn btn-outline-secondary btn-sm rounded-pill px-3" id="btn-read-all">모두 읽음</button>
             <a href="/emp_dash" class="btn btn-light rounded-pill px-4 shadow-sm"><i class="fas fa-arrow-left me-2"></i>돌아가기</a>
         </div>
     </div>
@@ -44,17 +44,17 @@
 <footer class="footer">
     <div class="container">
         <div class="footer-menu mb-4">
-            <a href="/about">소개</a><a href="/contact">문의하기</a><a href="/accessibility">접근성</a>
+            <a href="/faq">소개</a><a href="/contact">문의하기</a><a href="/accessibility">접근성</a>
         </div>
         <p class="mb-0 opacity-50 small">&copy; 2024 Wno1. All Rights Reserved.</p>
     </div>
 </footer>
 
 <script>
-function readAll() {
+document.getElementById('btn-read-all').addEventListener('click', function() {
     fetch('/api/notifications/read_all', {method: 'POST'})
         .then(() => location.reload());
-}
+});
 </script>
 </body>
 </html>

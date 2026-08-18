@@ -302,11 +302,13 @@
     <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h4 class="fw-bold m-0">현재 매칭 가능한 전문가 <span class="text-muted fs-6 fw-normal">(총 18명 대기중)</span></h4>
-            <select class="form-select w-auto">
-                <option>추천순</option>
-                <option>평점 높은순</option>
-                <option>경력순</option>
-            </select>
+            <form action="/real_trans" method="GET">
+                <select class="form-select w-auto" name="sort" onchange="this.form.submit()">
+                    <option value="recommend">추천순</option>
+                    <option value="rating">평점 높은순</option>
+                    <option value="career">경력순</option>
+                </select>
+            </form>
         </div>
 
         <div class="row g-4">

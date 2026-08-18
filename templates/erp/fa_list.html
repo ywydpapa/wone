@@ -11,7 +11,7 @@
             <h2>{{ page_title }}</h2>
             <p>{{ user_name }} 님, {{ subtitle }}</p>
         </div>
-        <div><a href="/erp_fa" class="btn btn-light rounded-pill px-4 shadow-sm"><i class="fas fa-arrow-left me-2"></i>자금관리</a></div>
+        <div><a href="{{ back_url|default('/erp_fa') }}" class="btn btn-light rounded-pill px-4 shadow-sm"><i class="fas fa-arrow-left me-2"></i>{{ back_label|default('자금관리') }}</a></div>
     </div>
 </div>
 

@@ -1,4 +1,5 @@
 import os
+from contextlib import asynccontextmanager
 from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -6,15 +7,23 @@ from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 import dotenv
 
+from core.db import run_migrations
 from routers import auth, dashboard, jobs, community, erp, resume, contact, profile, info, apps
 
 dotenv.load_dotenv()
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    run_migrations()
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     SessionMiddleware,
-    secret_key=os.getenv("SESSION_SECRET_KEY", "supersecretkey"),
+    secret_key=os.getenv("SESSION_SECRET_KEY", "wone-sample-dev-key-change-in-production"),
 )
 app.add_middleware(
     CORSMiddleware,

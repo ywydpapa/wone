@@ -8,130 +8,130 @@
 
 <!-- Dashboard Header -->
 <div class="dash-header">
-    <div class="container">
-        <h2>인사관리 대시보드 👥</h2>
-        <p>{{ user_name }} 님, 오늘의 인사/노무 현황 및 결재 대기 목록입니다. 원활한 조직 운영을 위해 확인해 주세요.</p>
-    </div>
+ <div class="container">
+ <h2>인사관리 대시보드</h2>
+ <p>{{ user_name }} 님, 오늘의 인사/노무 현황 및 결재 대기 목록입니다. 원활한 조직 운영을 위해 확인해 주세요.</p>
+</div>
 </div>
 
 <!-- Main Content -->
 <div class="container pb-5">
-    <!-- Stats Row -->
-    <div class="row">
-        <div class="col-lg-4 col-md-6">
-            <div class="stat-card">
-                <div class="stat-icon bg-blue-light">
-                    <i class="fas fa-users"></i>
-                </div>
-                <div class="stat-info">
-                    <p>현재 재직 인원</p>
-                    <h3>156<span> 명</span></h3>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-4 col-md-6">
-            <a href="/leave_approvals" class="text-decoration-none small">
-            <div class="stat-card">
-                <div class="stat-icon bg-yellow-light">
-                    <i class="fas fa-calendar-check"></i>
-                </div>
-                <div class="stat-info">
-                    <p>연차/휴가 결재 대기</p>
-                    <h3>8<span> 건</span></h3>
-                </div>
-            </div>
-            </a>
-        </div>
-        <div class="col-lg-4 col-md-6">
-            <a href="/recruitment_status" class="text-decoration-none small">
-            <div class="stat-card">
-                <div class="stat-icon bg-green-light">
-                    <i class="fas fa-user-plus"></i>
-                </div>
-                <div class="stat-info">
-                    <p>진행 중인 채용</p>
-                    <h3>3<span> 포지션</span></h3>
-                </div>
-            </div>
-            </a>
-        </div>
-    </div>
+ <!-- Stats Row -->
+ <div class="row">
+ <div class="col-lg-4 col-md-6">
+ <div class="stat-card">
+ <div class="stat-icon bg-blue-light">
+ <i class="fas fa-users"></i>
+</div>
+ <div class="stat-info">
+ <p>현재 재직 인원</p>
+ <h3>156<span> 명</span></h3>
+</div>
+</div>
+</div>
+ <div class="col-lg-4 col-md-6">
+ <a href="/leave_approvals" class="text-decoration-none small">
+ <div class="stat-card">
+ <div class="stat-icon bg-yellow-light">
+ <i class="fas fa-calendar-check"></i>
+</div>
+ <div class="stat-info">
+ <p>연차/휴가 결재 대기</p>
+ <h3>8<span> 건</span></h3>
+</div>
+</div>
+</a>
+</div>
+ <div class="col-lg-4 col-md-6">
+ <a href="/recruitment_status" class="text-decoration-none small">
+ <div class="stat-card">
+ <div class="stat-icon bg-green-light">
+ <i class="fas fa-user-plus"></i>
+</div>
+ <div class="stat-info">
+ <p>진행 중인 채용</p>
+ <h3>3<span> 포지션</span></h3>
+</div>
+</div>
+</a>
+</div>
+</div>
 
-    <div class="row mt-2">
-        <!-- Left Column: HR Task List -->
-        <div class="col-lg-8">
-            <div class="content-card">
-                <div class="card-title">
-                    <span><i class="fas fa-clipboard-check me-2 text-primary"></i>결재 대기 및 주요 인사 업무</span>
-                    <button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="location.href='/new_hr_task'">+ 업무 추가</button>
-                </div>
+ <div class="row mt-2">
+ <!-- Left Column: HR Task List -->
+ <div class="col-lg-8">
+ <div class="content-card">
+ <div class="card-title">
+ <span><i class="fas fa-clipboard-check me-2 text-primary"></i>결재 대기 및 주요 인사 업무</span>
+ <a href="/new_hr_task" class="btn btn-sm btn-outline-primary rounded-pill px-3">+ 업무 추가</a>
+</div>
 
-                {% include 'erp/_doc_list.html' %}
-            </div>
-        </div>
+ {% include 'erp/_doc_list.html' %}
+</div>
+</div>
 
-        <!-- Right Column: Messages & Tools -->
-        <div class="col-lg-4">
-            <!-- Messages -->
-            <div class="content-card">
-                <div class="card-title">
-                    <span><i class="far fa-bell me-2 text-primary"></i>인사/노무 알림</span>
-                    <a href="/erp_hr" class="text-decoration-none small">전체보기</a>
-                </div>
+ <!-- Right Column: Messages & Tools -->
+ <div class="col-lg-4">
+ <!-- Messages -->
+ <div class="content-card">
+ <div class="card-title">
+ <span><i class="far fa-bell me-2 text-primary"></i>인사/노무 알림</span>
+ <a href="/erp_hr" class="text-decoration-none small">전체보기</a>
+</div>
 
-                <div class="msg-item">
-                    <div class="msg-header">
-                        <span class="msg-sender"><i class="fas fa-desktop me-1"></i>시스템 알림</span>
-                        <span class="msg-time">오전 09:00</span>
-                    </div>
-                    <div class="msg-body">
-                        [계약만료 예고] 디자인팀 계약직 김사원의 근로계약 만료일이 30일 남았습니다. 재계약 여부를 검토해 주세요.
-                    </div>
-                </div>
+ <div class="msg-item">
+ <div class="msg-header">
+ <span class="msg-sender"><i class="fas fa-desktop me-1"></i>시스템 알림</span>
+ <span class="msg-time">오전 09:00</span>
+</div>
+ <div class="msg-body">
+ [계약만료 예고] 디자인팀 계약직 김사원의 근로계약 만료일이 30일 남았습니다. 재계약 여부를 검토해 주세요.
+</div>
+</div>
 
-                <div class="msg-item">
-                    <div class="msg-header">
-                        <span class="msg-sender"><i class="fas fa-user-circle me-1"></i>박인사 팀장</span>
-                        <span class="msg-time">어제</span>
-                    </div>
-                    <div class="msg-body">
-                        민수님, 이번 주 금요일 전사 하반기 워크샵 세부 일정표 최종본 사내 인트라넷 게시판에 공지 부탁드립니다.
-                    </div>
-                </div>
-            </div>
+ <div class="msg-item">
+ <div class="msg-header">
+ <span class="msg-sender"><i class="fas fa-user-circle me-1"></i>박인사 팀장</span>
+ <span class="msg-time">어제</span>
+</div>
+ <div class="msg-body">
+ 민수님, 이번 주 금요일 전사 하반기 워크샵 세부 일정표 최종본 사내 인트라넷 게시판에 공지 부탁드립니다.
+</div>
+</div>
+</div>
 
-            <!-- Quick Tools -->
-            <div class="content-card">
-                <div class="card-title">
-                    <span><i class="fas fa-toolbox me-2 text-primary"></i>인사관리 도구</span>
-                </div>
-                <a href="/erp_hr" class="tool-btn">
-                    <i class="fas fa-address-book"></i> 임직원 정보 조회
-                </a>
-                <a href="/erp_hr" class="tool-btn">
-                    <i class="fas fa-user-clock"></i> 근태 및 휴가 관리
-                </a>
-                <a href="/erp_hr" class="tool-btn">
-                    <i class="fas fa-file-invoice-dollar"></i> 급여 대장 및 정산 관리
-                </a>
-                <a href="/erp_hr" class="tool-btn">
-                    <i class="fas fa-id-badge"></i> 채용 공고 및 이력서 관리
-                </a>
-                <a href="/erp_hr" class="tool-btn">
-                    <i class="fas fa-print"></i> 제증명서(재직/경력) 발급 대장
-                </a>
-            </div>
-        </div>
-    </div>
+ <!-- Quick Tools -->
+ <div class="content-card">
+ <div class="card-title">
+ <span><i class="fas fa-toolbox me-2 text-primary"></i>인사관리 도구</span>
+</div>
+ <a href="/new_hr_task" class="tool-btn">
+ <i class="fas fa-address-book"></i> 업무 추가
+</a>
+ <a href="/leave_approvals" class="tool-btn">
+ <i class="fas fa-user-clock"></i> 휴가 승인
+</a>
+ <a href="/approval_pending" class="tool-btn">
+ <i class="fas fa-file-invoice-dollar"></i> 결재 대기
+</a>
+ <a href="/recruitment_status" class="tool-btn">
+ <i class="fas fa-id-badge"></i> 채용 현황
+</a>
+ <a href="/calendar" class="tool-btn">
+ <i class="fas fa-calendar-alt"></i> 일정 캘린더
+</a>
+</div>
+</div>
+</div>
 </div>
 
 <!-- Bootstrap 5 JS Bundle -->
 <!-- Tooltip Initialization -->
 <script>
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl)
-    })
+ var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+ var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+ return new bootstrap.Tooltip(tooltipTriggerEl)
+ })
 </script>
 </body>
 </html>

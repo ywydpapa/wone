@@ -106,9 +106,40 @@ http://127.0.0.1:8000 → 아이디/비밀번호 입력 후 로그인
 
 | 변수 | 설명 | 예시 |
 |---|---|---|
-| `dburl` | DB 접속 URL | `sqlite+aiosqlite:///./test.db` (테스트) |
-| | | `mysql+asyncmy://user:pass@host/db` (실서비스) |
+| `DATABASE_URL` | DB 접속 URL | `sqlite:///test.db` (기본) |
+| | | `mysql://user:pass@host:3306/dbname` (MySQL) |
 | `SESSION_SECRET_KEY` | 세션 암호화 키 | `supersecretkey` |
+
+## DB 설정
+
+기본값은 SQLite(`test.db`)다. `.env` 파일의 `DATABASE_URL` 한 줄만 바꾸면 MySQL로 전환된다.
+
+### SQLite (기본)
+
+별도 설정 없이 바로 실행 가능하다. `DATABASE_URL`을 생략하거나 아래처럼 지정한다.
+
+```
+DATABASE_URL=sqlite:///test.db
+```
+
+### MySQL 전환
+
+1. `.env`에 MySQL URL을 설정한다.
+   ```
+   DATABASE_URL=mysql://user:password@localhost:3306/wone_db
+   ```
+2. DB와 유저를 MySQL에서 미리 생성해 둔다.
+3. 목업 데이터를 포함한 테이블 초기화를 실행한다.
+   ```bash
+   python3 init_db.py
+   ```
+4. 서버를 기동한다.
+   ```bash
+   uvicorn main:app --reload
+   ```
+
+PyMySQL이 설치되어 있어야 MySQL 모드가 동작한다(`pip install PyMySQL`).
+SQLite 모드에서는 PyMySQL을 설치하지 않아도 무방하다.
 
 ## DB 스키마
 

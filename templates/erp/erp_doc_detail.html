@@ -6,12 +6,38 @@
 <!-- Navbar -->
 {% include 'common/topbar.html' %}
 
+<style>
+.meta-table th { background: #f8f9fa; font-weight: 600; width: 140px; font-size: 0.85rem; vertical-align: middle; }
+.meta-table td { font-size: 0.9rem; }
+.approval-strip { background: #fafafa; }
+.approval-cell { min-width: 120px; }
+.approval-cell.step-approved { background: rgba(25,135,84,0.06); }
+.approval-cell.step-rejected { background: rgba(220,53,69,0.06); }
+.approval-cell.step-pending { background: #fff; }
+.stamp-circle { width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; font-size: 0.75rem; font-weight: 700; }
+.stamp-approved { border: 2.5px solid #198754; color: #198754; }
+.stamp-rejected { border: 2.5px solid #dc3545; color: #dc3545; }
+.stamp-pending { border: 2px dashed #ccc; color: #ccc; }
+.doc-body { min-height: 200px; line-height: 1.9; background: #fff; }
+.timeline-dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+.chat-bubble { max-width: 75%; padding: 7px 12px; border-radius: 12px; font-size: 0.83rem; line-height: 1.5; }
+.chat-bubble.me  { background: #0d6efd; color: #fff; border-bottom-right-radius: 3px; }
+.chat-bubble.them { background: #f0f0f0; color: #222; border-bottom-left-radius: 3px; }
+.chat-time { font-size: 0.68rem; color: #9ca3af; margin-top: 2px; }
+#chat-area { height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 12px; background: #fafafa; border-radius: 8px; }
+@media print {
+    .no-print, nav, .navbar, footer, .sidebar, .dash-header, .btn { display: none !important; }
+    .card { box-shadow: none !important; border: 1px solid #ddd !important; }
+    .approval-cell { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+</style>
+
 <!-- Dashboard Header -->
-<div class="dash-header">
+<div class="dash-header no-print">
     <div class="container d-flex justify-content-between align-items-center flex-wrap gap-3">
         <div>
-            <h2>문서 상세</h2>
-            <p>ERP 문서 내용을 확인하고 결재 처리합니다.</p>
+            <h2>{{ page_title or '문서 상세' }}</h2>
+            <p>ERP 전자결재 문서를 확인하고 결재 처리합니다.</p>
         </div>
         <div>
             <a href="{{ back_url }}" class="btn btn-light rounded-pill px-4 shadow-sm">
@@ -23,72 +49,478 @@
 
 <!-- Main Content -->
 <div class="list-section">
-    <div class="container">
+    <div class="container pb-5">
         <div class="row justify-content-center">
             <div class="col-lg-9">
-                <div class="content-card">
 
-                    <!-- 상태 뱃지 & 유형 -->
-                    <div class="mb-3 d-flex gap-2 flex-wrap">
-                        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary px-2 py-1">{{ doc.doc_type_label }}</span>
-                        <span class="badge-status {{ doc.status_class }}" {% if doc.status_style %}style="{{ doc.status_style }}"{% endif %}>{{ doc.status_label }}</span>
+                <!-- Section 1: Page Header -->
+                <div class="d-flex align-items-center gap-2 flex-wrap mb-4 no-print">
+                    <a href="{{ back_url }}" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                        <i class="fas fa-arrow-left me-1"></i>목록
+                    </a>
+                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary px-2 py-1">
+                        {{ doc.doc_type_label }}
+                    </span>
+                    <span class="badge-status {{ doc.status_class }}"
+                          {% if doc.status_style %}style="{{ doc.status_style }}"{% endif %}>
+                        {{ doc.status_label }}
+                    </span>
+                    <h5 class="mb-0 ms-2 fw-bold text-dark">{{ doc.title }}</h5>
+                </div>
+
+                <!-- Section 2: Document Meta Table -->
+                <div class="card mb-4">
+                    <div class="card-header bg-white py-2">
+                        <h6 class="mb-0 fw-bold"><i class="fas fa-info-circle me-2"></i>문서 정보</h6>
                     </div>
-
-                    <h3 class="fw-bold text-dark mb-3">{{ doc.title }}</h3>
-
-                    <div class="d-flex align-items-center gap-3 mb-3 small text-muted">
-                        {% if doc.dept %}<span><i class="far fa-folder-open me-1"></i>{{ doc.dept }}</span>{% endif %}
-                        {% if doc.due_label %}<span><i class="far fa-clock me-1"></i>{{ doc.due_label }}</span>{% endif %}
-                        <span><i class="far fa-calendar-alt me-1"></i>{{ doc.created_at }}</span>
+                    <div class="card-body p-0">
+                        <table class="table table-bordered mb-0 meta-table">
+                            <tbody>
+                                <tr>
+                                    <th class="ps-3">문서번호</th>
+                                    <td class="ps-3">{{ doc.doc_number or '—' }}</td>
+                                    <th class="ps-3">문서유형</th>
+                                    <td class="ps-3">{{ doc.doc_type_label }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="ps-3">공개구분</th>
+                                    <td class="ps-3">{{ doc.visibility or '공개' }}</td>
+                                    <th class="ps-3">보존연한</th>
+                                    <td class="ps-3">{{ doc.retention_period or '3년' }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="ps-3">기안일</th>
+                                    <td class="ps-3">{{ doc.created_at[:10] }}</td>
+                                    <th class="ps-3">시행일</th>
+                                    <td class="ps-3">{{ doc.effective_date or '—' }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="ps-3">기한</th>
+                                    <td class="ps-3">{{ doc.due_label or '—' }}</td>
+                                    <th class="ps-3">수신부서</th>
+                                    <td class="ps-3">{{ doc.dept or '—' }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="ps-3">기안자</th>
+                                    <td class="ps-3" colspan="3">
+                                        {% if doc.author_name %}
+                                        <a href="#" class="text-decoration-none author-link"
+                                           data-name="{{ doc.author_name }}"
+                                           data-dept="{{ doc.author_dept or '' }}"
+                                           data-position="{{ doc.author_position or '' }}"
+                                           data-phone="{{ doc.author_phone or '' }}"
+                                           data-bs-toggle="modal" data-bs-target="#profileModal">
+                                            <i class="fas fa-user-circle me-1 text-primary"></i>
+                                            {{ doc.author_name }}
+                                            {% if doc.author_dept %} ({{ doc.author_dept }}{% if doc.author_position %} / {{ doc.author_position }}{% endif %}){% endif %}
+                                        </a>
+                                        {% else %}—{% endif %}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
+                </div>
 
-                    <hr class="mb-4">
+                <!-- Section 3: Approval Line Strip -->
+                {% if approval_lines %}
+                <div class="card mb-4">
+                    <div class="card-header bg-white py-2">
+                        <h6 class="mb-0 fw-bold"><i class="fas fa-stamp me-2"></i>결재선</h6>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="d-flex approval-strip overflow-auto">
+                            {% for line in approval_lines %}
+                            <div class="approval-cell flex-fill text-center border-end p-3 step-{{ line.status }}">
+                                <div class="text-muted small fw-semibold mb-2">{{ line.role }}</div>
+                                <div class="stamp-circle mb-2
+                                    {% if line.status == 'approved' %}stamp-approved
+                                    {% elif line.status == 'rejected' %}stamp-rejected
+                                    {% else %}stamp-pending{% endif %}">
+                                    {% if line.status == 'approved' %}
+                                        &#10003;
+                                    {% elif line.status == 'rejected' %}
+                                        &#10007;
+                                    {% else %}
+                                        &mdash;
+                                    {% endif %}
+                                </div>
+                                {% if line.user_name %}
+                                <a href="#" class="text-decoration-none author-link fw-bold small"
+                                   data-name="{{ line.user_name }}"
+                                   data-dept="{{ line.user_dept or '' }}"
+                                   data-position="{{ line.user_position or '' }}"
+                                   data-phone=""
+                                   data-bs-toggle="modal" data-bs-target="#profileModal">
+                                    {{ line.user_name }}
+                                </a>
+                                {% else %}
+                                <div class="fw-bold small">—</div>
+                                {% endif %}
+                                <div class="text-muted" style="font-size:0.75rem;">{{ line.user_position or '' }}</div>
+                                {% if line.acted_at %}
+                                <div class="text-muted" style="font-size:0.7rem;">{{ line.acted_at[:10] }}</div>
+                                {% endif %}
+                                {% if line.comment %}
+                                <div class="mt-1 small fst-italic text-muted">"{{ line.comment }}"</div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
 
-                    <div class="detail-body" style="line-height: 1.8; color: #444; white-space: pre-wrap;">{{ doc.content or '(내용 없음)' }}</div>
+                <!-- Section 6: Reject Reason (shown before body for visibility) -->
+                {% if doc.status == 'rejected' and doc.reject_reason %}
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>반려 사유:</strong> {{ doc.reject_reason }}
+                </div>
+                {% endif %}
 
-                    <hr class="mt-4 mb-3">
+                <!-- Section 4: Document Body -->
+                <div class="card mb-4">
+                    <div class="card-header bg-white py-2">
+                        <h6 class="mb-0 fw-bold"><i class="fas fa-file-alt me-2"></i>본문</h6>
+                    </div>
+                    <div class="card-body doc-body">
+                        <div style="white-space:pre-wrap; font-size:0.93rem;">{{ doc.content or '(내용 없음)' }}</div>
+                    </div>
+                </div>
 
-                    <!-- 결재 버튼 -->
-                    {% if doc.status not in ['approved', 'done', 'rejected'] %}
-                    <form action="/api/erp_docs/{{ doc.id }}/status" method="POST" class="d-flex gap-2 justify-content-end">
-                        <input type="hidden" name="status" value="" id="statusInput">
-                        <button type="button" class="btn btn-light px-4" onclick="location.href='{{ back_url }}'">
-                            <i class="fas fa-arrow-left me-1"></i>돌아가기
-                        </button>
-                        <button type="submit" class="btn btn-success px-4" onclick="document.getElementById('statusInput').value='approved'">
-                            <i class="fas fa-check me-1"></i>승인
-                        </button>
-                        <button type="submit" class="btn btn-outline-danger px-4" onclick="document.getElementById('statusInput').value='rejected'">
-                            <i class="fas fa-times me-1"></i>반려
-                        </button>
-                    </form>
-                    {% else %}
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="alert alert-secondary mb-0">이미 처리된 문서입니다 ({{ doc.status_label }})</div>
-                        <a href="{{ back_url }}" class="btn btn-light px-4">
-                            <i class="fas fa-arrow-left me-2"></i>돌아가기
+                <!-- Section 5: Attachment -->
+                {% if doc.attachment %}
+                {% set parts = doc.attachment.split('|') %}
+                {% set orig_name = parts[0] %}
+                {% set saved_name = parts[1] if parts|length > 1 else parts[0] %}
+                {% set file_url = '/static/uploads/erp/' + saved_name %}
+                {% set ext = orig_name.rsplit('.', 1)[-1].lower() if '.' in orig_name else '' %}
+
+                <div class="card mb-4">
+                    <div class="card-header bg-white py-2 d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0 fw-bold"><i class="fas fa-paperclip me-2"></i>첨부파일</h6>
+                        <a href="{{ file_url }}" download="{{ orig_name }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                            <i class="fas fa-download me-1"></i>다운로드
                         </a>
                     </div>
-                    {% endif %}
-
+                    <div class="card-body p-0">
+                        <div class="p-3 small text-muted border-bottom">
+                            <i class="fas fa-file me-1"></i>{{ orig_name }}
+                        </div>
+                        {% if ext in ['pdf'] %}
+                        <div style="height:600px;">
+                            <iframe src="{{ file_url }}" width="100%" height="100%" style="border:none;"></iframe>
+                        </div>
+                        {% elif ext in ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'] %}
+                        <div class="text-center p-4" style="background:#f8f9fa;">
+                            <img src="{{ file_url }}" alt="{{ orig_name }}" class="img-fluid rounded shadow-sm" style="max-height:500px;">
+                        </div>
+                        {% else %}
+                        <div class="text-center p-5 text-muted">
+                            <i class="fas fa-file-alt fa-3x mb-3 d-block opacity-50"></i>
+                            <p class="mb-0">미리보기를 지원하지 않는 파일 형식입니다.</p>
+                            <p class="small">다운로드 버튼을 클릭하여 파일을 확인하세요.</p>
+                        </div>
+                        {% endif %}
+                    </div>
                 </div>
+                {% endif %}
+
+                <!-- Section 7: Action Buttons -->
+                {% if doc.status == 'draft' and current_user_id == doc.user_id %}
+                <!-- Draft state: submit or print -->
+                <div class="d-flex gap-2 justify-content-center my-4 no-print">
+                    <button class="btn btn-primary rounded-pill px-5" onclick="submitDoc()">
+                        <i class="fas fa-paper-plane me-1"></i>상신
+                    </button>
+                    <button class="btn btn-outline-secondary rounded-pill px-4" onclick="window.print()">
+                        <i class="fas fa-print me-1"></i>인쇄
+                    </button>
+                </div>
+
+                {% elif can_approve %}
+                <!-- Approver view -->
+                <div class="d-flex gap-2 justify-content-center my-4 no-print">
+                    <button class="btn btn-success rounded-pill px-5" onclick="submitApprove()">
+                        <i class="fas fa-check me-1"></i>승인
+                    </button>
+                    <button class="btn btn-outline-danger rounded-pill px-5" data-bs-toggle="modal" data-bs-target="#rejectModal">
+                        <i class="fas fa-times me-1"></i>반려
+                    </button>
+                    <button class="btn btn-outline-secondary rounded-pill px-4" onclick="window.print()">
+                        <i class="fas fa-print me-1"></i>인쇄
+                    </button>
+                </div>
+
+                {% elif doc.status in ['wait', 'pending', 'progress', 'urgent', 'in_progress'] and current_user_id == doc.user_id %}
+                <!-- Drafter can withdraw while in progress -->
+                <div class="d-flex gap-2 justify-content-center my-4 no-print">
+                    <button class="btn btn-outline-warning rounded-pill px-4" onclick="withdrawDoc()">
+                        <i class="fas fa-undo me-1"></i>철회
+                    </button>
+                    <span class="badge bg-warning text-dark fs-6 px-4 py-2">
+                        <i class="fas fa-hourglass-half me-1"></i>결재 진행중
+                    </span>
+                    <button class="btn btn-outline-secondary rounded-pill px-4" onclick="window.print()">
+                        <i class="fas fa-print me-1"></i>인쇄
+                    </button>
+                </div>
+
+                {% else %}
+                <!-- Terminal states or other users -->
+                <div class="d-flex gap-2 justify-content-center my-4 no-print">
+                    {% if doc.status in ['done', 'approved', 'resolved'] %}
+                    <span class="badge bg-success fs-6 px-4 py-2">
+                        <i class="fas fa-check-circle me-1"></i>최종 승인 완료
+                    </span>
+                    {% elif doc.status == 'rejected' %}
+                    <span class="badge bg-danger fs-6 px-4 py-2">
+                        <i class="fas fa-times-circle me-1"></i>반려됨
+                    </span>
+                    {% else %}
+                    <span class="badge bg-warning text-dark fs-6 px-4 py-2">
+                        <i class="fas fa-hourglass-half me-1"></i>결재 진행중
+                    </span>
+                    {% endif %}
+                    <button class="btn btn-outline-secondary rounded-pill px-4" onclick="window.print()">
+                        <i class="fas fa-print me-1"></i>인쇄
+                    </button>
+                </div>
+                {% endif %}
+
+                <!-- Section 9: Document History Timeline -->
+                {% if history %}
+                <div class="card mt-4 no-print">
+                    <div class="card-header bg-white py-2">
+                        <h6 class="mb-0 fw-bold"><i class="fas fa-history me-2"></i>처리 이력</h6>
+                    </div>
+                    <div class="card-body">
+                        {% for h in history %}
+                        <div class="d-flex gap-3 mb-3">
+                            <div class="timeline-dot mt-1
+                                {% if h.action == '승인' %}bg-success
+                                {% elif h.action == '반려' %}bg-danger
+                                {% else %}bg-primary{% endif %}"></div>
+                            <div>
+                                <div class="fw-semibold small">{{ h.action }}</div>
+                                <div class="text-muted small">{{ h.user_name }} · {{ h.created_at[:16] }}</div>
+                                {% if h.comment %}
+                                <div class="small text-muted fst-italic mt-1">"{{ h.comment }}"</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
             </div>
         </div>
     </div>
 </div>
 
+<!-- Section 8: Reject Modal -->
+<div class="modal fade" id="rejectModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="fas fa-times-circle me-2"></i>반려</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="rejectForm">
+                <div class="modal-body">
+                    <label class="form-label fw-semibold">반려 사유 <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="rejectComment" rows="4"
+                              placeholder="반려 사유를 입력하세요" required></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">취소</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-times me-1"></i>반려 확정
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Profile Modal -->
+<div class="modal fade" id="profileModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:400px;">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-0 pb-2 align-items-start">
+                <div class="d-flex align-items-center gap-3 w-100">
+                    <img id="prof-avatar" src="" alt="" class="rounded-circle" width="52" height="52">
+                    <div class="flex-grow-1">
+                        <div class="fw-bold fs-6" id="prof-name"></div>
+                        <div class="small text-muted" id="prof-meta"></div>
+                        <div class="small text-muted mt-1" id="prof-phone" style="display:none;">
+                            <i class="fas fa-phone me-1" style="font-size:0.7rem;"></i>
+                            <span id="prof-phone-val"></span>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-0 pb-2 px-3">
+                <div class="small text-muted mb-2 fw-semibold" style="letter-spacing:0.03em;">대화</div>
+                <div id="chat-area"></div>
+            </div>
+            <div class="modal-footer border-0 pt-1 px-3 pb-3 d-flex gap-2">
+                <input type="hidden" id="prof-to">
+                <input type="text" id="prof-msg-body" class="form-control form-control-sm rounded-pill px-3"
+                       placeholder="메시지를 입력하세요..." style="flex:1;">
+                <button type="button" class="btn btn-primary btn-sm rounded-pill px-3" id="profSendBtn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Section 10: JavaScript -->
+<script>
+function submitDoc() {
+    if (!confirm('문서를 상신하시겠습니까?')) return;
+    var fd = new FormData();
+    fetch('/api/erp_docs/{{ doc.id }}/submit', { method: 'POST', body: fd })
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+            if (d.ok) location.reload();
+            else alert(d.error || '처리 실패');
+        })
+        .catch(function() { alert('네트워크 오류'); });
+}
+
+function withdrawDoc() {
+    if (!confirm('문서를 철회하시겠습니까? 결재선이 초기화됩니다.')) return;
+    var fd = new FormData();
+    fetch('/api/erp_docs/{{ doc.id }}/withdraw', { method: 'POST', body: fd })
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+            if (d.ok) location.reload();
+            else alert(d.error || '처리 실패');
+        })
+        .catch(function() { alert('네트워크 오류'); });
+}
+
+function submitApprove() {
+    var comment = prompt('결재 의견을 입력하세요 (선택사항):', '');
+    if (comment === null) return;
+    var fd = new FormData();
+    fd.append('comment', comment);
+    fetch('/api/erp_docs/{{ doc.id }}/approve', { method: 'POST', body: fd })
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+            if (d.ok) location.reload();
+            else alert(d.error || '처리 실패');
+        })
+        .catch(function() { alert('네트워크 오류'); });
+}
+
+document.getElementById('rejectForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var comment = document.getElementById('rejectComment').value.trim();
+    if (!comment) { alert('반려 사유를 입력하세요.'); return; }
+    var fd = new FormData();
+    fd.append('comment', comment);
+    fetch('/api/erp_docs/{{ doc.id }}/reject', { method: 'POST', body: fd })
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+            if (d.ok) location.reload();
+            else alert(d.error || '처리 실패');
+        })
+        .catch(function() { alert('네트워크 오류'); });
+});
+
+(function () {
+    var currentName = '';
+
+    function renderChat(messages) {
+        var area = document.getElementById('chat-area');
+        area.innerHTML = '';
+        if (!messages.length) {
+            area.innerHTML = '<div class="text-muted small text-center">대화 내역이 없습니다.</div>';
+            return;
+        }
+        messages.forEach(function (m) {
+            var isMe = (m.direction === 'out');
+            var row = document.createElement('div');
+            row.className = 'd-flex flex-column ' + (isMe ? 'align-items-end' : 'align-items-start');
+            row.innerHTML =
+                '<div class="chat-bubble ' + (isMe ? 'me' : 'them') + '">' + m.body + '</div>' +
+                '<div class="chat-time">' + (m.time_label || '') + '</div>';
+            area.appendChild(row);
+        });
+        area.scrollTop = area.scrollHeight;
+    }
+
+    function loadThread(name) {
+        fetch('/api/messages/thread?with_name=' + encodeURIComponent(name))
+            .then(function (r) { return r.json(); })
+            .then(renderChat);
+    }
+
+    document.querySelectorAll('.author-link').forEach(function (el) {
+        el.addEventListener('click', function () {
+            currentName = el.dataset.name;
+            document.getElementById('prof-name').textContent = currentName;
+            var meta = [el.dataset.dept, el.dataset.position].filter(Boolean).join(' · ');
+            document.getElementById('prof-meta').textContent = meta;
+            var phone = el.dataset.phone;
+            if (phone) {
+                document.getElementById('prof-phone').style.display = '';
+                document.getElementById('prof-phone-val').textContent = phone;
+            } else {
+                document.getElementById('prof-phone').style.display = 'none';
+            }
+            document.getElementById('prof-avatar').src =
+                'https://ui-avatars.com/api/?name=' + encodeURIComponent(currentName) +
+                '&background=eef4fb&color=0056b3&size=52&rounded=true';
+            document.getElementById('prof-to').value = currentName;
+            document.getElementById('prof-msg-body').value = '';
+            document.getElementById('chat-area').innerHTML =
+                '<div class="text-muted small text-center" id="chat-empty">불러오는 중...</div>';
+            loadThread(currentName);
+        });
+    });
+
+    function sendMessage() {
+        var body = document.getElementById('prof-msg-body').value.trim();
+        if (!body) return;
+        var fd = new FormData();
+        fd.append('to_name', currentName);
+        fd.append('body', body);
+        fetch('/api/messages/send', { method: 'POST', body: fd })
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+                if (d.ok) {
+                    document.getElementById('prof-msg-body').value = '';
+                    loadThread(currentName);
+                }
+            });
+    }
+
+    document.getElementById('profSendBtn').addEventListener('click', sendMessage);
+    document.getElementById('prof-msg-body').addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+    });
+}());
+</script>
+
 <!-- Footer -->
-<footer class="footer">
+<footer class="footer no-print">
     <div class="container">
         <div class="footer-menu mb-4">
-            <a href="/about">소개</a>
+            <a href="/faq">소개</a>
             <a href="/contact">문의하기</a>
             <a href="/accessibility">접근성</a>
         </div>
         <div class="social-icons mb-4">
-            <a href="#"><i class="fab fa-facebook-f"></i></a>
-            <a href="#"><i class="fab fa-instagram"></i></a>
-            <a href="#"><i class="fab fa-youtube"></i></a>
+            <a href="https://www.facebook.com" target="_blank" rel="noopener"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://www.instagram.com" target="_blank" rel="noopener"><i class="fab fa-instagram"></i></a>
+            <a href="https://www.youtube.com" target="_blank" rel="noopener"><i class="fab fa-youtube"></i></a>
         </div>
         <p class="mb-0 opacity-50 small">&copy; 2024 Wno1. All Rights Reserved.</p>
     </div>

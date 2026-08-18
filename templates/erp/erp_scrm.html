@@ -8,130 +8,130 @@
 
 <!-- Dashboard Header -->
 <div class="dash-header">
-    <div class="container">
-        <h2>영업/고객관리 대시보드 🤝</h2>
-        <p>{{ user_name }} 님, 오늘의 영업 활동 및 고객 요청 사항입니다. 성공적인 비즈니스를 위해 파이팅 하세요!</p>
-    </div>
+ <div class="container">
+ <h2>영업/고객관리 대시보드</h2>
+ <p>{{ user_name }} 님, 오늘의 영업 활동 및 고객 요청 사항입니다. 성공적인 비즈니스를 위해 파이팅 하세요!</p>
+</div>
 </div>
 
 <!-- Main Content -->
 <div class="container pb-5">
-    <!-- Stats Row -->
-    <div class="row">
-        <div class="col-lg-4 col-md-6">
-            <div class="stat-card">
-                <div class="stat-icon bg-blue-light">
-                    <i class="fas fa-chart-line"></i>
-                </div>
-                <div class="stat-info">
-                    <p>금월 매출 달성률 (목표 5억)</p>
-                    <h3>82<span> %</span></h3>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-4 col-md-6">
-            <a href="/sales_leads" class="text-decoration-none small">
-            <div class="stat-card">
-                <div class="stat-icon bg-green-light">
-                    <i class="fas fa-user-plus"></i>
-                </div>
-                <div class="stat-info">
-                    <p>신규 영업 기회 (리드)</p>
-                    <h3>14<span> 건</span></h3>
-                </div>
-            </div>
-            </a>
-        </div>
-        <div class="col-lg-4 col-md-6">
-            <a href="/voc_list" class="text-decoration-none small">
-            <div class="stat-card">
-                <div class="stat-icon bg-red-light" style="background-color: #ffe5e5; color: #dc3545;">
-                    <i class="fas fa-headset"></i>
-                </div>
-                <div class="stat-info">
-                    <p>미처리 고객 클레임 (VOC)</p>
-                    <h3 style="color: #dc3545;">3<span> 건</span></h3>
-                </div>
-            </div>
-            </a>
-        </div>
-    </div>
+ <!-- Stats Row -->
+ <div class="row">
+ <div class="col-lg-4 col-md-6">
+ <div class="stat-card">
+ <div class="stat-icon bg-blue-light">
+ <i class="fas fa-chart-line"></i>
+</div>
+ <div class="stat-info">
+ <p>금월 매출 달성률 (목표 5억)</p>
+ <h3>82<span> %</span></h3>
+</div>
+</div>
+</div>
+ <div class="col-lg-4 col-md-6">
+ <a href="/sales_leads" class="text-decoration-none small">
+ <div class="stat-card">
+ <div class="stat-icon bg-green-light">
+ <i class="fas fa-user-plus"></i>
+</div>
+ <div class="stat-info">
+ <p>신규 영업 기회 (리드)</p>
+ <h3>14<span> 건</span></h3>
+</div>
+</div>
+</a>
+</div>
+ <div class="col-lg-4 col-md-6">
+ <a href="/voc_list" class="text-decoration-none small">
+ <div class="stat-card">
+ <div class="stat-icon bg-red-light" style="background-color: #ffe5e5; color: #dc3545;">
+ <i class="fas fa-headset"></i>
+</div>
+ <div class="stat-info">
+ <p>미처리 고객 클레임 (VOC)</p>
+ <h3 style="color: #dc3545;">3<span> 건</span></h3>
+</div>
+</div>
+</a>
+</div>
+</div>
 
-    <div class="row mt-2">
-        <!-- Left Column: Sales Task List -->
-        <div class="col-lg-8">
-            <div class="content-card">
-                <div class="card-title">
-                    <span><i class="fas fa-clipboard-list me-2 text-primary"></i>영업 활동 및 고객 지원 업무</span>
-                    <button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="location.href='/new_activity'">+ 활동 등록</button>
-                </div>
+ <div class="row mt-2">
+ <!-- Left Column: Sales Task List -->
+ <div class="col-lg-8">
+ <div class="content-card">
+ <div class="card-title">
+ <span><i class="fas fa-clipboard-list me-2 text-primary"></i>영업 활동 및 고객 지원 업무</span>
+ <a href="/new_activity" class="btn btn-sm btn-outline-primary rounded-pill px-3">+ 활동 등록</a>
+</div>
 
-                {% include 'erp/_doc_list.html' %}
-            </div>
-        </div>
+ {% include 'erp/_doc_list.html' %}
+</div>
+</div>
 
-        <!-- Right Column: Messages & Tools -->
-        <div class="col-lg-4">
-            <!-- Messages -->
-            <div class="content-card">
-                <div class="card-title">
-                    <span><i class="far fa-bell me-2 text-primary"></i>영업/CRM 알림</span>
-                    <a href="/erp_scrm" class="text-decoration-none small">전체보기</a>
-                </div>
+ <!-- Right Column: Messages & Tools -->
+ <div class="col-lg-4">
+ <!-- Messages -->
+ <div class="content-card">
+ <div class="card-title">
+ <span><i class="far fa-bell me-2 text-primary"></i>영업/CRM 알림</span>
+ <a href="/erp_scrm" class="text-decoration-none small">전체보기</a>
+</div>
 
-                <div class="msg-item">
-                    <div class="msg-header">
-                        <span class="msg-sender"><i class="fas fa-robot me-1 text-primary"></i>CRM 시스템</span>
-                        <span class="msg-time">오전 10:00</span>
-                    </div>
-                    <div class="msg-body">
-                        [리마인드] 주요 고객사 '미래산업'의 최종 방문일이 60일을 경과했습니다. 관계 유지를 위해 안부 연락이나 미팅을 권장합니다.
-                    </div>
-                </div>
+ <div class="msg-item">
+ <div class="msg-header">
+ <span class="msg-sender"><i class="fas fa-robot me-1 text-primary"></i>CRM 시스템</span>
+ <span class="msg-time">오전 10:00</span>
+</div>
+ <div class="msg-body">
+ [리마인드] 주요 고객사 '미래산업'의 최종 방문일이 60일을 경과했습니다. 관계 유지를 위해 안부 연락이나 미팅을 권장합니다.
+</div>
+</div>
 
-                <div class="msg-item">
-                    <div class="msg-header">
-                        <span class="msg-sender"><i class="fas fa-user-circle me-1"></i>영업본부장</span>
-                        <span class="msg-time">어제</span>
-                    </div>
-                    <div class="msg-body">
-                        민수님, 내일 주간 영업 회의 때 이번 달 예상 매출액(포캐스트) 및 장기 장기 미수금 리스트 업데이트해서 보고해 주세요.
-                    </div>
-                </div>
-            </div>
+ <div class="msg-item">
+ <div class="msg-header">
+ <span class="msg-sender"><i class="fas fa-user-circle me-1"></i>영업본부장</span>
+ <span class="msg-time">어제</span>
+</div>
+ <div class="msg-body">
+ 민수님, 내일 주간 영업 회의 때 이번 달 예상 매출액(포캐스트) 및 장기 장기 미수금 리스트 업데이트해서 보고해 주세요.
+</div>
+</div>
+</div>
 
-            <!-- Quick Tools -->
-            <div class="content-card">
-                <div class="card-title">
-                    <span><i class="fas fa-toolbox me-2 text-primary"></i>영업관리 도구</span>
-                </div>
-                <a href="/erp_scrm" class="tool-btn">
-                    <i class="fas fa-address-book"></i> 고객사(CRM) 및 연락처 관리
-                </a>
-                <a href="/erp_scrm" class="tool-btn">
-                    <i class="fas fa-funnel-dollar"></i> 영업 기회(Pipeline) 관리
-                </a>
-                <a href="/erp_scrm" class="tool-btn">
-                    <i class="fas fa-file-signature"></i> 견적서 작성 및 계약 관리
-                </a>
-                <a href="/erp_scrm" class="tool-btn">
-                    <i class="fas fa-won-sign"></i> 매출 실적 및 미수금 관리
-                </a>
-                <a href="/erp_scrm" class="tool-btn">
-                    <i class="fas fa-headset"></i> 고객 클레임(VOC) 접수/처리
-                </a>
-            </div>
-        </div>
-    </div>
+ <!-- Quick Tools -->
+ <div class="content-card">
+ <div class="card-title">
+ <span><i class="fas fa-toolbox me-2 text-primary"></i>영업관리 도구</span>
+</div>
+ <a href="/new_activity" class="tool-btn">
+ <i class="fas fa-address-book"></i> 활동 등록
+</a>
+ <a href="/sales_leads" class="tool-btn">
+ <i class="fas fa-funnel-dollar"></i> 영업 기회
+</a>
+ <a href="/voc_list" class="tool-btn">
+ <i class="fas fa-headset"></i> 고객 VOC
+</a>
+ <a href="/approval_pending" class="tool-btn">
+ <i class="fas fa-file-contract"></i> 결재 대기
+</a>
+ <a href="/community" class="tool-btn">
+ <i class="fas fa-comments"></i> 커뮤니티
+</a>
+</div>
+</div>
+</div>
 </div>
 
 <!-- Bootstrap 5 JS Bundle -->
 <!-- Tooltip Initialization -->
 <script>
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl)
-    })
+ var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+ var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+ return new bootstrap.Tooltip(tooltipTriggerEl)
+ })
 </script>
 </body>
 </html>

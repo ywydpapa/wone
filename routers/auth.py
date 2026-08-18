@@ -1,3 +1,5 @@
+import hashlib
+
 from fastapi import APIRouter, Form, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from core.db import get_sqlite
@@ -19,9 +21,10 @@ async def login_page(request: Request, error: str = ""):
 
 @router.post("/login_check")
 async def login_check(request: Request, username: str = Form(...), password: str = Form(...)):
+    hashed = hashlib.sha256(password.encode()).hexdigest()
     conn = get_sqlite()
     row = conn.execute(
-        "SELECT * FROM users WHERE username=? AND password=?", (username, password)
+        "SELECT * FROM users WHERE username=? AND password=?", (username, hashed)
     ).fetchone()
     conn.close()
     if row:
@@ -59,9 +62,10 @@ async def signup_submit(
 ):
     conn = get_sqlite()
     try:
+        hashed = hashlib.sha256(password.encode()).hexdigest()
         conn.execute(
             "INSERT INTO users (username, password, name, dept) VALUES (?,?,?,?)",
-            (username, password, name, dept)
+            (username, hashed, name, dept)
         )
         conn.commit()
     except Exception:
