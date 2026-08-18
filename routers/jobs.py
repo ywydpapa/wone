@@ -411,11 +411,32 @@ async def read_message(request: Request, msg_id: int):
     return {"ok": True}
 
 
-@router.get("/report_export", response_class=HTMLResponse)
+@router.get("/report_export")
 async def report_export(request: Request):
     if not check_login(request):
         return RedirectResponse(url="/login", status_code=303)
-    return RedirectResponse(url="/completed_jobs", status_code=303)
+    import csv
+    import io
+    from starlette.responses import Response
+    conn = get_sqlite()
+    try:
+        rows = conn.execute(
+            "SELECT id, title, dept, category, work_date, due_label, status, created_at FROM jobs WHERE status='done' ORDER BY id DESC"
+        ).fetchall()
+    finally:
+        conn.close()
+    buf = io.StringIO()
+    buf.write('\ufeff')
+    writer = csv.writer(buf)
+    writer.writerow(["ID", "제목", "부서", "분류", "작업일", "기한", "상태", "등록일"])
+    for r in rows:
+        writer.writerow([r["id"], r["title"], r["dept"] or "", r["category"] or "", r["work_date"] or "", r["due_label"] or "", r["status"], r["created_at"] or ""])
+    content = buf.getvalue()
+    return Response(
+        content=content,
+        media_type="text/csv; charset=utf-8",
+        headers={"Content-Disposition": "attachment; filename=\"completed_jobs.csv\""},
+    )
 
 
 @router.get("/api/dept/members")

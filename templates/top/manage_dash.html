@@ -116,7 +116,7 @@
                                 <td><span class="status-badge {{ job.status_class }}" {% if job.status_style %}style="{{ job.status_style }}"{% endif %}>{{ job.status_label }}</span></td>
                                 <td class="{{ 'text-danger' if job.status == 'urgent' else '' }}">{{ job.due_label or '-' }}</td>
                                 <td>
-                                    <a href="/newarrived_jobs" class="btn btn-sm btn-light text-primary" title="메시지 보내기"><i class="far fa-envelope"></i></a>
+                                    <a href="/newarrived_jobs" class="btn btn-sm btn-light text-primary" title="메시지함"><i class="far fa-envelope"></i></a>
                                     <a href="/job/{{ job.id }}" class="btn btn-sm btn-light" title="상세보기"><i class="fas fa-chevron-right"></i></a>
                                 </td>
                             </tr>
@@ -154,7 +154,6 @@
                     </div>
                     <div class="d-flex gap-2">
                         <a href="/as_request/{{ req.id }}" class="btn btn-sm btn-danger flex-grow-1">요청 상세</a>
-                        <a href="/newarrived_jobs" class="btn btn-sm btn-outline-secondary">메시지</a>
                     </div>
                 </div>
                 {% else %}

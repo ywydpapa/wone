@@ -278,6 +278,9 @@ async def erp_groupware(request: Request):
             "SELECT id, category, title, author, dept, created_at FROM posts "
             "WHERE category IN ('notice', 'general') ORDER BY id DESC LIMIT 5"
         ).fetchall()]
+        alerts = with_status_meta(conn.execute(
+            "SELECT * FROM erp_docs WHERE status IN ('urgent','wait','pending') ORDER BY CASE status WHEN 'urgent' THEN 0 WHEN 'pending' THEN 1 ELSE 2 END, id DESC LIMIT 3"
+        ).fetchall())
     finally:
         conn.close()
     return templates.TemplateResponse(request=request, name="/erp/erp_groupware.html", context={
@@ -288,6 +291,7 @@ async def erp_groupware(request: Request):
         "today_jobs": today_jobs,
         "pending_docs": pending_docs,
         "notices": notices,
+        "alerts": alerts,
     })
 
 

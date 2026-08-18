@@ -65,7 +65,7 @@
  <div class="content-card">
  <div class="card-title">
  <span><i class="fas fa-clipboard-list me-2 text-primary"></i>나의 할 일 및 전자결재</span>
- <a href="#" onclick="alert('준비 중인 기능입니다.');return false;" class="btn btn-sm btn-outline-primary rounded-pill px-3">+ 새 결재 기안</a>
+ <a href="/draft_doc" class="btn btn-sm btn-outline-primary rounded-pill px-3">+ 새 결재 기안</a>
 </div>
 
  {% include 'erp/_doc_list.html' %}
@@ -74,6 +74,33 @@
 
  <!-- Right Column: Messages & Tools -->
  <div class="col-lg-4">
+ <!-- 결재 대기 알림 -->
+ <div class="content-card">
+ <div class="card-title">
+ <span><i class="far fa-bell me-2 text-primary"></i>결재 대기 알림</span>
+ <a href="/approval_pending" class="text-decoration-none small">전체보기</a>
+</div>
+
+ {% if alerts %}
+ {% for a in alerts %}
+ <a href="/erp_doc/{{ a.id }}" class="text-decoration-none">
+ <div class="msg-item" style="cursor:pointer; transition: background 0.15s;" onmouseover="this.style.backgroundColor='#eef4fb'" onmouseout="this.style.backgroundColor=''">
+ <div class="msg-header">
+ <span class="msg-sender">
+  {% if a.status == 'urgent' %}<i class="fas fa-exclamation-circle me-1 text-danger"></i>{% else %}<i class="fas fa-clock me-1 text-warning"></i>{% endif %}
+  <span class="badge-status {{ a.status_class }}" {% if a.status_style %}style="{{ a.status_style }}; font-size:0.7rem;"{% else %}style="font-size:0.7rem;"{% endif %}>{{ a.status_label }}</span>
+ </span>
+ <span class="msg-time">{{ a.created_at[:10] if a.created_at else '' }}</span>
+</div>
+ <div class="msg-body">{{ a.title }}</div>
+</div>
+ </a>
+ {% endfor %}
+ {% else %}
+ <p class="text-muted small text-center py-3 mb-0">새 알림이 없습니다.</p>
+ {% endif %}
+</div>
+
  <!-- Messages -->
  <div class="content-card">
  <div class="card-title">
