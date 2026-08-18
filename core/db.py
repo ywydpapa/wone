@@ -254,6 +254,32 @@ def run_migrations():
     except Exception:
         pass
 
+    for col_sql in [
+        "ALTER TABLE erp_docs ADD COLUMN slip_type TEXT DEFAULT ''",
+        "ALTER TABLE erp_docs ADD COLUMN slip_date TEXT DEFAULT ''",
+        "ALTER TABLE erp_docs ADD COLUMN slip_total INTEGER DEFAULT 0",
+    ]:
+        try:
+            conn.execute(col_sql)
+            conn.commit()
+        except Exception:
+            pass
+
+    try:
+        conn.execute("""CREATE TABLE IF NOT EXISTS slip_lines (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            doc_id INTEGER NOT NULL,
+            line_no INTEGER NOT NULL,
+            account_name TEXT NOT NULL,
+            debit INTEGER DEFAULT 0,
+            credit INTEGER DEFAULT 0,
+            partner TEXT DEFAULT '',
+            summary TEXT DEFAULT ''
+        )""")
+        conn.commit()
+    except Exception:
+        pass
+
     conn.close()
 
 

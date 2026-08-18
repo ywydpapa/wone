@@ -21,6 +21,36 @@ async def job_diary(request: Request):
     )
 
 
+@router.get("/progress_jobs", response_class=HTMLResponse)
+async def progress_jobs(request: Request, q: str = "", page: int = 1):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+    u = get_current_user(request)
+    conn = get_sqlite()
+    per_page = 10
+    base = "FROM jobs WHERE status NOT IN ('done','trash')"
+    params: list = []
+    if q:
+        base += " AND title LIKE '%'||?||'%'"; params.append(q)
+    try:
+        total = conn.execute("SELECT COUNT(*) " + base, params).fetchone()[0]
+        rows = with_status_meta(conn.execute(
+            "SELECT * " + base + " ORDER BY CASE status WHEN 'urgent' THEN 0 WHEN 'progress' THEN 1 ELSE 2 END, id DESC LIMIT ? OFFSET ?",
+            params + [per_page, (page - 1) * per_page]
+        ).fetchall())
+        done_count = conn.execute("SELECT COUNT(*) FROM jobs WHERE status='done'").fetchone()[0]
+    finally:
+        conn.close()
+    return templates.TemplateResponse(
+        request=request, name="apps/progress_jobs.html", context={
+            "request": request, "page_title": "진행 중인 업무",
+            "user_name": u["user_name"],
+            "jobs": rows, "total": total, "done_count": done_count,
+            "q": q, "page": page, "total_pages": max(1, (total + per_page - 1) // per_page),
+        }
+    )
+
+
 @router.get("/completed_jobs", response_class=HTMLResponse)
 async def completed_jobs(request: Request, q: str = "", page: int = 1):
     if not check_login(request):

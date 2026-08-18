@@ -16,7 +16,7 @@ from core.db import get_sqlite, _DB_SCHEME
 
 TABLES = ["users", "jobs", "as_requests", "as_comments", "posts", "comments", "post_likes",
           "bookmarks", "messages", "erp_docs", "job_postings", "notifications",
-          "job_applications", "approval_lines", "doc_history"]
+          "job_applications", "approval_lines", "doc_history", "slip_lines"]
 
 
 # ---------------------------------------------------------------------------
@@ -186,7 +186,10 @@ def init():
         effective_date TEXT DEFAULT '',
         approved_by INTEGER,
         approved_at TEXT,
-        reject_reason TEXT DEFAULT ''
+        reject_reason TEXT DEFAULT '',
+        slip_type TEXT DEFAULT '',
+        slip_date TEXT DEFAULT '',
+        slip_total INTEGER DEFAULT 0
     )""")
 
     _create_table(c, """CREATE TABLE job_postings (
@@ -233,6 +236,17 @@ def init():
         action TEXT NOT NULL,
         comment TEXT DEFAULT '',
         created_at TEXT DEFAULT (datetime('now','localtime'))
+    )""")
+
+    _create_table(c, """CREATE TABLE IF NOT EXISTS slip_lines (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        doc_id INTEGER NOT NULL,
+        line_no INTEGER NOT NULL,
+        account_name TEXT NOT NULL,
+        debit INTEGER DEFAULT 0,
+        credit INTEGER DEFAULT 0,
+        partner TEXT DEFAULT '',
+        summary TEXT DEFAULT ''
     )""")
 
     _create_table(c, """CREATE TABLE notifications (
@@ -616,8 +630,7 @@ def init():
 
     conn.commit()
     conn.close()
-    db_label = _DATABASE_URL if _DB_SCHEME == "mysql" else f"sqlite: {conn if _DB_SCHEME != 'sqlite' else ''}"
-    print(f"DB initialized ({_DB_SCHEME}): {_DATABASE_URL}")
+    print(f"DB initialized ({_DB_SCHEME})")
 
 
 if __name__ == "__main__":

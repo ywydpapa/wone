@@ -100,6 +100,18 @@
                                     <th class="ps-3">수신부서</th>
                                     <td class="ps-3">{{ doc.dept or '—' }}</td>
                                 </tr>
+                                {% if doc.slip_type %}
+                                <tr>
+                                    <th class="ps-3">전표유형</th>
+                                    <td class="ps-3"><span class="badge bg-primary bg-opacity-10 text-primary">{{ doc.slip_type }}전표</span></td>
+                                    <th class="ps-3">전표일자</th>
+                                    <td class="ps-3">{{ doc.slip_date or '—' }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="ps-3">전표금액</th>
+                                    <td class="ps-3 fw-bold text-primary" colspan="3">{{ "{:,}".format(doc.slip_total or 0) }}원</td>
+                                </tr>
+                                {% endif %}
                                 <tr>
                                     <th class="ps-3">기안자</th>
                                     <td class="ps-3" colspan="3">
@@ -179,10 +191,82 @@
                 </div>
                 {% endif %}
 
+                <!-- Section 3.5: Slip Lines (전표 분개) -->
+                {% if slip_lines %}
+                <div class="card mb-4">
+                    <div class="card-header bg-white py-2">
+                        <h6 class="mb-0 fw-bold"><i class="fas fa-receipt me-2"></i>전표 분개 내역
+                            {% if doc.slip_type %}
+                            <span class="badge bg-primary bg-opacity-10 text-primary ms-2" style="font-size:0.75rem;">{{ doc.slip_type }}전표</span>
+                            {% endif %}
+                            {% if doc.slip_date %}
+                            <span class="text-muted ms-2" style="font-size:0.78rem;"><i class="far fa-calendar-alt me-1"></i>{{ doc.slip_date }}</span>
+                            {% endif %}
+                        </h6>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-bordered mb-0 align-middle" style="font-size:0.88rem;">
+                                <thead class="table-light text-center">
+                                    <tr>
+                                        <th style="width:40px;">No</th>
+                                        <th>계정과목</th>
+                                        <th style="width:130px;">차변(원)</th>
+                                        <th style="width:130px;">대변(원)</th>
+                                        <th>거래처</th>
+                                        <th>적요</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for sl in slip_lines %}
+                                    <tr>
+                                        <td class="text-center text-muted fw-bold">{{ sl.line_no }}</td>
+                                        <td class="fw-semibold">{{ sl.account_name }}</td>
+                                        <td class="text-end {% if sl.debit > 0 %}text-primary fw-bold{% else %}text-muted{% endif %}">
+                                            {{ "{:,}".format(sl.debit) if sl.debit else '—' }}
+                                        </td>
+                                        <td class="text-end {% if sl.credit > 0 %}text-danger fw-bold{% else %}text-muted{% endif %}">
+                                            {{ "{:,}".format(sl.credit) if sl.credit else '—' }}
+                                        </td>
+                                        <td>{{ sl.partner or '—' }}</td>
+                                        <td>{{ sl.summary or '—' }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot class="table-light">
+                                    <tr class="fw-bold" style="font-size:0.9rem;">
+                                        <td colspan="2" class="text-end pe-3">합 계</td>
+                                        <td class="text-end pe-3 text-primary">
+                                            {{ "{:,}".format(slip_lines | map(attribute='debit') | sum) }}
+                                        </td>
+                                        <td class="text-end pe-3 text-danger">
+                                            {{ "{:,}".format(slip_lines | map(attribute='credit') | sum) }}
+                                        </td>
+                                        <td colspan="2">
+                                            {% set total_d = slip_lines | map(attribute='debit') | sum %}
+                                            {% set total_c = slip_lines | map(attribute='credit') | sum %}
+                                            {% if total_d == total_c %}
+                                            <span class="badge bg-success rounded-pill">
+                                                <i class="fas fa-check-circle me-1"></i>차대 일치 ({{ "{:,}".format(total_d) }}원)
+                                            </span>
+                                            {% else %}
+                                            <span class="badge bg-danger rounded-pill">
+                                                <i class="fas fa-exclamation-triangle me-1"></i>차액 {{ "{:,}".format((total_d - total_c)|abs) }}원
+                                            </span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
                 <!-- Section 4: Document Body -->
                 <div class="card mb-4">
                     <div class="card-header bg-white py-2">
-                        <h6 class="mb-0 fw-bold"><i class="fas fa-file-alt me-2"></i>본문</h6>
+                        <h6 class="mb-0 fw-bold"><i class="fas fa-file-alt me-2"></i>{% if slip_lines %}비고{% else %}본문{% endif %}</h6>
                     </div>
                     <div class="card-body doc-body">
                         <div style="white-space:pre-wrap; font-size:0.93rem;">{{ doc.content or '(내용 없음)' }}</div>

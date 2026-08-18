@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ko">
+{% include 'common/header.html' %}
+<body>
+
+<!-- Navbar -->
+{% include 'common/topbar.html' %}
+
+<!-- Dashboard Header -->
+<div class="dash-header">
+    <div class="container d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+            <h2>전표 입력</h2>
+            <p>회계 전표를 작성하고 결재를 요청합니다.</p>
+        </div>
+        <div>
+            <a href="/erp_fa" class="btn btn-light rounded-pill px-4 shadow-sm">
+                <i class="fas fa-arrow-left me-2"></i>자금관리
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="list-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="content-card">
+                    <div class="card-title mb-4 border-bottom pb-3">
+                        <span><i class="fas fa-receipt me-2 text-primary"></i>전표 입력</span>
+                    </div>
+
+                    <form id="slipForm" action="/api/slip" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="doc_type" value="expense">
+
+                        <!-- 결재선 -->
+                        <div class="card mb-4 border">
+                            <div class="card-header bg-white py-2">
+                                <h6 class="mb-0 fw-bold"><i class="fas fa-stamp me-2 text-primary"></i>결재선</h6>
+                            </div>
+                            <div class="card-body py-3">
+                                <div class="d-flex gap-0 border rounded overflow-hidden">
+                                    <div class="flex-fill text-center border-end p-3 bg-success bg-opacity-10">
+                                        <div class="text-muted small fw-semibold mb-2">기안</div>
+                                        <div style="width:48px;height:48px;border-radius:50%;border:2.5px solid #198754;color:#198754;display:flex;align-items:center;justify-content:center;margin:0 auto;font-weight:700;font-size:1.2rem;">&#10003;</div>
+                                        <div class="fw-bold small mt-2">{{ user_name }}</div>
+                                        <div class="text-muted" style="font-size:0.7rem;">자동 확정</div>
+                                    </div>
+                                    <div class="flex-fill text-center border-end p-3">
+                                        <div class="text-muted small fw-semibold mb-2">검토</div>
+                                        <div style="width:48px;height:48px;border-radius:50%;border:2px dashed #ccc;margin:0 auto;" class="mb-2 d-flex align-items-center justify-content-center text-muted">&mdash;</div>
+                                        <select name="reviewer_id" class="form-select form-select-sm mt-1" required>
+                                            <option value="">검토자 선택</option>
+                                            {% for u in users %}
+                                            <option value="{{ u.id }}">{{ u.name }} ({{ u.dept }}{% if u.position %} / {{ u.position }}{% endif %})</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="flex-fill text-center p-3">
+                                        <div class="text-muted small fw-semibold mb-2">승인</div>
+                                        <div style="width:48px;height:48px;border-radius:50%;border:2px dashed #ccc;margin:0 auto;" class="mb-2 d-flex align-items-center justify-content-center text-muted">&mdash;</div>
+                                        <select name="approver_id" class="form-select form-select-sm mt-1" required>
+                                            <option value="">승인자 선택</option>
+                                            {% for u in users %}
+                                            <option value="{{ u.id }}">{{ u.name }} ({{ u.dept }}{% if u.position %} / {{ u.position }}{% endif %})</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 전표 기본정보 -->
+                        <div class="card mb-4 border">
+                            <div class="card-header bg-white py-2">
+                                <h6 class="mb-0 fw-bold"><i class="fas fa-info-circle me-2 text-primary"></i>전표 기본정보</h6>
+                            </div>
+                            <div class="card-body py-3">
+                                <div class="row g-3">
+                                    <div class="col-sm-4">
+                                        <label class="form-label fw-semibold small">전표유형 <span class="text-danger">*</span></label>
+                                        <select name="slip_type" id="slipType" class="form-select form-select-sm" required>
+                                            <option value="">선택</option>
+                                            <option value="입금">입금전표</option>
+                                            <option value="출금">출금전표</option>
+                                            <option value="대체">대체전표</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label class="form-label fw-semibold small">전표일자 <span class="text-danger">*</span></label>
+                                        <input type="date" name="slip_date" id="slipDate" class="form-control form-control-sm" required>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label class="form-label fw-semibold small">수신부서</label>
+                                        <input type="text" name="dept" class="form-control form-control-sm"
+                                               placeholder="예: 재무팀" list="deptList">
+                                        <datalist id="deptList">
+                                            <option value="경영지원팀">
+                                            <option value="개발팀">
+                                            <option value="디자인팀">
+                                            <option value="영업팀">
+                                            <option value="재무팀">
+                                            <option value="인사팀">
+                                            <option value="총무팀">
+                                        </datalist>
+                                    </div>
+                                </div>
+                                <div class="row g-3 mt-1">
+                                    <div class="col-12">
+                                        <label class="form-label fw-semibold small">제목 <span class="text-danger">*</span></label>
+                                        <input type="text" name="title" class="form-control" placeholder="예: 8월 사무용품 구매 대금 지급" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 분개 입력 -->
+                        <div class="card mb-4 border">
+                            <div class="card-header bg-white py-2 d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0 fw-bold"><i class="fas fa-table me-2 text-primary"></i>분개 입력</h6>
+                                <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="addLine()">
+                                    <i class="fas fa-plus me-1"></i>행 추가
+                                </button>
+                            </div>
+                            <div class="card-body p-0">
+                                <!-- 분개 안내 -->
+                                <div id="slipGuide" class="px-3 py-2 bg-light border-bottom" style="font-size:0.8rem;">
+                                    <i class="fas fa-lightbulb me-1 text-warning"></i>
+                                    <span id="guideText">전표유형을 선택하면 분개 입력 가이드가 표시됩니다.</span>
+                                </div>
+
+                                <div class="table-responsive">
+                                    <table class="table table-bordered mb-0 align-middle" style="font-size:0.88rem;">
+                                        <thead class="table-light text-center">
+                                            <tr>
+                                                <th style="width:40px;">No</th>
+                                                <th style="min-width:160px;">계정과목 <span class="text-danger">*</span></th>
+                                                <th style="width:140px;">차변(원) <span class="text-danger">*</span></th>
+                                                <th style="width:140px;">대변(원) <span class="text-danger">*</span></th>
+                                                <th style="min-width:120px;">거래처</th>
+                                                <th style="min-width:150px;">적요</th>
+                                                <th style="width:50px;"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="slipLines">
+                                            <tr data-line="1">
+                                                <td class="text-center fw-bold text-muted line-no">1</td>
+                                                <td>
+                                                    <input type="text" name="account_1" class="form-control form-control-sm"
+                                                           list="accountList" placeholder="계정과목 선택" required>
+                                                </td>
+                                                <td><input type="number" name="debit_1" class="form-control form-control-sm text-end debit-input" min="0" value="0" onfocus="this.select()"></td>
+                                                <td><input type="number" name="credit_1" class="form-control form-control-sm text-end credit-input" min="0" value="0" onfocus="this.select()"></td>
+                                                <td><input type="text" name="partner_1" class="form-control form-control-sm" placeholder="거래처명"></td>
+                                                <td><input type="text" name="summary_1" class="form-control form-control-sm" placeholder="적요"></td>
+                                                <td class="text-center">
+                                                    <button type="button" class="btn btn-sm btn-outline-danger border-0" onclick="removeLine(this)" title="삭제">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <tr data-line="2">
+                                                <td class="text-center fw-bold text-muted line-no">2</td>
+                                                <td>
+                                                    <input type="text" name="account_2" class="form-control form-control-sm"
+                                                           list="accountList" placeholder="계정과목 선택" required>
+                                                </td>
+                                                <td><input type="number" name="debit_2" class="form-control form-control-sm text-end debit-input" min="0" value="0" onfocus="this.select()"></td>
+                                                <td><input type="number" name="credit_2" class="form-control form-control-sm text-end credit-input" min="0" value="0" onfocus="this.select()"></td>
+                                                <td><input type="text" name="partner_2" class="form-control form-control-sm" placeholder="거래처명"></td>
+                                                <td><input type="text" name="summary_2" class="form-control form-control-sm" placeholder="적요"></td>
+                                                <td class="text-center">
+                                                    <button type="button" class="btn btn-sm btn-outline-danger border-0" onclick="removeLine(this)" title="삭제">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                        <tfoot class="table-light">
+                                            <tr class="fw-bold" style="font-size:0.9rem;">
+                                                <td colspan="2" class="text-end pe-3">합 계</td>
+                                                <td class="text-end pe-3" id="totalDebit" style="color:#0d6efd;">0</td>
+                                                <td class="text-end pe-3" id="totalCredit" style="color:#dc3545;">0</td>
+                                                <td colspan="2">
+                                                    <span id="balanceStatus" class="badge rounded-pill bg-secondary">
+                                                        <i class="fas fa-balance-scale me-1"></i>입력 대기
+                                                    </span>
+                                                </td>
+                                                <td></td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 계정과목 datalist -->
+                        <datalist id="accountList">
+                            <!-- 자산 -->
+                            <option value="현금">
+                            <option value="보통예금">
+                            <option value="당좌예금">
+                            <option value="정기예금">
+                            <option value="외상매출금">
+                            <option value="받을어음">
+                            <option value="미수금">
+                            <option value="선급금">
+                            <option value="선급비용">
+                            <option value="부가세대급금">
+                            <option value="상품">
+                            <option value="제품">
+                            <option value="원재료">
+                            <option value="건물">
+                            <option value="비품">
+                            <option value="차량운반구">
+                            <option value="토지">
+                            <!-- 부채 -->
+                            <option value="외상매입금">
+                            <option value="지급어음">
+                            <option value="미지급금">
+                            <option value="미지급비용">
+                            <option value="선수금">
+                            <option value="예수금">
+                            <option value="부가세예수금">
+                            <option value="단기차입금">
+                            <option value="장기차입금">
+                            <!-- 자본 -->
+                            <option value="자본금">
+                            <option value="이익잉여금">
+                            <!-- 수익 -->
+                            <option value="상품매출">
+                            <option value="제품매출">
+                            <option value="용역매출">
+                            <option value="이자수익">
+                            <option value="잡이익">
+                            <!-- 비용 -->
+                            <option value="급여">
+                            <option value="상여금">
+                            <option value="퇴직급여">
+                            <option value="복리후생비">
+                            <option value="여비교통비">
+                            <option value="접대비">
+                            <option value="통신비">
+                            <option value="수도광열비">
+                            <option value="세금과공과">
+                            <option value="감가상각비">
+                            <option value="임차료">
+                            <option value="수선비">
+                            <option value="보험료">
+                            <option value="차량유지비">
+                            <option value="운반비">
+                            <option value="교육훈련비">
+                            <option value="도서인쇄비">
+                            <option value="소모품비">
+                            <option value="지급수수료">
+                            <option value="광고선전비">
+                            <option value="대손상각비">
+                            <option value="잡손실">
+                            <option value="이자비용">
+                        </datalist>
+
+                        <!-- 비고 -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">비고 <span class="text-muted fw-normal small">(선택)</span></label>
+                            <textarea name="content" class="form-control" rows="3" placeholder="전표 관련 참고 사항을 입력하세요"></textarea>
+                        </div>
+
+                        <!-- 첨부 파일 -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">증빙 첨부 <span class="text-muted fw-normal small">(선택)</span></label>
+                            <input class="form-control" type="file" name="attachment"
+                                   accept=".pdf,.png,.jpg,.jpeg,.gif,.xlsx,.xls,.docx,.doc,.pptx,.ppt,.hwp,.txt,.zip">
+                            <div class="form-text">세금계산서, 영수증, 거래명세서 등 증빙 자료 (최대 10MB)</div>
+                        </div>
+
+                        <input type="hidden" name="line_count" id="lineCount" value="2">
+
+                        <hr class="my-4">
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex gap-2 justify-content-center mt-4">
+                            <a href="/erp_fa" class="btn btn-light rounded-pill px-4">
+                                <i class="fas fa-times me-1"></i>취소
+                            </a>
+                            <button type="submit" name="save_mode" value="draft" class="btn btn-outline-secondary rounded-pill px-4">
+                                <i class="fas fa-save me-1"></i>임시저장
+                            </button>
+                            <button type="submit" name="save_mode" value="submit" class="btn btn-primary rounded-pill px-5" id="btnSubmit">
+                                <i class="fas fa-paper-plane me-1"></i>상신
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-menu mb-4">
+            <a href="/faq">소개</a>
+            <a href="/contact">문의하기</a>
+            <a href="/accessibility">접근성</a>
+        </div>
+        <div class="social-icons mb-4">
+            <a href="https://www.facebook.com" target="_blank" rel="noopener"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://www.instagram.com" target="_blank" rel="noopener"><i class="fab fa-instagram"></i></a>
+            <a href="https://www.youtube.com" target="_blank" rel="noopener"><i class="fab fa-youtube"></i></a>
+        </div>
+        <p class="mb-0 opacity-50 small">&copy; 2024 Wno1. All Rights Reserved.</p>
+    </div>
+</footer>
+
+<script>
+// 전표일자 기본값: 오늘
+document.getElementById('slipDate').valueAsDate = new Date();
+
+// 전표유형별 가이드
+document.getElementById('slipType').addEventListener('change', function() {
+    var guide = document.getElementById('guideText');
+    switch(this.value) {
+        case '입금':
+            guide.innerHTML = '<strong>입금전표:</strong> 차변은 현금/예금, 대변은 매출·외상매출금 등 입금 사유 계정을 입력합니다.';
+            break;
+        case '출금':
+            guide.innerHTML = '<strong>출금전표:</strong> 차변은 비용·자산 계정, 대변은 현금/예금을 입력합니다.';
+            break;
+        case '대체':
+            guide.innerHTML = '<strong>대체전표:</strong> 현금 입출금 없이 계정 간 대체 거래를 기록합니다. 차변·대변 합계가 일치해야 합니다.';
+            break;
+        default:
+            guide.textContent = '전표유형을 선택하면 분개 입력 가이드가 표시됩니다.';
+    }
+});
+
+var lineCounter = 2;
+
+function addLine() {
+    lineCounter++;
+    var tbody = document.getElementById('slipLines');
+    var tr = document.createElement('tr');
+    tr.setAttribute('data-line', lineCounter);
+    tr.innerHTML =
+        '<td class="text-center fw-bold text-muted line-no">' + lineCounter + '</td>' +
+        '<td><input type="text" name="account_' + lineCounter + '" class="form-control form-control-sm" list="accountList" placeholder="계정과목 선택" required></td>' +
+        '<td><input type="number" name="debit_' + lineCounter + '" class="form-control form-control-sm text-end debit-input" min="0" value="0" onfocus="this.select()"></td>' +
+        '<td><input type="number" name="credit_' + lineCounter + '" class="form-control form-control-sm text-end credit-input" min="0" value="0" onfocus="this.select()"></td>' +
+        '<td><input type="text" name="partner_' + lineCounter + '" class="form-control form-control-sm" placeholder="거래처명"></td>' +
+        '<td><input type="text" name="summary_' + lineCounter + '" class="form-control form-control-sm" placeholder="적요"></td>' +
+        '<td class="text-center"><button type="button" class="btn btn-sm btn-outline-danger border-0" onclick="removeLine(this)" title="삭제"><i class="fas fa-times"></i></button></td>';
+    tbody.appendChild(tr);
+    document.getElementById('lineCount').value = lineCounter;
+    recalc();
+}
+
+function removeLine(btn) {
+    var tbody = document.getElementById('slipLines');
+    if (tbody.rows.length <= 2) {
+        alert('최소 2개의 분개행이 필요합니다.');
+        return;
+    }
+    btn.closest('tr').remove();
+    // 행번호 재정렬
+    var rows = tbody.querySelectorAll('tr');
+    rows.forEach(function(row, idx) {
+        row.querySelector('.line-no').textContent = idx + 1;
+    });
+    recalc();
+}
+
+function recalc() {
+    var debits = document.querySelectorAll('.debit-input');
+    var credits = document.querySelectorAll('.credit-input');
+    var totalD = 0, totalC = 0;
+    debits.forEach(function(el) { totalD += parseInt(el.value) || 0; });
+    credits.forEach(function(el) { totalC += parseInt(el.value) || 0; });
+    document.getElementById('totalDebit').textContent = totalD.toLocaleString();
+    document.getElementById('totalCredit').textContent = totalC.toLocaleString();
+    var badge = document.getElementById('balanceStatus');
+    if (totalD === 0 && totalC === 0) {
+        badge.className = 'badge rounded-pill bg-secondary';
+        badge.innerHTML = '<i class="fas fa-balance-scale me-1"></i>입력 대기';
+    } else if (totalD === totalC) {
+        badge.className = 'badge rounded-pill bg-success';
+        badge.innerHTML = '<i class="fas fa-check-circle me-1"></i>차대 일치 (' + totalD.toLocaleString() + '원)';
+    } else {
+        var diff = Math.abs(totalD - totalC);
+        badge.className = 'badge rounded-pill bg-danger';
+        badge.innerHTML = '<i class="fas fa-exclamation-triangle me-1"></i>차액 ' + diff.toLocaleString() + '원';
+    }
+}
+
+// 실시간 합계 계산
+document.addEventListener('input', function(e) {
+    if (e.target.classList.contains('debit-input') || e.target.classList.contains('credit-input')) {
+        recalc();
+    }
+});
+
+// 폼 제출 전 검증
+document.getElementById('slipForm').addEventListener('submit', function(e) {
+    var debits = document.querySelectorAll('.debit-input');
+    var credits = document.querySelectorAll('.credit-input');
+    var totalD = 0, totalC = 0;
+    debits.forEach(function(el) { totalD += parseInt(el.value) || 0; });
+    credits.forEach(function(el) { totalC += parseInt(el.value) || 0; });
+
+    if (totalD !== totalC) {
+        e.preventDefault();
+        alert('차변 합계와 대변 합계가 일치하지 않습니다.\n차변: ' + totalD.toLocaleString() + '원\n대변: ' + totalC.toLocaleString() + '원\n차액: ' + Math.abs(totalD - totalC).toLocaleString() + '원');
+        return false;
+    }
+    if (totalD === 0) {
+        e.preventDefault();
+        alert('금액을 입력해 주세요.');
+        return false;
+    }
+
+    // line_count를 실제 행 수로 업데이트
+    var rows = document.getElementById('slipLines').querySelectorAll('tr');
+    var lineNums = [];
+    rows.forEach(function(row) { lineNums.push(row.getAttribute('data-line')); });
+    document.getElementById('lineCount').value = lineNums.join(',');
+});
+</script>
+</body>
+</html>

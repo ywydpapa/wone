@@ -25,7 +25,6 @@ ERP_DOC_TYPES = {
     "new_work_order": ("work_order", "작업 지시"),
     "new_po":         ("po",         "발주서"),
     "new_activity":   ("activity",   "활동 등록"),
-    "new_slip":       ("expense",    "전표 입력"),
 }
 
 ERP_DOC_TYPE_LABELS = {
