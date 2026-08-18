@@ -26,6 +26,7 @@
     <!-- Stats -->
     <div class="row">
         <div class="col-xl-3 col-md-6">
+            <a href="/workers" class="text-decoration-none">
             <div class="stat-card">
                 <div class="stat-icon bg-blue-light"><i class="fas fa-users"></i></div>
                 <div class="stat-info">
@@ -33,8 +34,10 @@
                     <h3>{{ worker_count }}<span>명</span></h3>
                 </div>
             </div>
+            </a>
         </div>
         <div class="col-xl-3 col-md-6">
+            <a href="/manage_dash?status_filter=progress" class="text-decoration-none">
             <div class="stat-card">
                 <div class="stat-icon bg-purple-light"><i class="fas fa-tasks"></i></div>
                 <div class="stat-info">
@@ -42,8 +45,10 @@
                     <h3>{{ progress_count }}<span>건</span></h3>
                 </div>
             </div>
+            </a>
         </div>
         <div class="col-xl-3 col-md-6">
+            <a href="/completed_jobs" class="text-decoration-none">
             <div class="stat-card">
                 <div class="stat-icon bg-green-light"><i class="fas fa-clipboard-check"></i></div>
                 <div class="stat-info">
@@ -51,8 +56,10 @@
                     <h3>{{ review_count }}<span>건</span></h3>
                 </div>
             </div>
+            </a>
         </div>
         <div class="col-xl-3 col-md-6">
+            <a href="/as_manage" class="text-decoration-none">
             <div class="stat-card border-danger">
                 <div class="stat-icon bg-red-light"><i class="fas fa-hands-helping"></i></div>
                 <div class="stat-info">
@@ -60,56 +67,7 @@
                     <h3 class="text-danger">{{ pending_as_count }}<span>건</span></h3>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <!-- 부서별 업무 현황 -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="content-card">
-                <div class="card-title-wrap">
-                    <h5><i class="fas fa-chart-bar me-2 text-primary"></i>부서별 업무 현황</h5>
-                    <div class="d-flex gap-3 text-muted small">
-                        <span><i class="fas fa-exclamation-circle text-danger me-1"></i>긴급 <strong class="text-danger">{{ urgent_count }}</strong>건</span>
-                        <span><i class="fas fa-check-circle text-success me-1"></i>금주 완료 <strong class="text-success">{{ week_done_count }}</strong>건</span>
-                    </div>
-                </div>
-                <div class="table-responsive">
-                    <table class="table table-custom table-hover mb-0">
-                        <thead>
-                            <tr>
-                                <th>부서명</th>
-                                <th class="text-center">전체</th>
-                                <th class="text-center">진행중</th>
-                                <th class="text-center">완료</th>
-                                <th style="min-width:160px;">완료율</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for ds in dept_stats %}
-                            <tr>
-                                <td class="fw-bold">{{ ds.dept }}</td>
-                                <td class="text-center">{{ ds.total }}</td>
-                                <td class="text-center"><span class="badge bg-primary bg-opacity-10 text-primary">{{ ds.in_progress }}</span></td>
-                                <td class="text-center"><span class="badge bg-success bg-opacity-10 text-success">{{ ds.done }}</span></td>
-                                <td>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="progress flex-grow-1" style="height:8px;">
-                                            <div class="progress-bar bg-success" role="progressbar" style="width:{{ ds.rate }}%"></div>
-                                        </div>
-                                        <span class="text-muted small" style="min-width:36px;">{{ ds.rate }}%</span>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% else %}
-                            <tr>
-                                <td colspan="5" class="text-center text-muted py-3">업무 데이터가 없습니다.</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            </a>
         </div>
     </div>
 
