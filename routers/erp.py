@@ -620,11 +620,12 @@ async def update_erp_doc_status(request: Request, doc_id: int, status: str = For
         if status == "rejected" and reason:
             conn.execute("UPDATE erp_docs SET reject_reason=? WHERE id=?", (reason, doc_id))
 
-        # Update the matching pending approval line for this user
+        # Update the first pending approval line (admin/manager acts on behalf)
         conn.execute(
             """UPDATE approval_lines SET status=?, comment=?, acted_at=?
-               WHERE doc_id=? AND user_id=? AND status='pending'""",
-            (status, reason, now, doc_id, uid)
+               WHERE id = (SELECT id FROM approval_lines
+                           WHERE doc_id=? AND status='pending' ORDER BY step LIMIT 1)""",
+            (status, reason, now, doc_id)
         )
 
         # Insert history entry
