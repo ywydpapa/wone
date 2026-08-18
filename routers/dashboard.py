@@ -1,3 +1,5 @@
+import hashlib
+
 from fastapi import APIRouter, Request, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from starlette.responses import JSONResponse
@@ -136,7 +138,7 @@ async def manage_dash(request: Request, q: str = "", status_filter: str = ""):
 
 
 @router.get("/workers", response_class=HTMLResponse)
-async def workers_page(request: Request, dept: str = "", q: str = ""):
+async def workers_page(request: Request, dept: str = "", q: str = "", error: str = "", ok: str = ""):
     if not check_login(request):
         return RedirectResponse(url="/login", status_code=303)
     u = get_current_user(request)
@@ -170,8 +172,59 @@ async def workers_page(request: Request, dept: str = "", q: str = ""):
             "depts": depts,
             "dept": dept,
             "q": q,
+            "error": error,
+            "ok": ok,
+            "is_admin": request.session.get("role") == "admin",
         }
     )
+
+
+@router.post("/workers/add")
+async def workers_add(
+    request: Request,
+    name: str = Form(...),
+    username: str = Form(...),
+    password: str = Form(...),
+    dept: str = Form("경영지원팀"),
+    position: str = Form("사원"),
+    phone: str = Form(""),
+):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+    if request.session.get("role") != "admin":
+        return JSONResponse({"detail": "권한이 없습니다."}, status_code=403)
+    hashed = hashlib.sha256(password.encode()).hexdigest()
+    conn = get_sqlite()
+    try:
+        conn.execute(
+            "INSERT INTO users (username, password, name, dept, position, phone, role, photo) VALUES (?,?,?,?,?,?,?,?)",
+            (username, hashed, name, dept, position, phone, "employee", "")
+        )
+        conn.commit()
+    except Exception:
+        return RedirectResponse(url="/workers?error=dup", status_code=303)
+    finally:
+        conn.close()
+    return RedirectResponse(url="/workers?ok=added", status_code=303)
+
+
+@router.post("/workers/{user_id}/delete")
+async def workers_delete(request: Request, user_id: int):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+    if request.session.get("role") != "admin":
+        return JSONResponse({"detail": "권한이 없습니다."}, status_code=403)
+    current_user_id = request.session.get("user_id")
+    conn = get_sqlite()
+    try:
+        row = conn.execute("SELECT id, role FROM users WHERE id=?", (user_id,)).fetchone()
+        if row is None or row["id"] == current_user_id or row["role"] == "admin":
+            return RedirectResponse(url="/workers?error=denied", status_code=303)
+        conn.execute("DELETE FROM users WHERE id=?", (user_id,))
+        conn.commit()
+    finally:
+        conn.close()
+    return RedirectResponse(url="/workers?ok=deleted", status_code=303)
 
 
 @router.get("/worker/{user_id}", response_class=HTMLResponse)

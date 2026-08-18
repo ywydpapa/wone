@@ -35,11 +35,11 @@
  <label for="workCategory" class="form-label fw-bold">업무 분류 <span class="text-danger">*</span></label>
  <select class="form-select" id="workCategory" name="workCategory" required>
  <option value="" selected disabled>분류를 선택하세요</option>
- <option value="development">개발/유지보수</option>
- <option value="design">디자인/기획</option>
- <option value="support">운영/고객지원</option>
- <option value="meeting">회의/미팅</option>
- <option value="other">기타 업무</option>
+ <option value="IT">IT</option>
+ <option value="사무">사무</option>
+ <option value="공통">공통</option>
+ <option value="회의">회의</option>
+ <option value="기타">기타</option>
 </select>
 </div>
 </div>
@@ -60,6 +60,18 @@
  <div class="mb-3">
  <label for="workIssues" class="form-label fw-bold">특이사항 및 이슈 (선택)</label>
  <textarea class="form-control" id="workIssues" name="workIssues" rows="3" placeholder="업무 중 발생한 문제점, 건의사항 또는 내일 진행할 예정인 업무를 적어주세요."></textarea>
+</div>
+
+ <!-- Dept & Due -->
+ <div class="row mb-3">
+ <div class="col-md-6">
+ <label for="workDept" class="form-label fw-bold">부서</label>
+ <input type="text" class="form-control" id="workDept" name="workDept" placeholder="예: IT 지원팀">
+</div>
+ <div class="col-md-6 mt-3 mt-md-0">
+ <label for="workDue" class="form-label fw-bold">마감/완료</label>
+ <input type="text" class="form-control" id="workDue" name="workDue" placeholder="예: 이번주 금요일까지, 오늘 18:00 까지">
+</div>
 </div>
 
  <!-- Progress Status -->

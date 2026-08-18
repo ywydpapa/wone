@@ -590,19 +590,27 @@ async def pending_payments(request: Request):
 
 
 @router.get("/production_status", response_class=HTMLResponse)
-async def production_status(request: Request):
+async def production_status(request: Request, all: int = 0):
     if not check_login(request):
         return RedirectResponse(url="/login", status_code=303)
     conn = get_sqlite()
     try:
-        docs = with_status_meta(conn.execute(
-            "SELECT * FROM erp_docs WHERE doc_type='work_order' AND status IN ('progress','wait') ORDER BY id DESC"
-        ).fetchall())
+        if all == 1:
+            query = "SELECT * FROM erp_docs WHERE doc_type='work_order' ORDER BY id DESC"
+        else:
+            query = "SELECT * FROM erp_docs WHERE doc_type='work_order' AND status IN ('progress','wait') ORDER BY id DESC"
+        docs = with_status_meta(conn.execute(query).fetchall())
     finally:
         conn.close()
+    if all == 1:
+        page_title = "전체 작업지시"
+        subtitle = "전체 작업 지시 목록입니다."
+    else:
+        page_title = "작업 진행 현황"
+        subtitle = "진행 중이거나 대기 중인 작업 지시입니다."
     return templates.TemplateResponse(request=request, name="erp/fa_list.html", context={
-        "request": request, "page_title": "작업 진행 현황",
-        "subtitle": "진행 중이거나 대기 중인 작업 지시입니다.",
+        "request": request, "page_title": page_title,
+        "subtitle": subtitle,
         "user_name": get_current_user(request)["user_name"], "docs": docs,
         "back_url": "/erp_product", "back_label": "생산관리",
     })
@@ -723,19 +731,27 @@ async def low_stock_alerts(request: Request):
 
 
 @router.get("/sales_leads", response_class=HTMLResponse)
-async def sales_leads(request: Request):
+async def sales_leads(request: Request, all: int = 0):
     if not check_login(request):
         return RedirectResponse(url="/login", status_code=303)
     conn = get_sqlite()
     try:
-        docs = with_status_meta(conn.execute(
-            "SELECT * FROM erp_docs WHERE doc_type='activity' AND status IN ('progress','wait') ORDER BY id DESC"
-        ).fetchall())
+        if all == 1:
+            query = "SELECT * FROM erp_docs WHERE doc_type='activity' ORDER BY id DESC"
+        else:
+            query = "SELECT * FROM erp_docs WHERE doc_type='activity' AND status IN ('progress','wait') ORDER BY id DESC"
+        docs = with_status_meta(conn.execute(query).fetchall())
     finally:
         conn.close()
+    if all == 1:
+        page_title = "전체 영업 활동"
+        subtitle = "전체 영업 활동 목록입니다."
+    else:
+        page_title = "영업 기회"
+        subtitle = "진행 중인 영업 활동입니다."
     return templates.TemplateResponse(request=request, name="erp/fa_list.html", context={
-        "request": request, "page_title": "영업 기회",
-        "subtitle": "진행 중인 영업 활동입니다.",
+        "request": request, "page_title": page_title,
+        "subtitle": subtitle,
         "user_name": get_current_user(request)["user_name"], "docs": docs,
         "back_url": "/erp_scrm", "back_label": "영업/고객관리",
     })

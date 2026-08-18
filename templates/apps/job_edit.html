@@ -36,11 +36,12 @@
                             <label for="workCategory" class="form-label fw-bold">업무 분류 <span class="text-danger">*</span></label>
                             <select class="form-select" id="workCategory" name="workCategory" required>
                                 <option value="" disabled>분류를 선택하세요</option>
-                                <option value="development" {% if job.category == 'development' %}selected{% endif %}>개발/유지보수</option>
-                                <option value="design"      {% if job.category == 'design'      %}selected{% endif %}>디자인/기획</option>
-                                <option value="support"     {% if job.category == 'support'     %}selected{% endif %}>운영/고객지원</option>
-                                <option value="meeting"     {% if job.category == 'meeting'     %}selected{% endif %}>회의/미팅</option>
-                                <option value="other"       {% if job.category == 'other'       %}selected{% endif %}>기타 업무</option>
+                                {% if job.category and job.category not in ['IT','사무','공통','회의','기타'] %}<option value="{{ job.category }}" selected>{{ job.category }}</option>{% endif %}
+                                <option value="IT"   {% if job.category == 'IT'   %}selected{% endif %}>IT</option>
+                                <option value="사무" {% if job.category == '사무' %}selected{% endif %}>사무</option>
+                                <option value="공통" {% if job.category == '공통' %}selected{% endif %}>공통</option>
+                                <option value="회의" {% if job.category == '회의' %}selected{% endif %}>회의</option>
+                                <option value="기타" {% if job.category == '기타' %}selected{% endif %}>기타</option>
                             </select>
                         </div>
                     </div>
@@ -59,6 +60,19 @@
                     <div class="mb-3">
                         <label for="workIssues" class="form-label fw-bold">특이사항 및 이슈 (선택)</label>
                         <textarea class="form-control" id="workIssues" name="workIssues" rows="3">{{ job.issues or '' }}</textarea>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="workDept" class="form-label fw-bold">부서</label>
+                            <input type="text" class="form-control" id="workDept" name="workDept"
+                                   value="{{ job.dept or '' }}" placeholder="예: IT 지원팀">
+                        </div>
+                        <div class="col-md-6 mt-3 mt-md-0">
+                            <label for="workDue" class="form-label fw-bold">마감/완료</label>
+                            <input type="text" class="form-control" id="workDue" name="workDue"
+                                   value="{{ job.due_label or '' }}" placeholder="예: 이번주 금요일까지, 오늘 18:00 까지">
+                        </div>
                     </div>
 
                     <div class="mb-4">

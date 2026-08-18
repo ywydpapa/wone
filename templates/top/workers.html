@@ -14,15 +14,87 @@
                 <h2>근로자 관리</h2>
                 <p class="mb-0 text-white-50">전체 근로자 현황 및 업무 배정 관리</p>
             </div>
-            <a href="/manage_dash" class="btn btn-primary bg-white text-dark border-0 fw-bold px-4 rounded-pill">
-                <i class="fas fa-arrow-left me-2"></i>대시보드로 돌아가기
-            </a>
+            <div class="d-flex gap-2 align-items-center">
+                <a href="/manage_dash" class="btn btn-primary bg-white text-dark border-0 fw-bold px-4 rounded-pill">
+                    <i class="fas fa-arrow-left me-2"></i>대시보드로 돌아가기
+                </a>
+            </div>
         </div>
     </div>
 </div>
 
+{% if is_admin %}
+<!-- 근로자 추가 모달 -->
+<div class="modal fade" id="addWorkerModal" tabindex="-1" aria-labelledby="addWorkerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="addWorkerModalLabel"><i class="fas fa-user-plus me-2 text-primary"></i>근로자 추가</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/workers/add" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">이름 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="name" required placeholder="홍길동">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">아이디 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="username" required placeholder="로그인 아이디">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">비밀번호 <span class="text-danger">*</span></label>
+                        <input type="password" class="form-control" name="password" required placeholder="초기 비밀번호">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">부서</label>
+                        <input type="text" class="form-control" name="dept" value="경영지원팀" placeholder="부서명">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">직급</label>
+                        <input type="text" class="form-control" name="position" value="사원" placeholder="직급">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">연락처</label>
+                        <input type="text" class="form-control" name="phone" placeholder="010-0000-0000">
+                    </div>
+                    <div class="d-flex gap-2 justify-content-end mt-4">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">취소</button>
+                        <button type="submit" class="btn btn-primary fw-bold px-4">추가</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 <!-- Main Content -->
 <div class="container-fluid px-4 pb-5">
+
+    <!-- 플래시 메시지 -->
+    {% if error == "dup" %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>이미 존재하는 아이디입니다.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="닫기"></button>
+    </div>
+    {% elif error == "denied" %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>삭제할 수 없는 계정입니다.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="닫기"></button>
+    </div>
+    {% endif %}
+    {% if ok == "added" %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>근로자가 추가되었습니다.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="닫기"></button>
+    </div>
+    {% elif ok == "deleted" %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>삭제되었습니다.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="닫기"></button>
+    </div>
+    {% endif %}
 
     <!-- 필터바 -->
     <div class="content-card mb-4">
@@ -55,7 +127,14 @@
     <div class="content-card">
         <div class="card-title-wrap">
             <h5><i class="fas fa-users me-2 text-primary"></i>근로자 목록</h5>
-            <span class="text-muted small">총 <strong>{{ workers|length }}</strong>명</span>
+            <div class="d-flex gap-3 align-items-center">
+                <span class="text-muted small">총 <strong>{{ workers|length }}</strong>명</span>
+                {% if is_admin %}
+                <button type="button" class="btn btn-sm btn-success fw-bold px-3" data-bs-toggle="modal" data-bs-target="#addWorkerModal">
+                    <i class="fas fa-user-plus me-1"></i>근로자 추가
+                </button>
+                {% endif %}
+            </div>
         </div>
         <div class="table-responsive">
             <table class="table table-custom table-hover">
@@ -71,7 +150,7 @@
                 </thead>
                 <tbody>
                     {% for w in workers %}
-                    <tr>
+                    <tr onclick="location.href='/worker/{{ w.id }}'" style="cursor: pointer;">
                         <td>
                             <div class="worker-info">
                                 <img src="https://ui-avatars.com/api/?name={{ w.name|replace(' ','+') }}&background=eef4fb&color=0056b3" alt="{{ w.name }}">
@@ -99,10 +178,16 @@
                             <span class="text-muted small">-</span>
                             {% endif %}
                         </td>
-                        <td class="text-center">
-                            <a href="/worker/{{ w.id }}" class="btn btn-sm btn-outline-primary">
-                                <i class="fas fa-chevron-right me-1"></i>상세보기
-                            </a>
+                        <td class="text-center" onclick="event.stopPropagation()">
+                            {% if is_admin and w.role != 'admin' %}
+                            <form action="/workers/{{ w.id }}/delete" method="POST" onsubmit="return confirm('{{ w.name }} 님을 삭제하시겠습니까?')" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <i class="fas fa-trash me-1"></i>삭제
+                                </button>
+                            </form>
+                            {% else %}
+                            <span class="text-muted small">-</span>
+                            {% endif %}
                         </td>
                     </tr>
                     {% else %}

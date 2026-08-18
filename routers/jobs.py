@@ -174,6 +174,7 @@ async def update_job(
     workDate: str = Form(""), workCategory: str = Form(""),
     workTitle: str = Form(""), workDetails: str = Form(""),
     workIssues: str = Form(""), progressStatus: str = Form("progress"),
+    workDept: str = Form(""), workDue: str = Form(""),
 ):
     if not check_login(request):
         return RedirectResponse(url="/login", status_code=303)
@@ -184,8 +185,8 @@ async def update_job(
         if not owner or owner["user_id"] != uid:
             return JSONResponse({"error": "forbidden"}, status_code=403)
         conn.execute(
-            "UPDATE jobs SET work_date=?, category=?, title=?, details=?, issues=?, status=? WHERE id=?",
-            (workDate, workCategory, workTitle, workDetails, workIssues, progressStatus, job_id),
+            "UPDATE jobs SET work_date=?, category=?, title=?, details=?, issues=?, status=?, dept=?, due_label=? WHERE id=?",
+            (workDate, workCategory, workTitle, workDetails, workIssues, progressStatus, workDept, workDue, job_id),
         )
         conn.commit()
     finally:
@@ -308,6 +309,7 @@ async def create_job(
     workDate: str = Form(""), workCategory: str = Form(""),
     workTitle: str = Form(""), workDetails: str = Form(""),
     workIssues: str = Form(""), progressStatus: str = Form("progress"),
+    workDept: str = Form(""), workDue: str = Form(""),
     workAttachment: Optional[UploadFile] = File(None),
 ):
     if not check_login(request):
@@ -316,8 +318,8 @@ async def create_job(
     conn = get_sqlite()
     try:
         conn.execute(
-            "INSERT INTO jobs (user_id, work_date, category, title, details, issues, status) VALUES (?,?,?,?,?,?,?)",
-            (uid, workDate, workCategory, workTitle, workDetails, workIssues, progressStatus),
+            "INSERT INTO jobs (user_id, work_date, category, title, details, issues, status, dept, due_label) VALUES (?,?,?,?,?,?,?,?,?)",
+            (uid, workDate, workCategory, workTitle, workDetails, workIssues, progressStatus, workDept, workDue),
         )
         conn.commit()
     finally:
