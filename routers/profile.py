@@ -18,7 +18,10 @@ async def profile_page(request: Request, success: str = ""):
     uid = u["user_id"]
     conn = get_sqlite()
     try:
-        user = dict(conn.execute("SELECT * FROM users WHERE id=?", (uid,)).fetchone())
+        row = conn.execute("SELECT * FROM users WHERE id=?", (uid,)).fetchone()
+        if not row:
+            return RedirectResponse(url="/login", status_code=303)
+        user = dict(row)
         my_post_count = conn.execute("SELECT COUNT(*) FROM posts WHERE user_id=?", (uid,)).fetchone()[0]
         my_comment_count = conn.execute("SELECT COUNT(*) FROM comments WHERE user_id=?", (uid,)).fetchone()[0]
         my_done_count = conn.execute("SELECT COUNT(*) FROM jobs WHERE user_id=? AND status='done'", (uid,)).fetchone()[0]

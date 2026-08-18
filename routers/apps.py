@@ -11,8 +11,9 @@ class VoiceInput(BaseModel):
 
 
 @router.post("/api/text")
-async def receive_voice_text(data: VoiceInput):
-    print(f"인식된 텍스트: {data.text}")
+async def receive_voice_text(request: Request, data: VoiceInput):
+    if not check_login(request):
+        return {"error": "not logged in"}
     return {"status": "success", "received_text": data.text}
 
 

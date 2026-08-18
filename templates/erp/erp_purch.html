@@ -63,7 +63,7 @@
  <div class="content-card">
  <div class="card-title">
  <span><i class="fas fa-clipboard-list me-2 text-primary"></i>구매 요청 검토 및 발주 업무</span>
- <a href="/new_po" class="btn btn-sm btn-outline-primary rounded-pill px-3">+ 발주서 작성</a>
+ <a href="#" onclick="alert('준비 중인 기능입니다.');return false;" class="btn btn-sm btn-outline-primary rounded-pill px-3">+ 발주서 작성</a>
 </div>
 
  {% include 'erp/_doc_list.html' %}
@@ -76,28 +76,27 @@
  <div class="content-card">
  <div class="card-title">
  <span><i class="far fa-bell me-2 text-primary"></i>구매/납기 알림</span>
- <a href="/erp_purch" class="text-decoration-none small">전체보기</a>
+ <a href="/delayed_delivery" class="text-decoration-none small">전체보기</a>
 </div>
 
- <div class="msg-item">
+ {% if alerts %}
+ {% for a in alerts %}
+ <a href="/erp_doc/{{ a.id }}" class="text-decoration-none">
+ <div class="msg-item" style="cursor:pointer; transition: background 0.15s;" onmouseover="this.style.backgroundColor='#eef4fb'" onmouseout="this.style.backgroundColor=''">
  <div class="msg-header">
- <span class="msg-sender"><i class="fas fa-exclamation-circle me-1 text-danger"></i>ERP 시스템</span>
- <span class="msg-time">오전 11:20</span>
+ <span class="msg-sender">
+  {% if a.status == 'urgent' %}<i class="fas fa-exclamation-circle me-1 text-danger"></i>{% else %}<i class="fas fa-clock me-1 text-warning"></i>{% endif %}
+  <span class="badge-status {{ a.status_class }}" {% if a.status_style %}style="{{ a.status_style }}; font-size:0.7rem;"{% else %}style="font-size:0.7rem;"{% endif %}>{{ a.status_label }}</span>
+ </span>
+ <span class="msg-time">{{ a.created_at[:10] if a.created_at else '' }}</span>
 </div>
- <div class="msg-body">
- [납기경고] (주)제일정밀 발주건(PO-2608-001)의 입고 예정일이 2일 지났습니다. 협력사에 납기 독촉 연락 요망.
+ <div class="msg-body">{{ a.title }}</div>
 </div>
-</div>
-
- <div class="msg-item">
- <div class="msg-header">
- <span class="msg-sender"><i class="fas fa-user-circle me-1"></i>생산팀 박대리</span>
- <span class="msg-time">어제</span>
-</div>
- <div class="msg-body">
- 민수님, 다음 주 화요일부터 시작되는 신제품 라인에 들어갈 특수 나사(M4) 자재 수급 일정 한 번 더 확인 부탁드립니다.
-</div>
-</div>
+ </a>
+ {% endfor %}
+ {% else %}
+ <p class="text-muted small text-center py-3 mb-0">새 알림이 없습니다.</p>
+ {% endif %}
 </div>
 
  <!-- Quick Tools -->
@@ -105,7 +104,7 @@
  <div class="card-title">
  <span><i class="fas fa-toolbox me-2 text-primary"></i>구매관리 도구</span>
 </div>
- <a href="/new_po" class="tool-btn">
+ <a href="#" onclick="alert('준비 중인 기능입니다.');return false;" class="tool-btn">
  <i class="fas fa-file-import"></i> 발주서 작성
 </a>
  <a href="/po_status" class="tool-btn">

@@ -23,10 +23,12 @@ async def login_page(request: Request, error: str = ""):
 async def login_check(request: Request, username: str = Form(...), password: str = Form(...)):
     hashed = hashlib.sha256(password.encode()).hexdigest()
     conn = get_sqlite()
-    row = conn.execute(
-        "SELECT * FROM users WHERE username=? AND password=?", (username, hashed)
-    ).fetchone()
-    conn.close()
+    try:
+        row = conn.execute(
+            "SELECT * FROM users WHERE username=? AND password=?", (username, hashed)
+        ).fetchone()
+    finally:
+        conn.close()
     if row:
         request.session["logined"] = True
         request.session["user_id"] = row["id"]
@@ -69,9 +71,9 @@ async def signup_submit(
         )
         conn.commit()
     except Exception:
-        conn.close()
         return RedirectResponse(url="/signup?error=dup", status_code=303)
-    conn.close()
+    finally:
+        conn.close()
     return RedirectResponse(url="/login", status_code=303)
 
 
