@@ -58,10 +58,23 @@ async def erp_dash(request: Request):
 async def erp_hr(request: Request):
     if not check_login(request):
         return RedirectResponse(url="/login", status_code=303)
+    conn = get_sqlite()
+    try:
+        user_count = conn.execute("SELECT COUNT(*) FROM users").fetchone()[0]
+        leave_count = conn.execute(
+            "SELECT COUNT(*) FROM erp_docs WHERE doc_type='hr_task' AND title LIKE '%휴가%'"
+        ).fetchone()[0]
+        recruitment_count = conn.execute("SELECT COUNT(*) FROM job_postings").fetchone()[0]
+        docs = _erp_docs_for("hr_task")
+    finally:
+        conn.close()
     return templates.TemplateResponse(request=request, name="/erp/erp_hr.html", context={
         "request": request, "page_title": "인사관리 대시보드",
-        "docs": _erp_docs_for("hr_task"),
+        "docs": docs,
         "user_name": get_current_user(request)["user_name"],
+        "user_count": user_count,
+        "leave_count": leave_count,
+        "recruitment_count": recruitment_count,
     })
 
 
@@ -114,10 +127,27 @@ async def erp_fa(request: Request):
 async def erp_scrm(request: Request):
     if not check_login(request):
         return RedirectResponse(url="/login", status_code=303)
+    conn = get_sqlite()
+    try:
+        activity_count = conn.execute(
+            "SELECT COUNT(*) FROM erp_docs WHERE doc_type='activity'"
+        ).fetchone()[0]
+        sales_leads_count = conn.execute(
+            "SELECT COUNT(*) FROM erp_docs WHERE doc_type='activity' AND status IN ('progress','wait')"
+        ).fetchone()[0]
+        voc_count = conn.execute(
+            "SELECT COUNT(*) FROM erp_docs WHERE doc_type='activity' AND status='urgent'"
+        ).fetchone()[0]
+        docs = _erp_docs_for("activity")
+    finally:
+        conn.close()
     return templates.TemplateResponse(request=request, name="/erp/erp_scrm.html", context={
         "request": request, "page_title": "영업/고객관리 대시보드",
-        "docs": _erp_docs_for("activity"),
+        "docs": docs,
         "user_name": get_current_user(request)["user_name"],
+        "activity_count": activity_count,
+        "sales_leads_count": sales_leads_count,
+        "voc_count": voc_count,
     })
 
 
@@ -125,10 +155,27 @@ async def erp_scrm(request: Request):
 async def erp_purch(request: Request):
     if not check_login(request):
         return RedirectResponse(url="/login", status_code=303)
+    conn = get_sqlite()
+    try:
+        po_total_count = conn.execute(
+            "SELECT COUNT(*) FROM erp_docs WHERE doc_type='po'"
+        ).fetchone()[0]
+        po_inprogress_count = conn.execute(
+            "SELECT COUNT(*) FROM erp_docs WHERE doc_type='po' AND status IN ('wait','pending','urgent','progress')"
+        ).fetchone()[0]
+        delayed_count = conn.execute(
+            "SELECT COUNT(*) FROM erp_docs WHERE doc_type='po' AND status='urgent'"
+        ).fetchone()[0]
+        docs = _erp_docs_for("po")
+    finally:
+        conn.close()
     return templates.TemplateResponse(request=request, name="/erp/erp_purch.html", context={
         "request": request, "page_title": "구매관리 대시보드",
-        "docs": _erp_docs_for("po"),
+        "docs": docs,
         "user_name": get_current_user(request)["user_name"],
+        "po_total_count": po_total_count,
+        "po_inprogress_count": po_inprogress_count,
+        "delayed_count": delayed_count,
     })
 
 
@@ -136,10 +183,27 @@ async def erp_purch(request: Request):
 async def erp_inventory(request: Request):
     if not check_login(request):
         return RedirectResponse(url="/login", status_code=303)
+    conn = get_sqlite()
+    try:
+        stock_move_count = conn.execute(
+            "SELECT COUNT(*) FROM erp_docs WHERE doc_type='stock_move'"
+        ).fetchone()[0]
+        outbound_count = conn.execute(
+            "SELECT COUNT(*) FROM erp_docs WHERE doc_type='stock_move'"
+        ).fetchone()[0]
+        low_stock_count = conn.execute(
+            "SELECT COUNT(*) FROM erp_docs WHERE doc_type='stock_move' AND status='urgent'"
+        ).fetchone()[0]
+        docs = _erp_docs_for("stock_move")
+    finally:
+        conn.close()
     return templates.TemplateResponse(request=request, name="/erp/erp_inventory.html", context={
         "request": request, "page_title": "재고관리 대시보드",
-        "docs": _erp_docs_for("stock_move"),
+        "docs": docs,
         "user_name": get_current_user(request)["user_name"],
+        "stock_move_count": stock_move_count,
+        "outbound_count": outbound_count,
+        "low_stock_count": low_stock_count,
     })
 
 
@@ -147,10 +211,27 @@ async def erp_inventory(request: Request):
 async def erp_product(request: Request):
     if not check_login(request):
         return RedirectResponse(url="/login", status_code=303)
+    conn = get_sqlite()
+    try:
+        work_order_count = conn.execute(
+            "SELECT COUNT(*) FROM erp_docs WHERE doc_type='work_order'"
+        ).fetchone()[0]
+        production_inprogress_count = conn.execute(
+            "SELECT COUNT(*) FROM erp_docs WHERE doc_type='work_order' AND status IN ('progress','wait')"
+        ).fetchone()[0]
+        equipment_alert_count = conn.execute(
+            "SELECT COUNT(*) FROM erp_docs WHERE doc_type='work_order' AND status='urgent'"
+        ).fetchone()[0]
+        docs = _erp_docs_for("work_order")
+    finally:
+        conn.close()
     return templates.TemplateResponse(request=request, name="/erp/erp_product.html", context={
         "request": request, "page_title": "생산관리 대시보드",
-        "docs": _erp_docs_for("work_order"),
+        "docs": docs,
         "user_name": get_current_user(request)["user_name"],
+        "work_order_count": work_order_count,
+        "production_inprogress_count": production_inprogress_count,
+        "equipment_alert_count": equipment_alert_count,
     })
 
 
@@ -163,14 +244,15 @@ async def erp_groupware(request: Request):
     conn = get_sqlite()
     today = date.today().isoformat()
     try:
+        uid = get_current_user(request)["user_id"]
         unread_mail = conn.execute(
-            "SELECT COUNT(*) FROM messages WHERE is_read=0 AND direction='in'"
+            "SELECT COUNT(*) FROM messages WHERE user_id=? AND is_read=0 AND direction='in'", (uid,)
         ).fetchone()[0]
         today_jobs = conn.execute(
-            "SELECT COUNT(*) FROM jobs WHERE work_date=?", (today,)
+            "SELECT COUNT(*) FROM jobs WHERE user_id=? AND work_date=?", (uid, today)
         ).fetchone()[0]
         pending_docs = conn.execute(
-            "SELECT COUNT(*) FROM erp_docs WHERE status='wait'"
+            "SELECT COUNT(*) FROM erp_docs WHERE status IN ('wait','pending','urgent')"
         ).fetchone()[0]
         notices = [dict(r) for r in conn.execute(
             "SELECT id, category, title, author, dept, created_at FROM posts "
@@ -428,6 +510,7 @@ async def leave_approvals(request: Request):
     return templates.TemplateResponse(request=request, name="erp/leave_approvals.html", context={
         "request": request, "page_title": "휴가 승인",
         "user_name": get_current_user(request)["user_name"], "docs": docs,
+        "role": request.session.get("role", ""),
     })
 
 
@@ -558,6 +641,25 @@ async def delayed_delivery(request: Request):
     })
 
 
+@router.get("/po_pending", response_class=HTMLResponse)
+async def po_pending(request: Request):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+    conn = get_sqlite()
+    try:
+        docs = with_status_meta(conn.execute(
+            "SELECT * FROM erp_docs WHERE doc_type='po' AND status IN ('wait','pending','urgent','progress') ORDER BY CASE status WHEN 'urgent' THEN 0 WHEN 'progress' THEN 1 WHEN 'wait' THEN 2 ELSE 3 END, id DESC"
+        ).fetchall())
+    finally:
+        conn.close()
+    return templates.TemplateResponse(request=request, name="erp/fa_list.html", context={
+        "request": request, "page_title": "발주 진행 현황",
+        "subtitle": "진행 중인 발주 요청 목록입니다.",
+        "user_name": get_current_user(request)["user_name"], "docs": docs,
+        "back_url": "/erp_purch", "back_label": "구매관리",
+    })
+
+
 @router.get("/outbound_status", response_class=HTMLResponse)
 async def outbound_status(request: Request):
     if not check_login(request):
@@ -648,6 +750,8 @@ async def approval_pending(request: Request):
     return templates.TemplateResponse(request=request, name="erp/approval_pending.html", context={
         "request": request, "page_title": "결재 대기",
         "user_name": get_current_user(request)["user_name"], "docs": docs,
+        "role": request.session.get("role", ""),
+        "labels": ERP_DOC_TYPE_LABELS,
     })
 
 

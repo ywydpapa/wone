@@ -24,20 +24,20 @@
  <i class="fas fa-shopping-cart"></i>
 </div>
  <div class="stat-info">
- <p>신규 구매 요청 (PR)</p>
- <h3>12<span> 건</span></h3>
+ <p>전체 발주 (PO)</p>
+ <h3>{{ po_total_count }}<span> 건</span></h3>
 </div>
 </div>
 </div>
  <div class="col-lg-4 col-md-6">
- <a href="/po_status" class="text-decoration-none small">
+ <a href="/po_pending" class="text-decoration-none small">
  <div class="stat-card">
  <div class="stat-icon bg-green-light">
  <i class="fas fa-file-signature"></i>
 </div>
  <div class="stat-info">
- <p>금일 발주 완료 (PO)</p>
- <h3>8<span> 건</span></h3>
+ <p>발주 진행 중</p>
+ <h3>{{ po_inprogress_count }}<span> 건</span></h3>
 </div>
 </div>
 </a>
@@ -50,7 +50,7 @@
 </div>
  <div class="stat-info">
  <p>납기 지연 / 미입고</p>
- <h3 style="color: #dc3545;">3<span> 건</span></h3>
+ <h3 style="color: #dc3545;">{{ delayed_count }}<span> 건</span></h3>
 </div>
 </div>
 </a>

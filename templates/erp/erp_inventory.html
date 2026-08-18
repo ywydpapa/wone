@@ -24,8 +24,8 @@
  <i class="fas fa-box-open"></i>
 </div>
  <div class="stat-info">
- <p>금일 입고 예정</p>
- <h3>15<span> 건</span></h3>
+ <p>전체 입출고 이력</p>
+ <h3>{{ stock_move_count }}<span> 건</span></h3>
 </div>
 </div>
 </div>
@@ -36,8 +36,8 @@
  <i class="fas fa-truck-loading"></i>
 </div>
  <div class="stat-info">
- <p>금일 출고 대기</p>
- <h3>42<span> 건</span></h3>
+ <p>출고 처리 현황</p>
+ <h3>{{ outbound_count }}<span> 건</span></h3>
 </div>
 </div>
 </a>
@@ -49,8 +49,8 @@
  <i class="fas fa-exclamation-triangle"></i>
 </div>
  <div class="stat-info">
- <p>안전재고 미달</p>
- <h3 style="color: #dc3545;">5<span> 품목</span></h3>
+ <p>재고 부족 알림</p>
+ <h3 style="color: #dc3545;">{{ low_stock_count }}<span> 건</span></h3>
 </div>
 </div>
 </a>

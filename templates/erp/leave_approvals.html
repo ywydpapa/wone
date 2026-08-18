@@ -40,11 +40,15 @@
                         <td><span class="badge-status {{ d.status_class }}" {% if d.status_style %}style="{{ d.status_style }}"{% endif %}>{{ d.status_label }}</span></td>
                         <td>
                             {% if d.status not in ['approved', 'done', 'rejected'] %}
-                            <form action="/api/erp_docs/{{ d.id }}/status" method="POST" class="d-flex gap-1">
-                                <input type="hidden" name="status" value="" id="si{{ d.id }}">
-                                <button type="submit" class="btn btn-success btn-sm px-2" onclick="document.getElementById('si{{ d.id }}').value='approved'">승인</button>
-                                <button type="submit" class="btn btn-outline-danger btn-sm px-2" onclick="document.getElementById('si{{ d.id }}').value='rejected'">반려</button>
-                            </form>
+                                {% if role in ('admin', 'manager') %}
+                                <form action="/api/erp_docs/{{ d.id }}/status" method="POST" class="d-flex gap-1">
+                                    <input type="hidden" name="status" value="" id="si{{ d.id }}">
+                                    <button type="submit" class="btn btn-success btn-sm px-2" onclick="document.getElementById('si{{ d.id }}').value='approved'">승인</button>
+                                    <button type="submit" class="btn btn-outline-danger btn-sm px-2" onclick="document.getElementById('si{{ d.id }}').value='rejected'">반려</button>
+                                </form>
+                                {% else %}
+                                <span class="text-muted small">권한 없음</span>
+                                {% endif %}
                             {% else %}
                             <span class="text-muted small">처리 완료</span>
                             {% endif %}

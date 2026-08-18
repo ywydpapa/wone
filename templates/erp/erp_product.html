@@ -24,8 +24,8 @@
  <i class="fas fa-bullseye"></i>
 </div>
  <div class="stat-info">
- <p>금일 생산 목표</p>
- <h3>2,500<span> EA</span></h3>
+ <p>전체 작업지시</p>
+ <h3>{{ work_order_count }}<span> 건</span></h3>
 </div>
 </div>
 </div>
@@ -36,8 +36,8 @@
  <i class="fas fa-cogs"></i>
 </div>
  <div class="stat-info">
- <p>현재 생산 실적 (달성률 68%)</p>
- <h3>1,700<span> EA</span></h3>
+ <p>진행 중 작업지시</p>
+ <h3>{{ production_inprogress_count }}<span> 건</span></h3>
 </div>
 </div>
 </a>
@@ -49,8 +49,8 @@
  <i class="fas fa-exclamation-triangle"></i>
 </div>
  <div class="stat-info">
- <p>설비 이상 / 점검 대기</p>
- <h3 style="color: #dc3545;">2<span> 건</span></h3>
+ <p>긴급 작업 알림</p>
+ <h3 style="color: #dc3545;">{{ equipment_alert_count }}<span> 건</span></h3>
 </div>
 </div>
 </a>
