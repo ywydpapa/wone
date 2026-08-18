@@ -13,8 +13,23 @@ from routers import auth, dashboard, jobs, community, erp, resume, contact, prof
 dotenv.load_dotenv()
 
 
+def _ensure_db():
+    """신규 클론 등 users 테이블이 없으면 init_db로 자동 초기화."""
+    from core.db import get_sqlite
+    conn = get_sqlite()
+    try:
+        conn.execute("SELECT 1 FROM users LIMIT 1")
+    except Exception:
+        conn.close()
+        from init_db import init
+        init()
+        return
+    conn.close()
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    _ensure_db()
     run_migrations()
     yield
 
@@ -33,6 +48,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# 신규 클론에는 static/이 없을 수 있음(업로드 파일은 git 미추적) — 기동 전 보장
+os.makedirs("static/uploads/erp", exist_ok=True)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.include_router(auth.router)
