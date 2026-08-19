@@ -252,6 +252,15 @@
 <!-- Navbar -->
 {% include 'common/topbar.html' %}
 
+{% if requested %}
+<div class="container mt-3">
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <i class="fas fa-check-circle me-2"></i>요청이 성공적으로 전송되었습니다. 담당자가 확인 후 연락드립니다.
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+</div>
+{% endif %}
+
 <!-- Header -->
 <div class="header-dash">
     <div class="container">
@@ -335,7 +344,9 @@
 
                     <div class="d-flex gap-2 mt-auto">
                         <a href="/talent/1" class="btn btn-outline-secondary w-50 fw-bold">프로필 보기</a>
-                        <a href="/contact" class="btn btn-primary w-50 fw-bold">실시간 요청</a>
+                        <button type="button" class="btn btn-primary w-50 fw-bold"
+                                data-bs-toggle="modal" data-bs-target="#transRequestModal"
+                                data-translator="이지은 속기사">실시간 요청</button>
                     </div>
                 </div>
             </div>
@@ -363,7 +374,9 @@
 
                     <div class="d-flex gap-2 mt-auto">
                         <a href="/talent/2" class="btn btn-outline-secondary w-50 fw-bold">프로필 보기</a>
-                        <a href="/contact" class="btn btn-primary w-50 fw-bold">실시간 요청</a>
+                        <button type="button" class="btn btn-primary w-50 fw-bold"
+                                data-bs-toggle="modal" data-bs-target="#transRequestModal"
+                                data-translator="김민수 통역사">실시간 요청</button>
                     </div>
                 </div>
             </div>
@@ -391,7 +404,9 @@
 
                     <div class="d-flex gap-2 mt-auto">
                         <a href="/talent/3" class="btn btn-outline-secondary w-50 fw-bold">프로필 보기</a>
-                        <a href="/contact" class="btn btn-secondary w-50 fw-bold">예약하기</a>
+                        <button type="button" class="btn btn-secondary w-50 fw-bold"
+                                data-bs-toggle="modal" data-bs-target="#transRequestModal"
+                                data-translator="박준호 통역사">예약하기</button>
                     </div>
                 </div>
             </div>
@@ -456,5 +471,80 @@
 </div>
 
 <!-- Bootstrap 5 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- 통역 요청 모달 -->
+<div class="modal fade" id="transRequestModal" tabindex="-1" aria-labelledby="transRequestModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold" id="transRequestModalLabel">통역 요청</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="/api/trans_request" method="POST">
+        <div class="modal-body">
+          <input type="hidden" name="translator_name" id="modalTranslatorName">
+          <p class="text-muted small mb-3">요청 전문가: <strong id="modalTranslatorLabel"></strong></p>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold">서비스 유형</label>
+            <select class="form-select" name="service_type">
+              <option value="">선택 안함</option>
+              <option value="caption">실시간 문자통역 (속기)</option>
+              <option value="sign">수어 통역</option>
+              <option value="voice">음성 동시/순차 통역</option>
+            </select>
+          </div>
+
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="form-label fw-bold">희망 날짜</label>
+              <input type="date" class="form-control" name="request_date">
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-bold">희망 시간</label>
+              <input type="time" class="form-control" name="request_time">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold">소요 시간</label>
+            <select class="form-select" name="duration">
+              <option value="">선택 안함</option>
+              <option value="30분">30분</option>
+              <option value="1시간">1시간</option>
+              <option value="2시간">2시간</option>
+              <option value="3시간">3시간</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold">회의 링크 (Zoom 등)</label>
+            <input type="text" class="form-control" name="meeting_link" placeholder="https://zoom.us/j/...">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold">상세 요청 사항</label>
+            <textarea class="form-control" name="details" rows="3" placeholder="행사 내용, 전문 분야, 기타 요청사항을 입력해주세요."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">취소</button>
+          <button type="submit" class="btn btn-primary fw-bold">요청 전송</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  // 모달 열릴 때 통역사 이름 세팅
+  document.getElementById('transRequestModal').addEventListener('show.bs.modal', function (event) {
+    const btn = event.relatedTarget;
+    const name = btn.getAttribute('data-translator');
+    document.getElementById('modalTranslatorName').value = name;
+    document.getElementById('modalTranslatorLabel').textContent = name;
+  });
+</script>
 </body>
 </html>

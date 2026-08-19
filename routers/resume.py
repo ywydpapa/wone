@@ -70,12 +70,17 @@ async def resume_detail(request: Request, resume_id: int):
 
 
 @router.get("/talent/{talent_id}", response_class=HTMLResponse)
-async def talent_detail(request: Request, talent_id: int):
+async def talent_detail(request: Request, talent_id: int, offered: int = 0):
     if not check_login(request):
         return RedirectResponse(url="/login", status_code=303)
+    u = get_current_user(request)
+    uid = u["user_id"]
     conn = get_sqlite()
     try:
         row = conn.execute("SELECT * FROM talent_profiles WHERE id=?", (talent_id,)).fetchone()
+        already_offered = conn.execute(
+            "SELECT 1 FROM talent_offers WHERE talent_id=? AND sender_id=?", (talent_id, uid)
+        ).fetchone() is not None
     finally:
         conn.close()
     if not row:
@@ -87,9 +92,34 @@ async def talent_detail(request: Request, talent_id: int):
         request=request, name="top/talent_detail.html", context={
             "request": request, "page_title": f"{profile['name']} 이력서",
             "talent": profile,
-            "user_name": get_current_user(request)["user_name"],
+            "user_name": u["user_name"],
+            "offered": bool(offered) or already_offered,
         }
     )
+
+
+@router.post("/api/talent_offer/{talent_id}")
+async def talent_offer_submit(
+    request: Request, talent_id: int,
+    title: str = Form(...), message: str = Form(...), contact: str = Form(""),
+):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+    u = get_current_user(request)
+    uid = u["user_id"]
+    sender_name = u.get("user_name", "")
+    conn = get_sqlite()
+    try:
+        conn.execute(
+            "INSERT INTO talent_offers (talent_id, sender_id, sender_name, title, message, contact) VALUES (?,?,?,?,?,?)",
+            (talent_id, uid, sender_name, title, message, contact)
+        )
+        conn.commit()
+    except Exception:
+        pass
+    finally:
+        conn.close()
+    return RedirectResponse(url=f"/talent/{talent_id}?offered=1", status_code=303)
 
 
 @router.get("/job_apply/{job_id}", response_class=HTMLResponse)

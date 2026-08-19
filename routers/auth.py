@@ -34,7 +34,7 @@ async def login_check(request: Request, username: str = Form(...), password: str
         request.session["user_id"] = row["id"]
         request.session["username"] = row["username"]
         request.session["user_name"] = row["name"]
-        request.session["role"] = row["role"]
+        request.session["user_role"] = row["role"]
         return RedirectResponse(url="/", status_code=303)
     return RedirectResponse(url="/login?error=1", status_code=303)
 

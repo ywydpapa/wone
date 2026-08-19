@@ -18,7 +18,7 @@ from core.db import get_sqlite, _DB_SCHEME
 TABLES = ["users", "jobs", "as_requests", "as_comments", "posts", "comments", "post_likes",
           "bookmarks", "messages", "erp_docs", "job_postings", "notifications",
           "job_applications", "approval_lines", "doc_history", "slip_lines",
-          "accounts", "partners", "talent_profiles"]
+          "accounts", "partners", "talent_profiles", "talent_offers", "trans_requests"]
 
 
 # ---------------------------------------------------------------------------
@@ -289,6 +289,32 @@ def init():
         experience TEXT NOT NULL,
         education TEXT NOT NULL,
         avatar TEXT NOT NULL,
+        created_at TEXT DEFAULT (datetime('now','localtime'))
+    )""")
+
+    _create_table(c, """CREATE TABLE IF NOT EXISTS talent_offers (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        talent_id INTEGER NOT NULL,
+        sender_id INTEGER NOT NULL,
+        sender_name TEXT DEFAULT '',
+        title TEXT NOT NULL,
+        message TEXT NOT NULL,
+        contact TEXT DEFAULT '',
+        status TEXT DEFAULT 'pending',
+        created_at TEXT DEFAULT (datetime('now','localtime'))
+    )""")
+
+    _create_table(c, """CREATE TABLE IF NOT EXISTS trans_requests (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        translator_name TEXT NOT NULL,
+        service_type TEXT DEFAULT '',
+        request_date TEXT DEFAULT '',
+        request_time TEXT DEFAULT '',
+        duration TEXT DEFAULT '',
+        meeting_link TEXT DEFAULT '',
+        details TEXT DEFAULT '',
+        status TEXT DEFAULT 'pending',
         created_at TEXT DEFAULT (datetime('now','localtime'))
     )""")
 

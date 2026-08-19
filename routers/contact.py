@@ -3,7 +3,7 @@ from fastapi import APIRouter, File, Form, Request, UploadFile
 from fastapi.responses import HTMLResponse, RedirectResponse
 from starlette.responses import JSONResponse
 from core.db import get_sqlite, with_status_meta
-from core.deps import check_login, get_current_user, templates
+from core.deps import check_login, get_current_user, templates, require_admin
 
 router = APIRouter()
 
@@ -52,6 +52,9 @@ async def as_manage(
 ):
     if not check_login(request):
         return RedirectResponse(url="/login", status_code=303)
+    redirect = require_admin(request)
+    if redirect:
+        return redirect
     u = get_current_user(request)
     per_page = 15
     offset = (page - 1) * per_page

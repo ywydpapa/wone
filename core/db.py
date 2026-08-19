@@ -317,6 +317,40 @@ def run_migrations():
     except Exception:
         pass
 
+    try:
+        conn.execute("""CREATE TABLE IF NOT EXISTS talent_offers (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            talent_id INTEGER NOT NULL,
+            sender_id INTEGER NOT NULL,
+            sender_name TEXT DEFAULT '',
+            title TEXT NOT NULL,
+            message TEXT NOT NULL,
+            contact TEXT DEFAULT '',
+            status TEXT DEFAULT 'pending',
+            created_at TEXT DEFAULT (datetime('now','localtime'))
+        )""")
+        conn.commit()
+    except Exception:
+        pass
+
+    try:
+        conn.execute("""CREATE TABLE IF NOT EXISTS trans_requests (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            translator_name TEXT NOT NULL,
+            service_type TEXT DEFAULT '',
+            request_date TEXT DEFAULT '',
+            request_time TEXT DEFAULT '',
+            duration TEXT DEFAULT '',
+            meeting_link TEXT DEFAULT '',
+            details TEXT DEFAULT '',
+            status TEXT DEFAULT 'pending',
+            created_at TEXT DEFAULT (datetime('now','localtime'))
+        )""")
+        conn.commit()
+    except Exception:
+        pass
+
     conn.close()
 
 
