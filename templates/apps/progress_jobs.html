@@ -125,8 +125,7 @@ function toggleJob(id, el) {
 function deleteJob(id) {
  if (!confirm('이 업무를 삭제하시겠습니까?')) return;
  fetch('/api/jobs/' + id + '/delete', {method: 'POST'})
- .then(r => r.json())
- .then(() => location.reload());
+ .then(r => { if(r.ok || r.redirected) location.reload(); });
 }
 </script>
 </body>

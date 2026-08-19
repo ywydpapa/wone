@@ -8,7 +8,7 @@ router = APIRouter()
 
 
 @router.get("/resume", response_class=HTMLResponse)
-async def resume_list(request: Request, q: str = "", region: str = "", work_area: str = ""):
+async def resume_list(request: Request, q: str = "", region: str = "", work_area: str = "", disability_type: str = ""):
     if not check_login(request):
         return RedirectResponse(url="/login", status_code=303)
     conn = get_sqlite()
@@ -23,6 +23,8 @@ async def resume_list(request: Request, q: str = "", region: str = "", work_area
     talent_params = []
     if work_area:
         talents_sql += " AND category LIKE '%'||?||'%'"; talent_params.append(work_area)
+    if disability_type:
+        talents_sql += " AND disability_type = ?"; talent_params.append(disability_type)
     if q:
         talents_sql += " AND (name LIKE '%'||?||'%' OR summary LIKE '%'||?||'%')"; talent_params += [q, q]
     talents_sql += " ORDER BY id DESC"
@@ -39,6 +41,7 @@ async def resume_list(request: Request, q: str = "", region: str = "", work_area
             "request": request, "page_title": "채용/인재",
             "postings": postings, "q": q, "region": region,
             "talents": talents, "work_area": work_area,
+            "disability_type": disability_type,
             "user_name": get_current_user(request)["user_name"],
         }
     )

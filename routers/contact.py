@@ -14,6 +14,11 @@ AS_CATEGORIES = {
     "access": "접근성 지원",
     "facility": "시설/환경",
     "other": "기타",
+    "inquiry_system": "시스템 문의",
+    "inquiry_account": "계정 문의",
+    "inquiry_erp": "ERP 문의",
+    "inquiry_a11y": "접근성 문의",
+    "inquiry_etc": "기타 문의",
 }
 
 

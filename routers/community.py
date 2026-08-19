@@ -51,6 +51,8 @@ async def community(request: Request, category: str = "all", q: str = "", page: 
             "my_post_count": my_post_count,
             "my_comment_count": my_comment_count,
             "my_like_received": my_like_received,
+            "user_dept": u.get("dept", ""),
+            "user_position": u.get("position", ""),
         }
     )
 
