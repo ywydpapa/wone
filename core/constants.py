@@ -56,43 +56,6 @@ ERP_DOC_TYPE_LABELS = {
     "expense":    "자금관리",
 }
 
-TALENT_PROFILES = {
-    1: {
-        "name": "김*수", "gender": "남", "age": 32, "category": "IT/소프트웨어",
-        "career": "경력 3년", "summary": "프론트엔드 개발 및 웹 접근성 전문",
-        "disability": "지체장애 (경증)", "work_pref": "재택근무 희망",
-        "skills": ["HTML", "CSS", "JavaScript", "React", "웹 접근성(WCAG)"],
-        "experience": [
-            {"period": "2022.03 ~ 2025.01", "company": "(주)디지털브릿지", "role": "프론트엔드 개발자", "desc": "웹 접근성 개선 프로젝트 담당, WCAG 2.1 AA 기준 준수"},
-            {"period": "2021.06 ~ 2022.02", "company": "프리랜서", "role": "웹 퍼블리셔", "desc": "중소기업 홈페이지 제작 10건 이상"},
-        ],
-        "education": "한국IT대학교 컴퓨터공학과 졸업 (2021)",
-        "avatar": "https://ui-avatars.com/api/?name=김+민&background=eef4fb&color=0056b3&rounded=true&size=100",
-    },
-    2: {
-        "name": "이*은", "gender": "여", "age": 28, "category": "사무/행정 보조",
-        "career": "신입", "summary": "엑셀·워드 능통, 데이터 입력 전문",
-        "disability": "청각장애 (중증)", "work_pref": "출퇴근 가능 (서울)",
-        "skills": ["Microsoft Excel", "Word", "데이터 입력", "컴퓨터활용능력 2급"],
-        "experience": [
-            {"period": "2024.07 ~ 2024.12", "company": "사회적협동조합 희망", "role": "사무보조 인턴", "desc": "문서 정리, 데이터 입력 및 통계 보조"},
-        ],
-        "education": "서울여자대학교 경영학과 졸업 (2024)",
-        "avatar": "https://ui-avatars.com/api/?name=이+지&background=eef4fb&color=0056b3&rounded=true&size=100",
-    },
-    3: {
-        "name": "박*호", "gender": "남", "age": 25, "category": "디자인/예술",
-        "career": "경력 1년", "summary": "일러스트·로고 디자인 전문",
-        "disability": "발달장애 (경증)", "work_pref": "주 3일 근무 희망",
-        "skills": ["Adobe Illustrator", "Photoshop", "Figma", "로고 디자인"],
-        "experience": [
-            {"period": "2023.09 ~ 2024.08", "company": "스튜디오 봄", "role": "그래픽 디자이너", "desc": "브랜드 로고 및 SNS 콘텐츠 디자인"},
-        ],
-        "education": "한국예술고등학교 졸업 (2022)",
-        "avatar": "https://ui-avatars.com/api/?name=박+준&background=eef4fb&color=0056b3&rounded=true&size=100",
-    },
-}
-
 FAQ_ITEMS = [
     {"q": "로그인이 안됩니다.", "a": "아이디와 비밀번호를 다시 확인해 주세요. 비밀번호를 잊으셨다면 시스템 관리자(내선 119)에게 초기화를 요청하세요."},
     {"q": "업무일지는 어떻게 등록하나요?", "a": "상단 메뉴 > 업무관리 > 새 업무 등록을 클릭하면 업무일지 작성 폼이 열립니다. 분류, 제목, 내용을 입력 후 저장하면 대시보드에 바로 반영됩니다."},

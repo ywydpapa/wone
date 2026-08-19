@@ -1,14 +1,14 @@
+import json
 from fastapi import APIRouter, Form, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from core.db import get_sqlite
 from core.deps import check_login, get_current_user, templates
-from core.constants import TALENT_PROFILES
 
 router = APIRouter()
 
 
 @router.get("/resume", response_class=HTMLResponse)
-async def resume_list(request: Request, q: str = "", region: str = ""):
+async def resume_list(request: Request, q: str = "", region: str = "", work_area: str = ""):
     if not check_login(request):
         return RedirectResponse(url="/login", status_code=303)
     conn = get_sqlite()
@@ -19,14 +19,26 @@ async def resume_list(request: Request, q: str = "", region: str = ""):
     if region:
         sql += " AND region LIKE '%'||?||'%'"; params.append(region)
     sql += " ORDER BY id DESC"
+    talents_sql = "SELECT * FROM talent_profiles WHERE 1=1"
+    talent_params = []
+    if work_area:
+        talents_sql += " AND category LIKE '%'||?||'%'"; talent_params.append(work_area)
+    if q:
+        talents_sql += " AND (name LIKE '%'||?||'%' OR summary LIKE '%'||?||'%')"; talent_params += [q, q]
+    talents_sql += " ORDER BY id DESC"
     try:
         postings = [dict(r) for r in conn.execute(sql, params).fetchall()]
+        talents = [dict(r) for r in conn.execute(talents_sql, talent_params).fetchall()]
     finally:
         conn.close()
+    for t in talents:
+        t['skills'] = json.loads(t['skills']) if t.get('skills') else []
+        t['experience'] = json.loads(t['experience']) if t.get('experience') else []
     return templates.TemplateResponse(
         request=request, name="/top/resume.html", context={
             "request": request, "page_title": "채용/인재",
             "postings": postings, "q": q, "region": region,
+            "talents": talents, "work_area": work_area,
             "user_name": get_current_user(request)["user_name"],
         }
     )
@@ -61,9 +73,16 @@ async def resume_detail(request: Request, resume_id: int):
 async def talent_detail(request: Request, talent_id: int):
     if not check_login(request):
         return RedirectResponse(url="/login", status_code=303)
-    profile = TALENT_PROFILES.get(talent_id)
-    if not profile:
+    conn = get_sqlite()
+    try:
+        row = conn.execute("SELECT * FROM talent_profiles WHERE id=?", (talent_id,)).fetchone()
+    finally:
+        conn.close()
+    if not row:
         return HTMLResponse("<h2>인재 정보를 찾을 수 없습니다</h2><a href='/resume'>목록으로</a>", status_code=404)
+    profile = dict(row)
+    profile['skills'] = json.loads(profile['skills']) if profile.get('skills') else []
+    profile['experience'] = json.loads(profile['experience']) if profile.get('experience') else []
     return templates.TemplateResponse(
         request=request, name="top/talent_detail.html", context={
             "request": request, "page_title": f"{profile['name']} 이력서",

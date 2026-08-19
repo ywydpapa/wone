@@ -120,7 +120,7 @@ def test_resume_detail_200(admin_client, first_job_posting_id):
 
 
 def test_talent_detail_200(admin_client):
-    """로그인 상태에서 /talent/1 200 (TALENT_PROFILES 에 id=1 존재)."""
+    """로그인 상태에서 /talent/1 200 (talent_profiles DB에 id=1 존재)."""
     resp = admin_client.get("/talent/1", follow_redirects=True)
     assert resp.status_code == 200
 
@@ -169,6 +169,6 @@ def test_job_not_found_404(admin_client):
 
 
 def test_talent_not_found_404(admin_client):
-    """/talent/999999 는 404 응답 (TALENT_PROFILES 에 없음)."""
+    """/talent/999999 는 404 응답 (talent_profiles DB에 없음)."""
     resp = admin_client.get("/talent/999999", follow_redirects=False)
     assert resp.status_code == 404

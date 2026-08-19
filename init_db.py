@@ -5,6 +5,7 @@ DATABASE_URL 환경변수로 SQLite/MySQL 전환 가능.
 """
 import os
 import hashlib
+import json
 
 try:
     from dotenv import load_dotenv
@@ -17,7 +18,7 @@ from core.db import get_sqlite, _DB_SCHEME
 TABLES = ["users", "jobs", "as_requests", "as_comments", "posts", "comments", "post_likes",
           "bookmarks", "messages", "erp_docs", "job_postings", "notifications",
           "job_applications", "approval_lines", "doc_history", "slip_lines",
-          "accounts", "partners"]
+          "accounts", "partners", "talent_profiles"]
 
 
 # ---------------------------------------------------------------------------
@@ -272,6 +273,23 @@ def init():
         address TEXT DEFAULT '',
         phone TEXT DEFAULT '',
         is_active INTEGER DEFAULT 1
+    )""")
+
+    _create_table(c, """CREATE TABLE talent_profiles (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        gender TEXT NOT NULL,
+        age INTEGER NOT NULL,
+        category TEXT NOT NULL,
+        career TEXT NOT NULL,
+        summary TEXT NOT NULL,
+        disability TEXT NOT NULL,
+        work_pref TEXT NOT NULL,
+        skills TEXT NOT NULL,
+        experience TEXT NOT NULL,
+        education TEXT NOT NULL,
+        avatar TEXT NOT NULL,
+        created_at TEXT DEFAULT (datetime('now','localtime'))
     )""")
 
     _create_table(c, """CREATE TABLE notifications (
@@ -702,6 +720,44 @@ def init():
             ("V006","Dell Technologies","678-90-12345","Michael Dell","제조업","서버/PC"),
             ("V007","LG전자","789-01-23456","조주완","제조업","전자제품"),
             ("V008","Adobe Korea","890-12-34567","—","서비스","소프트웨어"),
+        ]
+    )
+
+    # ===== 인재 프로필 =====
+    c.executemany(
+        "INSERT INTO talent_profiles (name, gender, age, category, career, summary, disability, work_pref, skills, experience, education, avatar) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+        [
+            (
+                "김*수", "남", 32, "IT/소프트웨어", "경력 3년", "프론트엔드 개발 및 웹 접근성 전문",
+                "지체장애 (경증)", "재택근무 희망",
+                json.dumps(["HTML", "CSS", "JavaScript", "React", "웹 접근성(WCAG)"], ensure_ascii=False),
+                json.dumps([
+                    {"period": "2022.03 ~ 2025.01", "company": "(주)디지털브릿지", "role": "프론트엔드 개발자", "desc": "웹 접근성 개선 프로젝트 담당, WCAG 2.1 AA 기준 준수"},
+                    {"period": "2021.06 ~ 2022.02", "company": "프리랜서", "role": "웹 퍼블리셔", "desc": "중소기업 홈페이지 제작 10건 이상"},
+                ], ensure_ascii=False),
+                "한국IT대학교 컴퓨터공학과 졸업 (2021)",
+                "https://ui-avatars.com/api/?name=김+민&background=eef4fb&color=0056b3&rounded=true&size=100",
+            ),
+            (
+                "이*은", "여", 28, "사무/행정 보조", "신입", "엑셀·워드 능통, 데이터 입력 전문",
+                "청각장애 (중증)", "출퇴근 가능 (서울)",
+                json.dumps(["Microsoft Excel", "Word", "데이터 입력", "컴퓨터활용능력 2급"], ensure_ascii=False),
+                json.dumps([
+                    {"period": "2024.07 ~ 2024.12", "company": "사회적협동조합 희망", "role": "사무보조 인턴", "desc": "문서 정리, 데이터 입력 및 통계 보조"},
+                ], ensure_ascii=False),
+                "서울여자대학교 경영학과 졸업 (2024)",
+                "https://ui-avatars.com/api/?name=이+지&background=eef4fb&color=0056b3&rounded=true&size=100",
+            ),
+            (
+                "박*호", "남", 25, "디자인/예술", "경력 1년", "일러스트·로고 디자인 전문",
+                "발달장애 (경증)", "주 3일 근무 희망",
+                json.dumps(["Adobe Illustrator", "Photoshop", "Figma", "로고 디자인"], ensure_ascii=False),
+                json.dumps([
+                    {"period": "2023.09 ~ 2024.08", "company": "스튜디오 봄", "role": "그래픽 디자이너", "desc": "브랜드 로고 및 SNS 콘텐츠 디자인"},
+                ], ensure_ascii=False),
+                "한국예술고등학교 졸업 (2022)",
+                "https://ui-avatars.com/api/?name=박+준&background=eef4fb&color=0056b3&rounded=true&size=100",
+            ),
         ]
     )
 

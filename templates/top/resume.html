@@ -40,12 +40,12 @@
             <div class="row g-3">
                 <div class="col-md-3">
                     <select class="form-select form-select-lg" name="work_area">
-                        <option value="">업무 영역 (전체)</option>
-                        <option value="office">사무/행정 보조</option>
-                        <option value="it">IT/소프트웨어</option>
-                        <option value="design">디자인/예술</option>
-                        <option value="service">서비스/고객지원</option>
-                        <option value="manufacture">생산/단순노무</option>
+                        <option value="" {% if not work_area %}selected{% endif %}>업무 영역 (전체)</option>
+                        <option value="사무" {% if work_area == '사무' %}selected{% endif %}>사무/행정 보조</option>
+                        <option value="IT" {% if work_area == 'IT' %}selected{% endif %}>IT/소프트웨어</option>
+                        <option value="디자인" {% if work_area == '디자인' %}selected{% endif %}>디자인/예술</option>
+                        <option value="서비스" {% if work_area == '서비스' %}selected{% endif %}>서비스/고객지원</option>
+                        <option value="생산" {% if work_area == '생산' %}selected{% endif %}>생산/단순노무</option>
                     </select>
                 </div>
                 <div class="col-md-3">
@@ -116,63 +116,29 @@
             <!-- Tab 2: 인재 검색 (Talents) -->
             <div class="tab-pane fade" id="pills-talents" role="tabpanel">
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h4 class="fw-bold m-0">업무 가능 인재 <span class="text-muted fs-6 fw-normal">(총 85명)</span></h4>
+                    <h4 class="fw-bold m-0">업무 가능 인재 <span class="text-muted fs-6 fw-normal">(총 {{ talents|length }}명)</span></h4>
                 </div>
                 <div class="row g-4">
-                    <!-- Talent Card 1 -->
+                    {% for t in talents %}
                     <div class="col-lg-4 col-md-6">
                         <div class="item-card text-center">
                             <div class="mb-3">
-                                <img src="https://ui-avatars.com/api/?name=김+민&background=eef4fb&color=0056b3&rounded=true&size=80"
-                                     alt="Profile">
+                                <img src="{{ t.avatar }}" alt="Profile">
                             </div>
-                            <span class="item-badge">IT/소프트웨어</span>
-                            <h5 class="fw-bold mt-2">김*수 (남, 32세)</h5>
-                            <p class="text-muted small mb-3">경력 3년 / 프론트엔드 개발, 웹 접근성</p>
+                            <span class="item-badge">{{ t.category }}</span>
+                            <h5 class="fw-bold mt-2">{{ t.name }} ({{ t.gender }}, {{ t.age }}세)</h5>
+                            <p class="text-muted small mb-3">{{ t.career }} / {{ t.summary }}</p>
                             <div class="text-start item-meta small">
-                                <div><i class="fas fa-wheelchair"></i> 지체장애 (경증)</div>
-                                <div><i class="fas fa-briefcase"></i> 재택근무 희망</div>
-                                <div><i class="fas fa-tools"></i> HTML, CSS, React</div>
+                                <div><i class="fas fa-wheelchair"></i> {{ t.disability }}</div>
+                                <div><i class="fas fa-briefcase"></i> {{ t.work_pref }}</div>
+                                <div><i class="fas fa-tools"></i> {{ t.skills[:3]|join(', ') }}</div>
                             </div>
-                            <a href="/talent/1" class="btn btn-outline-secondary w-100 mt-3">이력서 열람</a>
+                            <a href="/talent/{{ t.id }}" class="btn btn-outline-secondary w-100 mt-3">이력서 열람</a>
                         </div>
                     </div>
-                    <!-- Talent Card 2 -->
-                    <div class="col-lg-4 col-md-6">
-                        <div class="item-card text-center">
-                            <div class="mb-3">
-                                <img src="https://ui-avatars.com/api/?name=이+지&background=eef4fb&color=0056b3&rounded=true&size=80"
-                                     alt="Profile">
-                            </div>
-                            <span class="item-badge">사무/행정 보조</span>
-                            <h5 class="fw-bold mt-2">이*은 (여, 28세)</h5>
-                            <p class="text-muted small mb-3">신입 / 엑셀, 워드 능통, 데이터 입력</p>
-                            <div class="text-start item-meta small">
-                                <div><i class="fas fa-wheelchair"></i> 청각장애 (중증)</div>
-                                <div><i class="fas fa-briefcase"></i> 출퇴근 가능 (서울)</div>
-                                <div><i class="fas fa-tools"></i> 컴퓨터활용능력 2급</div>
-                            </div>
-                            <a href="/talent/2" class="btn btn-outline-secondary w-100 mt-3">이력서 열람</a>
-                        </div>
-                    </div>
-                    <!-- Talent Card 3 -->
-                    <div class="col-lg-4 col-md-6">
-                        <div class="item-card text-center">
-                            <div class="mb-3">
-                                <img src="https://ui-avatars.com/api/?name=박+준&background=eef4fb&color=0056b3&rounded=true&size=80"
-                                     alt="Profile">
-                            </div>
-                            <span class="item-badge">디자인/예술</span>
-                            <h5 class="fw-bold mt-2">박*호 (남, 25세)</h5>
-                            <p class="text-muted small mb-3">경력 1년 / 일러스트, 포토샵, 로고 디자인</p>
-                            <div class="text-start item-meta small">
-                                <div><i class="fas fa-wheelchair"></i> 발달장애 (경증)</div>
-                                <div><i class="fas fa-briefcase"></i> 주 3일 근무 희망</div>
-                                <div><i class="fas fa-tools"></i> Adobe CC, Figma</div>
-                            </div>
-                            <a href="/talent/3" class="btn btn-outline-secondary w-100 mt-3">이력서 열람</a>
-                        </div>
-                    </div>
+                    {% else %}
+                    <div class="col-12 text-center py-5 text-muted">등록된 인재가 없습니다.</div>
+                    {% endfor %}
                 </div>
             </div>
 
