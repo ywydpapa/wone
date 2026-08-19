@@ -4,7 +4,7 @@ from starlette.responses import JSONResponse
 from typing import Optional
 from datetime import datetime
 from core.db import get_sqlite, with_status_meta
-from core.deps import check_login, get_current_user, templates, require_admin
+from core.deps import check_login, get_current_user, templates
 from core.constants import ERP_DOC_TYPES, ERP_REDIRECTS, ERP_DOC_TYPE_LABELS
 
 router = APIRouter()
@@ -58,9 +58,6 @@ async def erp_dash(request: Request):
 async def erp_hr(request: Request):
     if not check_login(request):
         return RedirectResponse(url="/login", status_code=303)
-    redirect = require_admin(request)
-    if redirect:
-        return redirect
     conn = get_sqlite()
     try:
         user_count = conn.execute("SELECT COUNT(*) FROM users").fetchone()[0]
@@ -89,9 +86,6 @@ async def erp_hr(request: Request):
 async def erp_fa(request: Request):
     if not check_login(request):
         return RedirectResponse(url="/login", status_code=303)
-    redirect = require_admin(request)
-    if redirect:
-        return redirect
     conn = get_sqlite()
     try:
         # Main doc list: expense docs ordered by urgency
@@ -137,9 +131,6 @@ async def erp_fa(request: Request):
 async def erp_scrm(request: Request):
     if not check_login(request):
         return RedirectResponse(url="/login", status_code=303)
-    redirect = require_admin(request)
-    if redirect:
-        return redirect
     conn = get_sqlite()
     try:
         activity_count = conn.execute(
@@ -172,9 +163,6 @@ async def erp_scrm(request: Request):
 async def erp_purch(request: Request):
     if not check_login(request):
         return RedirectResponse(url="/login", status_code=303)
-    redirect = require_admin(request)
-    if redirect:
-        return redirect
     conn = get_sqlite()
     try:
         po_total_count = conn.execute(
@@ -207,9 +195,6 @@ async def erp_purch(request: Request):
 async def erp_inventory(request: Request):
     if not check_login(request):
         return RedirectResponse(url="/login", status_code=303)
-    redirect = require_admin(request)
-    if redirect:
-        return redirect
     conn = get_sqlite()
     try:
         stock_move_count = conn.execute(
@@ -242,9 +227,6 @@ async def erp_inventory(request: Request):
 async def erp_product(request: Request):
     if not check_login(request):
         return RedirectResponse(url="/login", status_code=303)
-    redirect = require_admin(request)
-    if redirect:
-        return redirect
     conn = get_sqlite()
     try:
         work_order_count = conn.execute(
@@ -277,9 +259,6 @@ async def erp_product(request: Request):
 async def erp_groupware(request: Request):
     if not check_login(request):
         return RedirectResponse(url="/login", status_code=303)
-    redirect = require_admin(request)
-    if redirect:
-        return redirect
     from datetime import date
     uname = get_current_user(request)["user_name"]
     conn = get_sqlite()

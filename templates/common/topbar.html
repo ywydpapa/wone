@@ -11,7 +11,6 @@
                 <li class="nav-item"><a class="nav-link" href="/emp_dash">직원 업무</a></li>
                 <li class="nav-item"><a class="nav-link" href="/resume">채용/인재</a></li>
 
-                {% if user_role == 'admin' %}
                 <!-- 업무 대시보드 드롭다운 메뉴 시작 -->
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="erpDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -29,6 +28,7 @@
                 </li>
                 <!-- 업무 대시보드 드롭다운 메뉴 끝 -->
 
+                {% if user_role == 'admin' %}
                 <li class="nav-item"><a class="nav-link" href="/manage_dash">관리자 대시보드</a></li>
                 {% endif %}
 
