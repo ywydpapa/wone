@@ -58,14 +58,14 @@
 </a>
 </div>
  <div class="col-lg-3 col-md-6">
- <a href="/new_slip" class="text-decoration-none">
+ <a href="/new_slip_simple" class="text-decoration-none">
  <div class="stat-card">
  <div class="stat-icon bg-green-light">
- <i class="fas fa-plus-circle"></i>
+ <i class="fas fa-magic"></i>
 </div>
  <div class="stat-info">
  <p>전표 입력</p>
- <h3 style="font-size:1.1rem; padding-top:4px;">바로가기 <i class="fas fa-arrow-right ms-1" style="font-size:0.9rem;"></i></h3>
+ <h3 style="font-size:1.1rem; padding-top:4px;">간편입력 <i class="fas fa-arrow-right ms-1" style="font-size:0.9rem;"></i></h3>
 </div>
 </div>
 </a>
@@ -78,7 +78,7 @@
  <div class="content-card">
  <div class="card-title">
  <span><i class="fas fa-receipt me-2 text-primary"></i>결제 승인 대기 및 주요 거래</span>
- <a href="/new_slip" class="btn btn-sm btn-outline-primary rounded-pill px-3">+ 전표 입력</a>
+ <a href="/new_slip_simple" class="btn btn-sm btn-outline-success rounded-pill px-3"><i class="fas fa-magic me-1"></i>간편 전표 입력</a>
 </div>
 
  {% include 'erp/_doc_list.html' %}
@@ -151,8 +151,14 @@
  <div class="card-title">
  <span><i class="fas fa-wallet me-2 text-primary"></i>자금관리 도구</span>
 </div>
+ <a href="/new_slip_simple" class="tool-btn">
+ <i class="fas fa-magic"></i> 간편 전표 입력
+</a>
  <a href="/new_slip" class="tool-btn">
- <i class="fas fa-edit"></i> 전표 입력
+ <i class="fas fa-edit"></i> 전문가 전표 입력
+</a>
+ <a href="/slip_list" class="tool-btn">
+ <i class="fas fa-search"></i> 전표 조회
 </a>
  <a href="/outflow_list" class="tool-btn">
  <i class="fas fa-list-alt"></i> 출금 완료 내역

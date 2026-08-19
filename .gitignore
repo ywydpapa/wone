@@ -4,3 +4,4 @@ __pycache__/
 *.db
 static/uploads/
 .claude/
+workplace-log*

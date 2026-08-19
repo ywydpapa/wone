@@ -344,6 +344,147 @@ async def new_slip(request: Request):
     )
 
 
+@router.get("/new_slip_simple", response_class=HTMLResponse)
+async def new_slip_simple(request: Request):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+    uid = get_current_user(request)["user_id"]
+    conn = get_sqlite()
+    try:
+        users = [dict(u) for u in conn.execute(
+            "SELECT id, name, dept, position FROM users WHERE id != ? ORDER BY dept, name", (uid,)
+        ).fetchall()]
+        recent_partners = [r[0] for r in conn.execute(
+            "SELECT DISTINCT partner FROM slip_lines WHERE partner != '' ORDER BY id DESC LIMIT 20"
+        ).fetchall()]
+    finally:
+        conn.close()
+    from core.constants import SIMPLE_SLIP_PURPOSES
+    return templates.TemplateResponse(
+        request=request, name="erp/erp_slip_simple.html", context={
+            "request": request, "page_title": "간편 전표 입력",
+            "user_name": get_current_user(request)["user_name"],
+            "users": users,
+            "purposes": SIMPLE_SLIP_PURPOSES,
+            "recent_partners": recent_partners,
+        }
+    )
+
+
+@router.post("/api/slip/simple")
+async def create_slip_simple(
+    request: Request,
+    direction: str = Form(...),
+    slip_date: str = Form(""),
+    amount: str = Form(""),
+    partner: str = Form(""),
+    purpose: str = Form(""),
+    memo: str = Form(""),
+    reviewer_id: int = Form(...),
+    approver_id: int = Form(...),
+    attachment: Optional[UploadFile] = File(None),
+    save_mode: str = Form("submit"),
+):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+
+    import uuid, pathlib
+    from core.constants import SIMPLE_SLIP_PURPOSES
+
+    uid = get_current_user(request)["user_id"]
+    uname = get_current_user(request)["user_name"]
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    amt = int(amount.replace(",", "")) if amount else 0
+    if amt <= 0:
+        return JSONResponse({"error": "금액을 입력해 주세요."}, status_code=400)
+
+    purpose_info = next((p for p in SIMPLE_SLIP_PURPOSES if p[1] == purpose), None)
+    if not purpose_info:
+        return JSONResponse({"error": "용도를 선택해 주세요."}, status_code=400)
+
+    purpose_label, account_code, account_name, is_expense = purpose_info
+
+    if direction == "지출":
+        slip_type = "출금"
+        title = f"지출 {amt:,}원 - {purpose_label} / {partner or '미지정'}"
+        lines = [
+            (1, f"[{account_code}] {account_name}", account_code, amt, 0, partner, purpose_label),
+            (2, "[101] 보통예금", "101", 0, amt, "", ""),
+        ]
+    else:
+        slip_type = "입금"
+        title = f"수입 {amt:,}원 - {purpose_label} / {partner or '미지정'}"
+        lines = [
+            (1, "[101] 보통예금", "101", amt, 0, "", ""),
+            (2, f"[{account_code}] {account_name}", account_code, 0, amt, partner, purpose_label),
+        ]
+
+    saved_name = ""
+    if attachment and attachment.filename:
+        ext = pathlib.Path(attachment.filename).suffix
+        content_bytes = await attachment.read()
+        ALLOWED_EXTENSIONS = {".pdf", ".png", ".jpg", ".jpeg", ".gif", ".xlsx", ".xls", ".docx", ".doc", ".pptx", ".ppt", ".hwp", ".txt", ".zip"}
+        MAX_UPLOAD_SIZE = 10 * 1024 * 1024
+        if ext.lower() not in ALLOWED_EXTENSIONS:
+            return JSONResponse({"error": "허용되지 않는 파일 형식입니다."}, status_code=400)
+        if len(content_bytes) > MAX_UPLOAD_SIZE:
+            return JSONResponse({"error": "파일 크기가 10MB를 초과합니다."}, status_code=413)
+        safe_name = f"{uuid.uuid4().hex}{ext}"
+        upload_dir = pathlib.Path("static/uploads/erp")
+        upload_dir.mkdir(parents=True, exist_ok=True)
+        (upload_dir / safe_name).write_bytes(content_bytes)
+        saved_name = f"{attachment.filename}|{safe_name}"
+
+    is_draft = (save_mode == "draft")
+    doc_status = "draft" if is_draft else "wait"
+    year = datetime.now().year
+
+    conn = get_sqlite()
+    try:
+        cur = conn.execute(
+            "INSERT INTO erp_docs (user_id, doc_type, title, content, attachment, status, dept, slip_type, slip_date, slip_total) VALUES (?,?,?,?,?,?,?,?,?,?)",
+            (uid, "expense", title, memo, saved_name, doc_status, "", slip_type, slip_date, amt),
+        )
+        new_doc_id = cur.lastrowid
+        seq = conn.execute("SELECT COUNT(*) FROM erp_docs WHERE doc_type='expense'").fetchone()[0]
+        doc_number = f"EXP-{year}-{seq:04d}"
+        conn.execute("UPDATE erp_docs SET doc_number=? WHERE id=?", (doc_number, new_doc_id))
+
+        for line_no, account, ac_code, debit, credit, ptr, summary in lines:
+            conn.execute(
+                "INSERT INTO slip_lines (doc_id, line_no, account_name, account_code, debit, credit, partner, summary) VALUES (?,?,?,?,?,?,?,?)",
+                (new_doc_id, line_no, account, ac_code, debit, credit, ptr, summary)
+            )
+
+        if is_draft:
+            conn.execute(
+                "INSERT INTO approval_lines (doc_id, step, approver_id, role, status) VALUES (?,?,?,?,?)",
+                (new_doc_id, 0, uid, "기안", "pending")
+            )
+        else:
+            conn.execute(
+                "INSERT INTO approval_lines (doc_id, step, approver_id, role, status, acted_at) VALUES (?,?,?,?,?,?)",
+                (new_doc_id, 0, uid, "기안", "approved", now)
+            )
+        conn.execute(
+            "INSERT INTO approval_lines (doc_id, step, approver_id, role, status) VALUES (?,?,?,?,?)",
+            (new_doc_id, 1, reviewer_id, "검토", "pending")
+        )
+        conn.execute(
+            "INSERT INTO approval_lines (doc_id, step, approver_id, role, status) VALUES (?,?,?,?,?)",
+            (new_doc_id, 2, approver_id, "승인", "pending")
+        )
+        conn.execute(
+            "INSERT INTO doc_history (doc_id, user_id, user_name, action, comment) VALUES (?,?,?,?,?)",
+            (new_doc_id, uid, uname, "임시저장" if is_draft else "기안 (간편)", "")
+        )
+        conn.commit()
+    finally:
+        conn.close()
+    return RedirectResponse(url="/erp_fa", status_code=303)
+
+
 @router.post("/api/slip")
 async def create_slip(
     request: Request,
@@ -369,15 +510,16 @@ async def create_slip(
     lines = []
     for i, ln in enumerate(line_nums):
         account = form.get(f"account_{ln}", "")
+        account_code = form.get(f"account_code_{ln}", "")
         debit = int(form.get(f"debit_{ln}", 0) or 0)
         credit = int(form.get(f"credit_{ln}", 0) or 0)
         partner = form.get(f"partner_{ln}", "")
         summary = form.get(f"summary_{ln}", "")
         if account:
-            lines.append((i + 1, account, debit, credit, partner, summary))
+            lines.append((i + 1, account, account_code, debit, credit, partner, summary))
 
-    total_debit = sum(l[2] for l in lines)
-    total_credit = sum(l[3] for l in lines)
+    total_debit = sum(l[3] for l in lines)
+    total_credit = sum(l[4] for l in lines)
     if total_debit != total_credit:
         return JSONResponse({"error": "차변·대변 합계가 일치하지 않습니다."}, status_code=400)
 
@@ -414,10 +556,10 @@ async def create_slip(
         conn.execute("UPDATE erp_docs SET doc_number=? WHERE id=?", (doc_number, new_doc_id))
 
         # Insert slip lines
-        for line_no, account, debit, credit, partner, summary in lines:
+        for line_no, account, account_code, debit, credit, partner, summary in lines:
             conn.execute(
-                "INSERT INTO slip_lines (doc_id, line_no, account_name, debit, credit, partner, summary) VALUES (?,?,?,?,?,?,?)",
-                (new_doc_id, line_no, account, debit, credit, partner, summary)
+                "INSERT INTO slip_lines (doc_id, line_no, account_name, account_code, debit, credit, partner, summary) VALUES (?,?,?,?,?,?,?,?)",
+                (new_doc_id, line_no, account, account_code, debit, credit, partner, summary)
             )
 
         # Approval lines
@@ -1096,6 +1238,279 @@ async def erp_doc_print(request: Request, doc_id: int):
     if not check_login(request):
         return RedirectResponse(url="/login", status_code=303)
     return RedirectResponse(url=f"/erp_doc/{doc_id}?print=1", status_code=303)
+
+
+@router.get("/api/accounts")
+async def api_accounts(request: Request):
+    if not check_login(request):
+        return JSONResponse({"error": "not logged in"}, status_code=401)
+    conn = get_sqlite()
+    try:
+        rows = conn.execute(
+            "SELECT code, name, category, is_debit FROM accounts WHERE is_active=1 ORDER BY code"
+        ).fetchall()
+    finally:
+        conn.close()
+    return [dict(r) for r in rows]
+
+
+@router.get("/api/partners")
+async def api_partners(request: Request):
+    if not check_login(request):
+        return JSONResponse({"error": "not logged in"}, status_code=401)
+    conn = get_sqlite()
+    try:
+        rows = conn.execute(
+            "SELECT code, name, biz_no, representative, biz_type, biz_item FROM partners WHERE is_active=1 ORDER BY code"
+        ).fetchall()
+    finally:
+        conn.close()
+    return [dict(r) for r in rows]
+
+
+@router.get("/slip_list", response_class=HTMLResponse)
+async def slip_list(request: Request):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+    conn = get_sqlite()
+    try:
+        docs = with_status_meta(conn.execute(
+            """SELECT e.*, u.name as author_name
+               FROM erp_docs e
+               LEFT JOIN users u ON e.user_id = u.id
+               WHERE e.doc_type='expense' AND e.slip_type != ''
+               ORDER BY e.id DESC"""
+        ).fetchall())
+    finally:
+        conn.close()
+    return templates.TemplateResponse(request=request, name="erp/slip_list.html", context={
+        "request": request, "page_title": "전표 조회",
+        "user_name": get_current_user(request)["user_name"],
+        "docs": docs,
+    })
+
+
+@router.get("/edit_slip/{doc_id}", response_class=HTMLResponse)
+async def edit_slip(request: Request, doc_id: int):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+    uid = get_current_user(request)["user_id"]
+    conn = get_sqlite()
+    try:
+        doc = conn.execute("SELECT * FROM erp_docs WHERE id=?", (doc_id,)).fetchone()
+        if not doc:
+            return HTMLResponse("<h2>문서를 찾을 수 없습니다</h2>", status_code=404)
+        if doc["user_id"] != uid:
+            return HTMLResponse("<h2>본인 문서만 수정할 수 있습니다</h2>", status_code=403)
+        if doc["status"] != "draft":
+            return HTMLResponse("<h2>임시저장 상태의 문서만 수정할 수 있습니다</h2>", status_code=400)
+        slip_lines_rows = [dict(s) for s in conn.execute(
+            "SELECT * FROM slip_lines WHERE doc_id=? ORDER BY line_no", (doc_id,)
+        ).fetchall()]
+        users = [dict(u) for u in conn.execute(
+            "SELECT id, name, dept, position FROM users WHERE id != ? ORDER BY dept, name", (uid,)
+        ).fetchall()]
+        approval = [dict(a) for a in conn.execute(
+            "SELECT * FROM approval_lines WHERE doc_id=? ORDER BY step", (doc_id,)
+        ).fetchall()]
+    finally:
+        conn.close()
+    doc = dict(doc)
+    reviewer_id = next((a["approver_id"] for a in approval if a["role"] == "검토"), "")
+    approver_id = next((a["approver_id"] for a in approval if a["role"] == "승인"), "")
+    return templates.TemplateResponse(
+        request=request, name="erp/erp_slip_form.html", context={
+            "request": request, "page_title": "전표 수정",
+            "user_name": get_current_user(request)["user_name"],
+            "users": users,
+            "edit_mode": True, "doc": doc,
+            "slip_lines": slip_lines_rows,
+            "reviewer_id": reviewer_id, "approver_id": approver_id,
+        }
+    )
+
+
+@router.post("/api/slip/{doc_id}")
+async def update_slip(
+    request: Request, doc_id: int,
+    title: str = Form(""), content: str = Form(""),
+    slip_type: str = Form(""), slip_date: str = Form(""),
+    dept: str = Form(""),
+    reviewer_id: int = Form(...),
+    approver_id: int = Form(...),
+    line_count: str = Form(""),
+    attachment: Optional[UploadFile] = File(None),
+    save_mode: str = Form("submit"),
+):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+    uid = get_current_user(request)["user_id"]
+    uname = get_current_user(request)["user_name"]
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    conn = get_sqlite()
+    try:
+        doc = conn.execute("SELECT * FROM erp_docs WHERE id=?", (doc_id,)).fetchone()
+        if not doc or doc["user_id"] != uid or doc["status"] != "draft":
+            return JSONResponse({"error": "수정할 수 없는 문서입니다."}, status_code=400)
+        form = await request.form()
+        line_nums = [n.strip() for n in line_count.split(",") if n.strip()]
+        lines = []
+        for i, ln in enumerate(line_nums):
+            account = form.get(f"account_{ln}", "")
+            account_code = form.get(f"account_code_{ln}", "")
+            debit = int(form.get(f"debit_{ln}", 0) or 0)
+            credit = int(form.get(f"credit_{ln}", 0) or 0)
+            partner = form.get(f"partner_{ln}", "")
+            summary = form.get(f"summary_{ln}", "")
+            if account:
+                lines.append((i + 1, account, account_code, debit, credit, partner, summary))
+        total_debit = sum(l[3] for l in lines)
+        total_credit = sum(l[4] for l in lines)
+        if total_debit != total_credit:
+            return JSONResponse({"error": "차변·대변 합계가 일치하지 않습니다."}, status_code=400)
+
+        import uuid, pathlib
+        saved_name = doc["attachment"] or ""
+        if attachment and attachment.filename:
+            ext = pathlib.Path(attachment.filename).suffix
+            content_bytes = await attachment.read()
+            ALLOWED_EXTENSIONS = {".pdf", ".png", ".jpg", ".jpeg", ".gif", ".xlsx", ".xls", ".docx", ".doc", ".pptx", ".ppt", ".hwp", ".txt", ".zip"}
+            MAX_UPLOAD_SIZE = 10 * 1024 * 1024
+            if ext.lower() not in ALLOWED_EXTENSIONS:
+                return JSONResponse({"error": "허용되지 않는 파일 형식입니다."}, status_code=400)
+            if len(content_bytes) > MAX_UPLOAD_SIZE:
+                return JSONResponse({"error": "파일 크기가 10MB를 초과합니다."}, status_code=413)
+            safe_name = f"{uuid.uuid4().hex}{ext}"
+            upload_dir = pathlib.Path("static/uploads/erp")
+            upload_dir.mkdir(parents=True, exist_ok=True)
+            (upload_dir / safe_name).write_bytes(content_bytes)
+            saved_name = f"{attachment.filename}|{safe_name}"
+
+        is_draft = (save_mode == "draft")
+        doc_status = "draft" if is_draft else "wait"
+        conn.execute(
+            "UPDATE erp_docs SET title=?, content=?, slip_type=?, slip_date=?, dept=?, slip_total=?, attachment=?, status=? WHERE id=?",
+            (title, content, slip_type, slip_date, dept, total_debit, saved_name, doc_status, doc_id)
+        )
+        conn.execute("DELETE FROM slip_lines WHERE doc_id=?", (doc_id,))
+        for line_no, account, account_code, debit, credit, partner, summary in lines:
+            conn.execute(
+                "INSERT INTO slip_lines (doc_id, line_no, account_name, account_code, debit, credit, partner, summary) VALUES (?,?,?,?,?,?,?,?)",
+                (doc_id, line_no, account, account_code, debit, credit, partner, summary)
+            )
+        conn.execute("DELETE FROM approval_lines WHERE doc_id=?", (doc_id,))
+        if is_draft:
+            conn.execute("INSERT INTO approval_lines (doc_id, step, approver_id, role, status) VALUES (?,?,?,?,?)",
+                         (doc_id, 0, uid, "기안", "pending"))
+        else:
+            conn.execute("INSERT INTO approval_lines (doc_id, step, approver_id, role, status, acted_at) VALUES (?,?,?,?,?,?)",
+                         (doc_id, 0, uid, "기안", "approved", now))
+        conn.execute("INSERT INTO approval_lines (doc_id, step, approver_id, role, status) VALUES (?,?,?,?,?)",
+                     (doc_id, 1, reviewer_id, "검토", "pending"))
+        conn.execute("INSERT INTO approval_lines (doc_id, step, approver_id, role, status) VALUES (?,?,?,?,?)",
+                     (doc_id, 2, approver_id, "승인", "pending"))
+        conn.execute("INSERT INTO doc_history (doc_id, user_id, user_name, action, comment) VALUES (?,?,?,?,?)",
+                     (doc_id, uid, uname, "수정", ""))
+        conn.commit()
+    finally:
+        conn.close()
+    return RedirectResponse(url="/erp_fa", status_code=303)
+
+
+@router.post("/api/slip/{doc_id}/delete")
+async def delete_slip(request: Request, doc_id: int):
+    if not check_login(request):
+        return JSONResponse({"error": "not logged in"}, status_code=401)
+    uid = get_current_user(request)["user_id"]
+    conn = get_sqlite()
+    try:
+        doc = conn.execute("SELECT * FROM erp_docs WHERE id=?", (doc_id,)).fetchone()
+        if not doc:
+            return JSONResponse({"error": "문서를 찾을 수 없습니다."}, status_code=404)
+        if doc["user_id"] != uid:
+            return JSONResponse({"error": "본인 문서만 삭제할 수 있습니다."}, status_code=403)
+        if doc["status"] != "draft":
+            return JSONResponse({"error": "임시저장 상태의 문서만 삭제할 수 있습니다."}, status_code=400)
+        conn.execute("DELETE FROM slip_lines WHERE doc_id=?", (doc_id,))
+        conn.execute("DELETE FROM approval_lines WHERE doc_id=?", (doc_id,))
+        conn.execute("DELETE FROM doc_history WHERE doc_id=?", (doc_id,))
+        conn.execute("DELETE FROM erp_docs WHERE id=?", (doc_id,))
+        conn.commit()
+    finally:
+        conn.close()
+    return JSONResponse({"ok": True})
+
+
+@router.get("/erp_doc/{doc_id}/trade_statement", response_class=HTMLResponse)
+async def trade_statement(request: Request, doc_id: int):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+    conn = get_sqlite()
+    try:
+        doc = conn.execute(
+            "SELECT e.*, u.name as author_name FROM erp_docs e LEFT JOIN users u ON e.user_id=u.id WHERE e.id=?",
+            (doc_id,)
+        ).fetchone()
+        if not doc:
+            return HTMLResponse("<h2>문서를 찾을 수 없습니다</h2>", status_code=404)
+        slip_lines_data = [dict(s) for s in conn.execute(
+            "SELECT * FROM slip_lines WHERE doc_id=? ORDER BY line_no", (doc_id,)
+        ).fetchall()]
+    finally:
+        conn.close()
+    return templates.TemplateResponse(request=request, name="erp/trade_statement.html", context={
+        "request": request, "doc": dict(doc), "slip_lines": slip_lines_data,
+        "company": {"name": "(주)원플러스", "biz_no": "123-86-00001", "representative": "대표이사",
+                     "address": "서울특별시 강남구 테헤란로 123", "biz_type": "서비스업", "biz_item": "소프트웨어 개발"},
+    })
+
+
+@router.get("/erp_doc/{doc_id}/receipt", response_class=HTMLResponse)
+async def receipt(request: Request, doc_id: int):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+    conn = get_sqlite()
+    try:
+        doc = conn.execute(
+            "SELECT e.*, u.name as author_name FROM erp_docs e LEFT JOIN users u ON e.user_id=u.id WHERE e.id=?",
+            (doc_id,)
+        ).fetchone()
+        if not doc:
+            return HTMLResponse("<h2>문서를 찾을 수 없습니다</h2>", status_code=404)
+        slip_lines_data = [dict(s) for s in conn.execute(
+            "SELECT * FROM slip_lines WHERE doc_id=? ORDER BY line_no", (doc_id,)
+        ).fetchall()]
+    finally:
+        conn.close()
+    return templates.TemplateResponse(request=request, name="erp/receipt.html", context={
+        "request": request, "doc": dict(doc), "slip_lines": slip_lines_data,
+        "company": {"name": "(주)원플러스", "biz_no": "123-86-00001", "representative": "대표이사",
+                     "address": "서울특별시 강남구 테헤란로 123"},
+    })
+
+
+@router.get("/erp_doc/{doc_id}/tax_invoice", response_class=HTMLResponse)
+async def tax_invoice(request: Request, doc_id: int):
+    if not check_login(request):
+        return RedirectResponse(url="/login", status_code=303)
+    conn = get_sqlite()
+    try:
+        doc = conn.execute(
+            "SELECT e.*, u.name as author_name FROM erp_docs e LEFT JOIN users u ON e.user_id=u.id WHERE e.id=?",
+            (doc_id,)
+        ).fetchone()
+        if not doc:
+            return HTMLResponse("<h2>문서를 찾을 수 없습니다</h2>", status_code=404)
+        slip_lines_data = [dict(s) for s in conn.execute(
+            "SELECT * FROM slip_lines WHERE doc_id=? ORDER BY line_no", (doc_id,)
+        ).fetchall()]
+    finally:
+        conn.close()
+    return templates.TemplateResponse(request=request, name="erp/tax_invoice.html", context={
+        "request": request, "doc": dict(doc), "slip_lines": slip_lines_data,
+        "company": {"name": "(주)원플러스", "biz_no": "123-86-00001", "representative": "대표이사",
+                     "address": "서울특별시 강남구 테헤란로 123", "biz_type": "서비스업", "biz_item": "소프트웨어 개발"},
+    })
 
 
 @router.get("/api/erp_docs")

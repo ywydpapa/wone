@@ -280,6 +280,43 @@ def run_migrations():
     except Exception:
         pass
 
+    try:
+        conn.execute("ALTER TABLE slip_lines ADD COLUMN account_code TEXT DEFAULT ''")
+        conn.commit()
+    except Exception:
+        pass
+
+    try:
+        conn.execute("""CREATE TABLE IF NOT EXISTS accounts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            code TEXT UNIQUE NOT NULL,
+            name TEXT NOT NULL,
+            category TEXT NOT NULL,
+            is_debit INTEGER DEFAULT 1,
+            parent_code TEXT DEFAULT '',
+            is_active INTEGER DEFAULT 1
+        )""")
+        conn.commit()
+    except Exception:
+        pass
+
+    try:
+        conn.execute("""CREATE TABLE IF NOT EXISTS partners (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            code TEXT UNIQUE NOT NULL,
+            name TEXT NOT NULL,
+            biz_no TEXT DEFAULT '',
+            representative TEXT DEFAULT '',
+            biz_type TEXT DEFAULT '',
+            biz_item TEXT DEFAULT '',
+            address TEXT DEFAULT '',
+            phone TEXT DEFAULT '',
+            is_active INTEGER DEFAULT 1
+        )""")
+        conn.commit()
+    except Exception:
+        pass
+
     conn.close()
 
 
